@@ -3,5 +3,5 @@ class Schedule():
         if len(shifts) != 21:
             raise Exception("Must be exactly 21 shifts")
 
-        shifts = shifts
-        nurses = nurses
+        self.shifts = shifts
+        self.nurses = nurses
