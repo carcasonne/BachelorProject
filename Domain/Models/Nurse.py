@@ -4,4 +4,4 @@ class Nurse():
         self.grade = grade
 
     def print(self):
-        print(str(self.id) + " is of grade: " + self.grade)
+        print(str(self.id) + " is of grade: " + str(self.grade))

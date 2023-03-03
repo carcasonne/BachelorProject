@@ -1,3 +1,3 @@
-class Class1:
+class Class1TabuSearch:
     def print(self):
         print("TabuSearch done")

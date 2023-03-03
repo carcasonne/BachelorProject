@@ -23,11 +23,11 @@ class IdiotParser:
             Grade.THREE: 3
         }
         i = 0
-        for s in shifts:
+        while i < 21:
             if i % 3 == 0:
-                shifts[i] = Shift(requirements, True)
+                shifts.append(Shift(requirements, True))
             else:
-                shifts[i] = Shift(requirements, False)
+                shifts.append(Shift(requirements, False))
 
             i += 1
 

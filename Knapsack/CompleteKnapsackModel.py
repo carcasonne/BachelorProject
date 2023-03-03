@@ -1,7 +1,8 @@
 import Domain.Models.Shift
 import Domain.Models.Schedule
 
-class CompleteKnapSackModel :
+
+class CompleteKnapSackModel:
     def __init__(self, schedule):
         self.__schedule = schedule
         self.e = sum(1 for shift in schedule.shifts if shift.isNightShift())

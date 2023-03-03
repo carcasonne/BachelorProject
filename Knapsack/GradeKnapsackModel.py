@@ -1,7 +1,8 @@
 import Domain.Models.Shift
 import Domain.Models.Schedule
 
-class GradeKnapsackModel :
+
+class GradeKnapsackModel:
     def __init__(self, schedule):
         self.__schedule = schedule
         self.e = sum(1 for shift in schedule.shifts if shift.isNightShift())

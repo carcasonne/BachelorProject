@@ -1,6 +1,6 @@
-from Parsers.IdiotParser import *
-from Parsers.XMLParser import *
-from Parsers.JSONParser import *
+from Parser.Parsers.IdiotParser import *
+from Parser.Parsers.XMLParser import *
+from Parser.Parsers.JSONParser import *
 
 
 class NurseParser:
