@@ -12,7 +12,7 @@ internal class IdiotParser
         var shifts = new Shift[21];
 
         var nurse1 = new Nurse("Jens", Grade.ONE);
-        var nurse2 = new Nurse("Emma", Grade.TWO);
+        var nurGse2 = new Nurse("Emma", Grade.TWO);
         var nurse3 = new Nurse("Paolo", Grade.THREE);
 
         nurses.Add(nurse1);

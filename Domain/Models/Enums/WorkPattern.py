@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ShiftType(Enum):
     FIVEORFOUR = 1
     FOURORTHREE = 2
