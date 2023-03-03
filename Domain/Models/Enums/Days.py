@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class ShiftType(Enum):
     SUNDAY = 1
     MONDAY = 2
