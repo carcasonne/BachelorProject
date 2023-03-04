@@ -1,6 +1,6 @@
 from Parser.NurseParser import *
 from Knapsack.SimpleKnapsackModel import *
-from TabuSearch.Class1TabuSearch import *
+from TabuSearch.TabuSearch import *
 from NetworkFlow.Class1NetworkFlow import *
 
 tabuSearch = Class1TabuSearch()
