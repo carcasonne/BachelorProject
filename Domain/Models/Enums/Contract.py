@@ -1,7 +1,6 @@
 from enum import Enum
 
-
-class ShiftType(Enum):
+class Contract(Enum):
     FIVEORFOUR = 1
     FOURORTHREE = 2
     THREEORTWO = 3

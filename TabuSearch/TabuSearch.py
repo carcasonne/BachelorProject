@@ -1,3 +1,5 @@
+# Based on this article https://towardsdatascience.com/optimization-techniques-tabu-search-36f197ef8e25
+
 class TabuSearch:
     def __init__(self, initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure):
         self.currSolution = initialSolution
@@ -7,12 +9,6 @@ class TabuSearch:
         self.neighborOperator = neighborOperator
         self.acceptableScoreThreshold = acceptableScoreThreshold
         self.tabuTenure = tabuTenure
-
-    def coveringCostIsMet(self):
-        pass
-
-    def penaltyCostIsMet(self):
-        pass
 
     def isTerminationCriteriaMet(self):
         # can add more termination criteria
@@ -51,3 +47,22 @@ class TabuSearch:
 
         # return best solution found
         return self.bestSolution
+
+    def StandardMove(self):
+        pass
+
+    def SwapMove(self):
+        pass
+
+    def ShiftMove(self):
+        pass
+
+    def ChainMove(self):
+        pass
+
+    def EvaluateCC(self):
+        pass
+
+    def EvaluatePC(self):
+        pass
+
