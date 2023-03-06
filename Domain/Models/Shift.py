@@ -2,9 +2,10 @@ from Domain.Models.Enums.Grade import Grade
 
 
 class Shift:
-    def __init__(self, coverRequirements, shiftType, nightShift):
+    def __init__(self, coverRequirements, shiftType, nightShift, shiftDay):
         self.coverRequirements = coverRequirements
         self.assignedNurses = []
+        self.shiftDay = shiftDay
         self.shiftType = shiftType
         self.nightShift = nightShift
 
