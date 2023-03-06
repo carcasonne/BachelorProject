@@ -30,3 +30,5 @@ class TabuSchedule:
         finalString = ""
         for shift in self.shifts:
             finalString = str(shift) + "\n"
+
+        return finalString

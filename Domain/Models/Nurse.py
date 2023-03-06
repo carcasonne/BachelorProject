@@ -7,8 +7,8 @@ class Nurse:
         self.grade = grade
         self.assignedShiftPattern = None
 
-    def AssignShift(self, shift):
-        self.assignedShiftPattern = shift
+    def AssignShiftPattern(self, shiftPattern): # A bit representation of ether (day-night) or (early, late, night)
+        self.assignedShiftPattern = shiftPattern
 
     def print(self):
         print(str(self.id) + " is of grade: " + str(self.grade))
