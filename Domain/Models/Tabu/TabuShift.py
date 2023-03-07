@@ -3,7 +3,7 @@ from Domain.Models.Enums.Grade import Grade
 class TabuShift:
     def __init__(self, coverRequirements, tabuShiftType, shiftDay):
         self.coverRequirements = coverRequirements
-        self.assignedNurses = [set()]
+        self.assignedNurses = [set(), set(), set()]
         self.tabuShiftType = tabuShiftType
         self.shiftDay = shiftDay
 
@@ -23,7 +23,7 @@ class TabuShift:
         bitShifts = (self.shiftDay - 1)
         return int('1', 2) <<  bitShifts
 
-    def Print(self):
-        finalString = "ST" + self.tabuShiftType + "CR: " + self.coverRequirements[Grade.ONE] + ", " + \
-                      self.coverRequirements[Grade.TWO] + ", " + self.coverRequirements[Grade.THREE] + "\n Assigned: "
+    def __str__(self):
+        finalString = "ST " + str(self.tabuShiftType) + " CR: " + str(self.coverRequirements[Grade.ONE]) + ", " + \
+                      str(self.coverRequirements[Grade.TWO]) + ", " + str(self.coverRequirements[Grade.THREE])
         return finalString

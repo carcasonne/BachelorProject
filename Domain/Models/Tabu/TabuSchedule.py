@@ -24,7 +24,7 @@ class TabuSchedule:
         CC = 0
         for shift in self.shifts:
             for grade in shift.coverRequirements:
-                CC += shift.coverRequirements[grade] - len(shift.assignedNurses[grade])
+                CC += shift.coverRequirements[grade] - len(shift.assignedNurses[grade.value - 1])
         return max(0, CC)
 
     def CalculatePC(self):
@@ -33,6 +33,6 @@ class TabuSchedule:
     def __str__(self):
         finalString = ""
         for shift in self.shifts:
-            finalString = str(shift) + "\n"
+            finalString += str(shift) + "\n"
 
         return finalString
