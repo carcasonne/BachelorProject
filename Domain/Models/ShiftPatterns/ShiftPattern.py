@@ -13,4 +13,4 @@ class StandardShiftPattern(ShiftPattern):
 class TabuShiftPattern(ShiftPattern):
     def __init__(self, day, night):
         super().__init__(night)
-        self.day = None
+        self.day = day
