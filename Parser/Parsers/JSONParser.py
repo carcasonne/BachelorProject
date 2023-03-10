@@ -28,6 +28,10 @@ class JSONParser:
                 nurses.append(nurse)
             
             for days in jsonData["Shifts"]:
+                dayName = None
+                for name in days:
+                    dayName = name
+                 
                 day = list(days.values())[0]
                 for rawShift in day:
                     strShiftType    = rawShift["ShiftType"]
@@ -36,7 +40,7 @@ class JSONParser:
                     noGradeThree    = rawShift["Grade3"]
 
                     shiftType   = self.strToShiftType(strShiftType)
-                    isNightshift = shiftType == ShiftType.NIGHT
+                    dayType     = self.strToDay(dayName)
 
                     coverRequirements = {
                         Grade.ONE: noGradeOne,
@@ -44,7 +48,7 @@ class JSONParser:
                         Grade.THREE: noGradeThree 
                     }
 
-                    shift = Shift(coverRequirements, shiftType, isNightshift)
+                    shift = Shift(coverRequirements, shiftType, dayType)
                     shifts.append(shift)
 
             return Schedule(shifts, nurses)
@@ -70,8 +74,8 @@ class JSONParser:
                 return Days.MONDAY
             case "tuesday":
                 return Days.TUESDAY 
-            case "wednessday":
-                return Days.WEDNESSDAY
+            case "wednesday":
+                return Days.WEDNESDAY
             case "thursday":
                 return Days.THURSDAY
             case "friday":

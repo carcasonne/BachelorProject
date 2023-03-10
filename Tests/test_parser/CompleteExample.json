@@ -16,7 +16,7 @@
         "DaysOffPreference": {
           "Monday": false,
           "Tuesday": false,
-          "Wednessday": false,
+          "Wednesday": false,
           "Thursday": false,
           "Friday": false,
           "Saturday": false,
@@ -25,7 +25,7 @@
         "ShiftPreference// Only relevant if nurse assigned to Day shift?": {
           "Monday": "Early",
           "Tuesday": "Early",
-          "Wednessday": "Early",
+          "Wednesday": "Early",
           "Thursday": "Early",
           "Friday": "Early",
           "Saturday": "Early",
@@ -79,7 +79,7 @@
         ]
       },
       {
-        "Wednessday": [
+        "Wednesday": [
           {
             "ShiftType": "Early",
             "Grade1": 1,

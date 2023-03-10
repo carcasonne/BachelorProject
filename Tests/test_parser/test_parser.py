@@ -49,14 +49,17 @@ class TestJsonParser(unittest.TestCase):
         }
 
         shifts = []
-        for i in range(0, 21):
-            n = i % 3
-            n = n + 1
+        for i in range(7):
+            n = i + 1;
+            day = self.intToDay(n)
 
-            shiftType = self.intToShiftType(n)
-            isNightshift = shiftType == ShiftType.NIGHT
-            shift = Shift(mockCoverRequirements, shiftType, isNightshift)
-            shifts.append(shift)
+            for i in range(3):
+                n = i % 3
+                n = n + 1
+
+                shiftType = self.intToShiftType(n)
+                shift = Shift(mockCoverRequirements, shiftType, day)
+                shifts.append(shift)
         
         return Schedule(shifts, nurses)
     
@@ -70,6 +73,25 @@ class TestJsonParser(unittest.TestCase):
                 return ShiftType.NIGHT
             case _:
                 raise ValueError(f'{shift} has to be either early, late, or night')
+    
+    def intToDay(self, i):
+        match i:
+            case 1:
+                return Days.MONDAY
+            case 2:
+                return Days.TUESDAY 
+            case 3:
+                return Days.WEDNESDAY
+            case 4:
+                return Days.THURSDAY
+            case 5:
+                return Days.FRIDAY
+            case 6:
+                return Days.SATURDAY
+            case 7:
+                return Days.SUNDAY
+            case _:
+                raise ValueError(f'{i} not recognized as a valid index for day')
 
 if __name__ == '__main__':
     unittest.main()

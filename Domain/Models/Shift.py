@@ -20,5 +20,5 @@ class Shift:
             # don't attempt to compare against unrelated types
             return False
 
-        return  (self.shiftType == other.shiftType and 
-                 self.nightShift == other.nightShift)
+        return (self.shiftType == other.shiftType and
+                self.shiftDay == other.shiftDay)
