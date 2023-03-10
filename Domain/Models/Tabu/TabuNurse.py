@@ -1,4 +1,4 @@
-import itertools
+from itertools import combinations
 from Domain.Models.ShiftPatterns.ShiftPattern import TabuShiftPattern
 from Domain.Models.Tabu.TabuShiftType import TabuShiftType
 
@@ -9,7 +9,9 @@ class TabuNurse:
         self.contract = nurse.contract
         self.grade = nurse.grade
         self.feasibleWorkPatterns = []
-        self.assignedShiftPattern = TabuShiftPattern(int('0000000', 2), int('0000000', 2))
+        self.assignedShiftPattern = TabuShiftPattern([0] * 7, [0] * 7)
+
+        self.findWorkPatterns()
 
     def assignShiftPattern(self, shiftPattern):  # A bit representation of ether (day, night) or (early, late, night)
         self.assignedShiftPattern = TabuShiftPattern(shiftPattern.day, shiftPattern.night)
@@ -25,7 +27,23 @@ class TabuNurse:
         pass
 
     def findWorkPatterns(self):
-        pass
+        counter = 0
+        while counter <= 1:
+            if counter == 0:
+                combs = combinations(range(7), self.contract.days)
+            else:
+                combs = combinations(range(7), self.contract.nights)
+
+            for comb in combs:
+                bitstring = [0] * 7
+                for i in comb:
+                    bitstring[i] = 1
+                if counter == 0:
+                    self.feasibleWorkPatterns.append((bitstring, [0] * 7))
+                else:
+                    self.feasibleWorkPatterns.append(([0] * 7, bitstring))
+            counter += 1
 
     def print(self):
         print("... To Be Continued ...")
+        print(self.feasibleWorkPatterns)
