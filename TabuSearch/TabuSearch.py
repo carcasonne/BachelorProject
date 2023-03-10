@@ -6,23 +6,21 @@ from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 
 class TabuSearch:
     def __init__(self, initialSchedule):
-        self.currSolution = TabuSchedule(initialSchedule)
-        for nurse in self.currSolution.nurses:
+        tabuSchedule = TabuSchedule(initialSchedule)
+        for nurse in tabuSchedule.nurses:
             pattern = random.choice(nurse.feasibleShiftPatterns)
             counter = 0
-            for full in pattern:
-                for dayOrNight in full:
-                    if dayOrNight == 1:
-                        self.currSolution.shifts[(dayOrNight + counter)*2].assignNurse(nurse)
+            for dayOrNightShifts in pattern:
+                for weekday in range(7):
+                    if dayOrNightShifts[weekday] == 1:
+                        print(str(weekday*2+counter))
+                        tabuSchedule.shifts[weekday*2+counter].assignNurse(nurse)
                 counter += 1
             nurse.assignShiftPattern(pattern)
-        self.currSolution.calculatePC()
-        self.currSolution.calculateCC()
-        self.currSolution.calculateLB()
+        tabuSchedule.updateAll()
 
-
-
-        self.bestSolution = self.currSolution
+        self.currSolution = tabuSchedule
+        self.bestSolution = tabuSchedule
         self.dayNightTabuList = []
         self.nurseTabuList = []
         self.dayNightCounter = 0

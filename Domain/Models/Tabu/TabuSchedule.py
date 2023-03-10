@@ -3,9 +3,11 @@ from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuShift import TabuShift
 from Domain.Models.Tabu.TabuShiftType import TabuShiftType
 
-
 class TabuSchedule:
     def __init__(self, Schedule):
+        self.CC = None
+        self.PC = None
+        self.LB = None
         self.nurses = list(map(lambda n: TabuNurse(n), Schedule.nurses))
         self.shifts = []
         for x in range(len(Schedule.shifts)):
@@ -20,22 +22,22 @@ class TabuSchedule:
                 self.shifts.append(TabuShift(requirements, TabuShiftType.DAY, Schedule.shifts[x].shiftDay))
         if len(self.shifts) != 14:
             raise Exception("Must be exactly 14 shifts")
-        self.CC = self.calculateCC()
-        self.PC = self.calculatePC()
-        self.LB = self.calculateLB()
+        self.updateAll()
 
     def calculateCC(self):
         CC = 0
         for shift in self.shifts:
             for grade in shift.coverRequirements:
-                CC += shift.coverRequirements[grade] - len(shift.assignedNurses[grade.value - 1])
-        return max(0, CC)
+                diff = shift.coverRequirements[grade] - len(shift.assignedNurses[grade.value - 1])
+                if diff > 0:
+                    CC += diff
+        self.CC = CC
 
     def calculatePC(self):
-        return -1
+        self.PC = -1
 
     def calculateLB(self):
-        return -1
+        self.LB = -1
 
     def __str__(self):
         finalString = ""
@@ -43,3 +45,13 @@ class TabuSchedule:
             finalString += str(shift) + "\n"
 
         return finalString
+
+    def update(self, CC, PC, LB):
+        if CC: self.calculateCC()
+        if PC: self.calculatePC()
+        if LB: self.calculateLB()
+
+    def updateAll(self):
+        self.calculateCC()
+        self.calculatePC()
+        self.calculateLB()
