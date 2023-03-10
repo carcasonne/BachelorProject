@@ -1,11 +1,12 @@
 from Domain.Models.Enums.Grade import Grade
+from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuShift import TabuShift
 from Domain.Models.Tabu.TabuShiftType import TabuShiftType
 
 
 class TabuSchedule:
     def __init__(self, Schedule):
-        self.nurses = Schedule.nurses
+        self.nurses = map(lambda n: TabuNurse(n), Schedule.nurses)
         self.shifts = []
         for x in range(len(Schedule.shifts)):
             if (x+1)%3 == 0:
@@ -19,6 +20,9 @@ class TabuSchedule:
                 self.shifts.append(TabuShift(requirements, TabuShiftType.DAY, Schedule.shifts[x].shiftDay))
         if len(self.shifts) != 14:
             raise Exception("Must be exactly 14 shifts")
+        self.CC = self.calculateCC()
+        self.PC = self.calculatePC()
+        self.LB = self.calculateLB()
 
     def calculateCC(self):
         CC = 0
@@ -28,7 +32,10 @@ class TabuSchedule:
         return max(0, CC)
 
     def calculatePC(self):
-        pass
+        return -1
+
+    def calculateLB(self):
+        return -1
 
     def __str__(self):
         finalString = ""
