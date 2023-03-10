@@ -6,7 +6,7 @@ from Domain.Models.Tabu.TabuShiftType import TabuShiftType
 
 class TabuSchedule:
     def __init__(self, Schedule):
-        self.nurses = map(lambda n: TabuNurse(n), Schedule.nurses)
+        self.nurses = list(map(lambda n: TabuNurse(n), Schedule.nurses))
         self.shifts = []
         for x in range(len(Schedule.shifts)):
             if (x+1)%3 == 0:

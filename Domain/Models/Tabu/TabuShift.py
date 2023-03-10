@@ -11,8 +11,7 @@ class TabuShift:
     def assignNurse(self, nurse):
         if nurse in self.assignedNurses:
             raise Exception("Nurse is already assigned to this shift")
-        self.assignedNurses[nurse.grade].add(nurse)
-        nurse.assignedShiftPattern += self.ToBit()
+        self.assignedNurses[nurse.grade.value - 1].add(nurse)
 
     def removeNurse(self, nurse):
         if nurse not in self.assignedNurses:

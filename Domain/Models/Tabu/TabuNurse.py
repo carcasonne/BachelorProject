@@ -8,13 +8,13 @@ class TabuNurse:
         self.id = nurse.id
         self.contract = nurse.contract
         self.grade = nurse.grade
-        self.feasibleWorkPatterns = []
+        self.feasibleShiftPatterns = []
         self.assignedShiftPattern = TabuShiftPattern([0] * 7, [0] * 7)
 
-        self.findWorkPatterns()
+        self.findShiftPatterns()
 
     def assignShiftPattern(self, shiftPattern):  # A bit representation of ether (day, night) or (early, late, night)
-        self.assignedShiftPattern = TabuShiftPattern(shiftPattern.day, shiftPattern.night)
+        self.assignedShiftPattern = TabuShiftPattern(shiftPattern[0], shiftPattern[1])
 
     def shiftIsCovered(self, shift): # 1 = shift pattern covers the shift, 0 = shift pattern does not cover the shift
         if shift.shiftType == TabuShiftType.DAY:
@@ -26,7 +26,7 @@ class TabuNurse:
     def penalty(self):
         pass
 
-    def findWorkPatterns(self):
+    def findShiftPatterns(self):
         counter = 0
         while counter <= 1:
             if counter == 0:
@@ -39,11 +39,11 @@ class TabuNurse:
                 for i in comb:
                     bitstring[i] = 1
                 if counter == 0:
-                    self.feasibleWorkPatterns.append((bitstring, [0] * 7))
+                    self.feasibleShiftPatterns.append((bitstring, [0] * 7))
                 else:
-                    self.feasibleWorkPatterns.append(([0] * 7, bitstring))
+                    self.feasibleShiftPatterns.append(([0] * 7, bitstring))
             counter += 1
 
     def print(self):
         print("... To Be Continued ...")
-        print(self.feasibleWorkPatterns)
+        print(self.feasibleShiftPatterns)

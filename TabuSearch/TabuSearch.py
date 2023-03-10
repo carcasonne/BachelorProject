@@ -8,13 +8,13 @@ class TabuSearch:
     def __init__(self, initialSchedule):
         self.currSolution = TabuSchedule(initialSchedule)
         for nurse in self.currSolution.nurses:
-            workpattern = random.choice(nurse.feasibleShiftPatterns)
+            pattern = random.choice(nurse.feasibleShiftPatterns)
             counter = 0
-            for full in workpattern:
+            for full in pattern:
                 for dayOrNight in full:
                     if dayOrNight == 1:
                         self.currSolution.shifts[dayOrNight + counter].assignNurse(nurse)
-            nurse.assignShiftPattern(workpattern)
+            nurse.assignShiftPattern(pattern)
         self.currSolution.calculatePC()
         self.currSolution.calculateCC()
         self.currSolution.calculateLB()
