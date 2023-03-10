@@ -1,3 +1,3 @@
-class Class1NetworkFlow():
+class NetworkFlow:
     def print(self):
         print("Network flow done")
