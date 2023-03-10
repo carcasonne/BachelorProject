@@ -1,7 +1,12 @@
-from enum import Enum
+class Contract():
+    def __init__(self, days, nights):
+        self.days = days
+        self.nights = nights
+    
+    def __eq__(self, other): 
+        if not isinstance(other, Contract):
+            # don't attempt to compare against unrelated types
+            return False
 
-class Contract(Enum):
-    FIVEORFOUR = 1
-    FOURORTHREE = 2
-    THREEORTWO = 3
-    THREEORTHREE = 4
+        return  (self.days == other.days and 
+                 self.nights == other.nights)
