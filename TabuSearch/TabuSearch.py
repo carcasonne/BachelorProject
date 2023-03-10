@@ -31,20 +31,32 @@ class TabuSearch:
         pass
         return self.bestSolution
 
-    def StandardMove(self):
+    # PHASE 1:
+
+    def randomDescent(self):
+        if self.currSolution == 0:
+            self.storeDetails()
+        else:
+
+
+    def balanceRestoration(self):
         pass
 
-    def SwapMove(self):
+    def shiftChainMoves(self):
         pass
 
-    def ShiftMove(self):
+    def nurseChainMoves(self):
         pass
 
-    def ChainMove(self):
+    def moveUnderCovering(self):
         pass
 
-    def EvaluateCC(self):
+    def randomKick(self):
         pass
 
-    def EvaluatePC(self):
+
+
+    # PHASE 2:
+
+    def storeDetails(self):
         pass

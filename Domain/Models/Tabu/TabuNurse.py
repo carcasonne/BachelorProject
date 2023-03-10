@@ -8,6 +8,7 @@ class TabuNurse:
         self.id = nurse.id
         self.contract = nurse.contract
         self.grade = nurse.grade
+        self.PC = 0
         self.feasibleShiftPatterns = []
         self.assignedShiftPattern = TabuShiftPattern([0] * 7, [0] * 7)
 
@@ -23,8 +24,8 @@ class TabuNurse:
             DayOrNightPattern = self.assignedShiftPattern.night
         return bool(DayOrNightPattern & shift.ToBit())
 
-    def penalty(self):
-        pass
+    def calcPC(self, fromMove, toMove):
+        return self.PC
 
     def findShiftPatterns(self):
         counter = 0
