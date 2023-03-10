@@ -2,6 +2,8 @@ from Parser.Parsers.IdiotParser import *
 from Parser.Parsers.XMLParser import *
 from Parser.Parsers.JSONParser import *
 
+import json
+
 
 class NurseParser:
     def __init__(self):
@@ -15,5 +17,9 @@ class NurseParser:
     def parseFromXML(self, xml):
         return self.xmlParser.parse(xml)
 
-    def parseFromJSON(self, json):
-        return self.jsonParser.parse(json)
+    def parseFromJSON(self, filePath):
+        file = open(filePath)
+        jsonData = json.load(file)
+        parsedData = self.jsonParser.parse(jsonData)
+        
+        return parsedData

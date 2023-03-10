@@ -1,6 +1,4 @@
 from Domain.Models.Enums.Grade import Grade
-
-
 class Shift:
     def __init__(self, coverRequirements, shiftType, shiftDay):
         self.coverRequirements = coverRequirements
@@ -16,3 +14,11 @@ class Shift:
         for nurse in self.assignedNurses:
             finalString += nurse.id + ", "
         return finalString
+    
+    def __eq__(self, other): 
+        if not isinstance(other, Shift):
+            # don't attempt to compare against unrelated types
+            return False
+
+        return (self.shiftType == other.shiftType and
+                self.shiftDay == other.shiftDay)
