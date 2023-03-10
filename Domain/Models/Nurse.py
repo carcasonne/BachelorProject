@@ -1,10 +1,10 @@
 from Domain.Models.Enums import Contract
 
 class Nurse:
-    def __init__(self, grade, contract):
+    def __init__(self, id, grade, contract):
         self.id = id
-        self.contract = contract
         self.grade = grade
+        self.contract = contract
         self.assignedShiftPattern = None
 
     def AssignShiftPattern(self, shiftPattern): # A bit representation of ether (day-night) or (early, late, night)
@@ -12,3 +12,12 @@ class Nurse:
 
     def print(self):
         print(str(self.id) + " is of grade: " + str(self.grade))
+
+    def __eq__(self, other): 
+        if not isinstance(other, Nurse):
+            # don't attempt to compare against unrelated types
+            return False
+
+        return  (self.id == other.id and 
+                 self.grade == other.grade and
+                 self.contract == other.contract)

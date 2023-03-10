@@ -1,0 +1,192 @@
+{
+    "StartDate": "2023-04-01",
+    "DurationWeeks": "3",
+    "Nurses": [
+      {
+        "Id": 1,
+        "Grade": 1,
+        "Contract": {
+          "Days": 5,
+          "Nights": 4
+        },
+        "PaidLeave": {
+          "StartDate": "2023-04-01",
+          "EndDate": "2023-04-08"
+        },
+        "DaysOffPreference": {
+          "Monday": false,
+          "Tuesday": false,
+          "Wednessday": false,
+          "Thursday": false,
+          "Friday": false,
+          "Saturday": false,
+          "Sunday": false
+        },
+        "ShiftPreference// Only relevant if nurse assigned to Day shift?": {
+          "Monday": "Early",
+          "Tuesday": "Early",
+          "Wednessday": "Early",
+          "Thursday": "Early",
+          "Friday": "Early",
+          "Saturday": "Early",
+          "Sunday": "Early"
+        }
+      }
+    ],
+    "Shifts": [
+      {
+        "Monday": [
+          {
+            "ShiftType": "Early",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Late",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Night",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          }
+        ]
+      },
+      {
+        "Tuesday": [
+          {
+            "ShiftType": "Early",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Late",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Night",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          }
+        ]
+      },
+      {
+        "Wednessday": [
+          {
+            "ShiftType": "Early",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Late",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Night",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          }
+        ]
+      },
+      {
+        "Thursday": [
+          {
+            "ShiftType": "Early",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Late",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Night",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          }
+        ]
+      },
+      {
+        "Friday": [
+          {
+            "ShiftType": "Early",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Late",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Night",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          }
+        ]
+      },
+      {
+        "Saturday": [
+          {
+            "ShiftType": "Early",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Late",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Night",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          }
+        ]
+      },
+      {
+        "Sunday": [
+          {
+            "ShiftType": "Early",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Late",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          },
+          {
+            "ShiftType": "Night",
+            "Grade1": 1,
+            "Grade2": 2,
+            "Grade3": 2
+          }
+        ]
+      }
+    ]
+  }
