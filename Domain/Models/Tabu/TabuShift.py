@@ -1,5 +1,6 @@
 from Domain.Models.Enums.Grade import Grade
 
+
 class TabuShift:
     def __init__(self, coverRequirements, tabuShiftType, shiftDay):
         self.coverRequirements = coverRequirements
@@ -21,7 +22,7 @@ class TabuShift:
 
     def ToBit(self):
         bitShifts = (self.shiftDay - 1)
-        return int('1', 2) <<  bitShifts
+        return int('1', 2) << bitShifts
 
     def __str__(self):
         finalString = "ST " + str(self.tabuShiftType) + " CR: " + str(self.coverRequirements[Grade.ONE]) + ", " + \
