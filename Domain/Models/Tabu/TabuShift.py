@@ -24,6 +24,7 @@ class TabuShift:
         return int('1', 2) << bitShifts
 
     def __str__(self):
-        finalString = "ST " + str(self.tabuShiftType) + " CR: " + str(self.coverRequirements[Grade.ONE]) + ", " + \
-                      str(self.coverRequirements[Grade.TWO]) + ", " + str(self.coverRequirements[Grade.THREE])
+        finalString = "ST: " + str(self.tabuShiftType) + " CR: " + str(self.coverRequirements[Grade.ONE]) + ", " + \
+                      str(self.coverRequirements[Grade.TWO]) + ", " + \
+                      str(self.coverRequirements[Grade.THREE]) + " NURSES ASSIGNED: " + str(len(self.assignedNurses[Grade.THREE.value - 1]))
         return finalString

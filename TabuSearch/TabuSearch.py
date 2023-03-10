@@ -13,7 +13,8 @@ class TabuSearch:
             for full in pattern:
                 for dayOrNight in full:
                     if dayOrNight == 1:
-                        self.currSolution.shifts[dayOrNight + counter].assignNurse(nurse)
+                        self.currSolution.shifts[(dayOrNight + counter)*2].assignNurse(nurse)
+                counter += 1
             nurse.assignShiftPattern(pattern)
         self.currSolution.calculatePC()
         self.currSolution.calculateCC()
@@ -37,6 +38,7 @@ class TabuSearch:
         if self.currSolution == 0:
             self.storeDetails()
         else:
+            pass
 
 
     def balanceRestoration(self):
