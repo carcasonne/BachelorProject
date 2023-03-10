@@ -6,5 +6,7 @@ from TestData.TabuSetup import *
 search = TabuSearch(schedule)
 print("here 1")
 print(str(len(search.currSolution.nurses)))
-for n in search.currSolution.nurses:
-    print("ID:" + str(n.id) + "   Grade: " + str(n.grade) + "   Contract: (" + str(n.contract.days) + ", " + str(n.contract.nights) + ")")
+for s in search.currSolution.shifts:
+    print(str(s))
+#for n in search.currSolution.nurses:
+#   print("ID:" + str(n.id) + "   Grade: " + str(n.grade) + "   Contract: (" + str(n.contract.days) + ", " + str(n.contract.nights) + ")")
