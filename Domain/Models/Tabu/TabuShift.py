@@ -14,7 +14,7 @@ class TabuShift:
         nurse.assignedShiftPattern += self.ToBit()
 
     def RemoveNurse(self, nurse):
-        if nurse in self.assignedNurses:
+        if nurse not in self.assignedNurses:
             raise Exception("Nurse does not exits")
         self.assignedNurses[nurse.grade].remove(nurse)
         nurse.assignedShiftPattern -= self.ToBit()

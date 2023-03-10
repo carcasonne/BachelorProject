@@ -1,19 +1,27 @@
 # Based on this article https://towardsdatascience.com/optimization-techniques-tabu-search-36f197ef8e25
+import sys
+
 
 class TabuSearch:
-    def __init__(self, initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure):
-        self.currSolution = initialSolution
-        self.bestSolution = initialSolution
+    def __init__(self, initialSchedule, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure):
+        self.currSolution = initialSchedule
+        self.bestSolution = initialSchedule
         self.evaluate = solutionEvaluator
         self.aspirationCriteria = aspirationCriteria
         self.neighborOperator = neighborOperator
         self.acceptableScoreThreshold = acceptableScoreThreshold
+        self.PC = sys.maxsize # Z - Penalty Cost
+        self.CC = sys.maxsize # CC - Covering Cost
         self.tabuTenure = tabuTenure
 
     def isTerminationCriteriaMet(self):
         # can add more termination criteria
         return self.evaluate(self.bestSolution) < self.acceptableScoreThreshold \
                or self.neighborOperator(self.currSolution) == 0
+
+    def Initialize(self, schedule):
+        
+
 
     def run(self):
         tabuList = {}
@@ -65,4 +73,3 @@ class TabuSearch:
 
     def EvaluatePC(self):
         pass
-

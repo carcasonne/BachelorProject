@@ -5,6 +5,7 @@ from Domain.Models.Tabu.TabuShiftType import TabuShiftType
 
 class TabuNurse:
     def __init__(self, nurse):
+        self.id = nurse.id
         self.contract = nurse.contract
         self.grade = nurse.grade
         self.assignedShiftPattern = TabuShiftPattern(int('0000000', 2), int('0000000', 2))
