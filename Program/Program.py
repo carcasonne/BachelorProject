@@ -4,7 +4,7 @@ from TabuSearch.TabuSearch import *
 from NetworkFlow.NetworkFlow import *
 
 tabuSearch = TabuSearch()
-networkFlow = Class1NetworkFlow()
+networkFlow = NetworkFlow()
 
 print("Beginning")
 
