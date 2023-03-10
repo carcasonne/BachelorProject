@@ -20,14 +20,14 @@ class TabuSchedule:
         if len(self.shifts) != 14:
             raise Exception("Must be exactly 14 shifts")
 
-    def CalculateCC(self):
+    def calculateCC(self):
         CC = 0
         for shift in self.shifts:
             for grade in shift.coverRequirements:
                 CC += shift.coverRequirements[grade] - len(shift.assignedNurses[grade.value - 1])
         return max(0, CC)
 
-    def CalculatePC(self):
+    def calculatePC(self):
         pass
 
     def __str__(self):
