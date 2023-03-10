@@ -7,10 +7,10 @@ class Nurse:
         self.contract = contract
         self.assignedShiftPattern = None
 
-    def AssignShiftPattern(self, shiftPattern): # A bit representation of ether (day, night) or (early, late, night)
+    def assignShiftPattern(self, shiftPattern): # A bit representation of ether (day, night) or (early, late, night)
         self.assignedShiftPattern = shiftPattern
 
-    def Print(self):
+    def print(self):
         print(str(self.id) + " is of grade: " + str(self.grade))
 
     def __eq__(self, other): 
