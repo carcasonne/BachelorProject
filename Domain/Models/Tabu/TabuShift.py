@@ -8,19 +8,19 @@ class TabuShift:
         self.tabuShiftType = tabuShiftType
         self.shiftDay = shiftDay
 
-    def AssignNurse(self, nurse):
+    def assignNurse(self, nurse):
         if nurse in self.assignedNurses:
             raise Exception("Nurse is already assigned to this shift")
         self.assignedNurses[nurse.grade].add(nurse)
         nurse.assignedShiftPattern += self.ToBit()
 
-    def RemoveNurse(self, nurse):
+    def removeNurse(self, nurse):
         if nurse not in self.assignedNurses:
             raise Exception("Nurse does not exits")
         self.assignedNurses[nurse.grade].remove(nurse)
         nurse.assignedShiftPattern -= self.ToBit()
 
-    def ToBit(self):
+    def toBit(self):
         bitShifts = (self.shiftDay - 1)
         return int('1', 2) << bitShifts
 
