@@ -1,10 +1,12 @@
 # Based on this article https://towardsdatascience.com/optimization-techniques-tabu-search-36f197ef8e25
 import sys
 
+from Domain.Models.Tabu.TabuSchedule import TabuSchedule
+
 
 class TabuSearch:
     def __init__(self, initialSchedule, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure):
-        self.currSolution = initialSchedule
+        self.currSolution = self.initialize(TabuSchedule(initialSchedule))
         self.bestSolution = initialSchedule
         self.evaluate = solutionEvaluator
         self.aspirationCriteria = aspirationCriteria
@@ -19,8 +21,9 @@ class TabuSearch:
         return self.evaluate(self.bestSolution) < self.acceptableScoreThreshold \
                or self.neighborOperator(self.currSolution) == 0
 
-    def Initialize(self, schedule):
-        pass
+    def initialize(self, schedule):
+        for nurse in schedule.nurses:
+            nurse
 
 
     def run(self):
