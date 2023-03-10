@@ -17,8 +17,10 @@ class TabuNurse:
             DayOrNightPattern = self.assignedShiftPattern.day
         else:
             DayOrNightPattern = self.assignedShiftPattern.night
-
         return bool(DayOrNightPattern & shift.ToBit())
+
+    def Penalty(self):
+        pass
 
     def Print(self):
         print("... To Be Continued ...")
