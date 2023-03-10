@@ -37,7 +37,7 @@ class TabuSearch:
         if self.currSolution == 0:
             self.storeDetails()
         else:
-
+            pass
 
     def balanceRestoration(self):
         pass

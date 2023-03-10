@@ -11,9 +11,9 @@ RANDOMIZEDDATA = True
 shifts = []
 for x in range(7):
     if RANDOMIZEDDATA:
-        shifts.append(Shift({Grade.ONE: randint(1, 2), Grade.TWO: randint(0, 3), Grade.THREE: randint(4, 7)}, ShiftType.EARLY, x))
-        shifts.append(Shift({Grade.ONE: randint(1, 2), Grade.TWO: randint(0, 4), Grade.THREE: randint(4, 8)}, ShiftType.LATE, x))
-        shifts.append(Shift({Grade.ONE: randint(1, 2), Grade.TWO: randint(0, 2), Grade.THREE: randint(3, 6)}, ShiftType.NIGHT, x))
+        shifts.append(Shift({Grade.ONE: randint(0, 2), Grade.TWO: randint(2, 3), Grade.THREE: randint(4, 5)}, ShiftType.EARLY, x))
+        shifts.append(Shift({Grade.ONE: randint(0, 2), Grade.TWO: randint(2, 4), Grade.THREE: randint(4, 5)}, ShiftType.LATE, x))
+        shifts.append(Shift({Grade.ONE: randint(0, 2), Grade.TWO: randint(2, 3), Grade.THREE: randint(3, 4)}, ShiftType.NIGHT, x))
     else:
         shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.EARLY, x))
         shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.LATE, x))
