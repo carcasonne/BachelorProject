@@ -3,7 +3,7 @@ from Knapsack.SimpleKnapsackModel import *
 from TabuSearch.TabuSearch import *
 from NetworkFlow.NetworkFlow import *
 
-tabuSearch = Class1TabuSearch()
+tabuSearch = TabuSearch()
 networkFlow = Class1NetworkFlow()
 
 print("Beginning")
