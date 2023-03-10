@@ -23,5 +23,8 @@ class TabuNurse:
     def Penalty(self):
         pass
 
+    def FeasibleWorkPatterns(self):
+        pass
+
     def Print(self):
         print("... To Be Continued ...")

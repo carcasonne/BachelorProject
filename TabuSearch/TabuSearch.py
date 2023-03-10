@@ -20,7 +20,7 @@ class TabuSearch:
                or self.neighborOperator(self.currSolution) == 0
 
     def Initialize(self, schedule):
-        
+        pass
 
 
     def run(self):
