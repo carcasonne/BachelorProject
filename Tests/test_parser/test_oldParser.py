@@ -2,13 +2,11 @@ import unittest
 
 from Parser.NurseParser import *
 
-
-
-class TestJsonParser(unittest.TestCase):
+class TestOldJsonParser(unittest.TestCase):
 
     def test_parses_example(self):
         parser = NurseParser()
-        exampleFilePath = "Tests/test_parser/CompleteExample.json" 
+        exampleFilePath = "Data/Example/CompleteExample.json" 
         actualSchedule = parser.parseFromJSON(exampleFilePath)
         expectedSchedule = self.create_example_model()
 

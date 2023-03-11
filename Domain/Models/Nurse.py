@@ -19,5 +19,4 @@ class Nurse:
             return False
 
         return  (self.id == other.id and 
-                 self.grade == other.grade and
-                 self.contract == other.contract)
+                 self.grade == other.grade)
