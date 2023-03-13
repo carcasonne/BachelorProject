@@ -24,6 +24,16 @@ class TabuSchedule:
             raise Exception("Must be exactly 14 shifts")
         self.updateAll()
 
+    def singleMove(self, nurse, newShiftPattern):
+        oldShiftPattern = nurse.assignedShiftPattern
+        for x in range(14):
+            if oldShiftPattern[x] is not newShiftPattern[x]:
+                if oldShiftPattern is 1:
+                    self.shifts[x].removeNurse(nurse)
+                else:
+                    self.shifts[x].assignNurse(nurse)
+        self.updateAll()
+
     def calculateCC(self):
         CC = 0
         for shift in self.shifts:

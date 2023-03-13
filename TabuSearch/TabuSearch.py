@@ -1,6 +1,7 @@
 # Based on this article https://towardsdatascience.com/optimization-techniques-tabu-search-36f197ef8e25
 import sys
 import random
+import numpy as np
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 
 
@@ -13,7 +14,6 @@ class TabuSearch:
             for dayOrNightShifts in pattern:
                 for weekday in range(7):
                     if dayOrNightShifts[weekday] == 1:
-                        print(str(weekday*2+counter))
                         tabuSchedule.shifts[weekday*2+counter].assignNurse(nurse)
                 counter += 1
             nurse.assignShiftPattern(pattern)
@@ -27,16 +27,34 @@ class TabuSearch:
 
 
     def run(self):
+        # Phase 1
+        pass
+        while self.currSolution.CC != 0:
+            move = self.randomDecent()
+            if move is None: self.balanceRestoration()
+            if move is None: self.shiftChainMoves()
+            if move is None: self.nurseChainMoves()
+            if move is None: self.moveUnderCovering()
+            if move is None: self.randomKick()
+            self.makeMove(move)
+
+        # Phase 2
+
         pass
         return self.bestSolution
 
-    # PHASE 1:
+    def makeMove(self, move):
+        self.bestSolution = move[0]
+        self.nurseTabuList.insert(0, move[0])
 
+    # PHASE 1:
     def randomDescent(self):
-        if self.currSolution == 0:
-            self.storeDetails()
-        else:
-            pass
+        while True:
+            nurse = np.random.choice(self.currSolution.nurses)
+            newShiftPattern = np.random.choice(nurse.feasibleShiftPatterns)
+            neighbor = self.currSolution.singleMove(nurse, newShiftPattern)
+            if neighbor.CC < self.currSolution.CC and neighbor.PC <= self.currSolution.PC:
+                return neighbor, nurse
 
     def balanceRestoration(self):
         pass
