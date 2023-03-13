@@ -18,11 +18,7 @@ class TabuNurse:
         self.assignedShiftPattern = TabuShiftPattern(shiftPattern[0], shiftPattern[1])
 
     def shiftIsCovered(self, shift): # 1 = shift pattern covers the shift, 0 = shift pattern does not cover the shift
-        if shift.shiftType == TabuShiftType.DAY:
-            DayOrNightPattern = self.assignedShiftPattern.day
-        else:
-            DayOrNightPattern = self.assignedShiftPattern.night
-        return bool(DayOrNightPattern & shift.ToBit())
+        pass
 
     def calcPC(self, fromMove, toMove):
         return self.PC
