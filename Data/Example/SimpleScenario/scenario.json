@@ -1,0 +1,127 @@
+{
+  "id" : "n030w4",
+  "numberOfWeeks" : 4,
+  "skills" : [ "HeadNurse", "Nurse", "Caretaker", "Trainee" ],
+  "shiftTypes" : [ {
+    "id" : "Early",
+    "minimumNumberOfConsecutiveAssignments" : 2,
+    "maximumNumberOfConsecutiveAssignments" : 5
+  }, {
+    "id" : "Day",
+    "minimumNumberOfConsecutiveAssignments" : 2,
+    "maximumNumberOfConsecutiveAssignments" : 28
+  }, {
+    "id" : "Late",
+    "minimumNumberOfConsecutiveAssignments" : 2,
+    "maximumNumberOfConsecutiveAssignments" : 5
+  }, {
+    "id" : "Night",
+    "minimumNumberOfConsecutiveAssignments" : 3,
+    "maximumNumberOfConsecutiveAssignments" : 5
+  } ],
+  "forbiddenShiftTypeSuccessions" : [ {
+    "precedingShiftType" : "Early",
+    "succeedingShiftTypes" : [ ]
+  }, {
+    "precedingShiftType" : "Day",
+    "succeedingShiftTypes" : [ "Early" ]
+  }, {
+    "precedingShiftType" : "Late",
+    "succeedingShiftTypes" : [ "Early", "Day" ]
+  }, {
+    "precedingShiftType" : "Night",
+    "succeedingShiftTypes" : [ "Early", "Day", "Late" ]
+  } ],
+  "contracts" : [ {
+    "id" : "FullTime",
+    "minimumNumberOfAssignments" : 15,
+    "maximumNumberOfAssignments" : 22,
+    "minimumNumberOfConsecutiveWorkingDays" : 3,
+    "maximumNumberOfConsecutiveWorkingDays" : 5,
+    "minimumNumberOfConsecutiveDaysOff" : 2,
+    "maximumNumberOfConsecutiveDaysOff" : 3,
+    "maximumNumberOfWorkingWeekends" : 2,
+    "completeWeekends" : 1
+  }, {
+    "id" : "PartTime",
+    "minimumNumberOfAssignments" : 7,
+    "maximumNumberOfAssignments" : 15,
+    "minimumNumberOfConsecutiveWorkingDays" : 3,
+    "maximumNumberOfConsecutiveWorkingDays" : 5,
+    "minimumNumberOfConsecutiveDaysOff" : 2,
+    "maximumNumberOfConsecutiveDaysOff" : 4,
+    "maximumNumberOfWorkingWeekends" : 2,
+    "completeWeekends" : 1
+  }, {
+    "id" : "HalfTime",
+    "minimumNumberOfAssignments" : 5,
+    "maximumNumberOfAssignments" : 11,
+    "minimumNumberOfConsecutiveWorkingDays" : 2,
+    "maximumNumberOfConsecutiveWorkingDays" : 4,
+    "minimumNumberOfConsecutiveDaysOff" : 2,
+    "maximumNumberOfConsecutiveDaysOff" : 5,
+    "maximumNumberOfWorkingWeekends" : 1,
+    "completeWeekends" : 1
+  } ],
+  "nurses" : [ {
+    "id" : "HN_0",
+    "contract" : "FullTime",
+    "skills" : [ "HeadNurse", "Nurse", "Caretaker" ]
+  }, {
+    "id" : "HN_1",
+    "contract" : "HalfTime",
+    "skills" : [ "HeadNurse", "Nurse", "Caretaker" ]
+  }, {
+    "id" : "NU_2",
+    "contract" : "HalfTime",
+    "skills" : [ "Nurse", "Caretaker" ]
+  }, {
+    "id" : "NU_3",
+    "contract" : "PartTime",
+    "skills" : [ "Nurse", "Caretaker" ]
+  }, {
+    "id" : "NU_4",
+    "contract" : "FullTime",
+    "skills" : [ "Nurse", "Caretaker" ]
+  }, {
+    "id" : "NU_5",
+    "contract" : "PartTime",
+    "skills" : [ "Nurse", "Caretaker" ]
+  }, {
+    "id" : "NU_6",
+    "contract" : "HalfTime",
+    "skills" : [ "Nurse", "Caretaker" ]
+  }, {
+    "id" : "NU_7",
+    "contract" : "FullTime",
+    "skills" : [ "Nurse", "Caretaker" ]
+  }, {
+    "id" : "NU_8",
+    "contract" : "FullTime",
+    "skills" : [ "Nurse", "Caretaker" ]
+  }, {
+    "id" : "NU_9",
+    "contract" : "HalfTime",
+    "skills" : [ "Nurse", "Caretaker" ]
+  }, {
+    "id" : "CT_10",
+    "contract" : "FullTime",
+    "skills" : [ "Caretaker" ]
+  }, {
+    "id" : "CT_11",
+    "contract" : "FullTime",
+    "skills" : [ "Caretaker" ]
+  }, {
+    "id" : "TR_12",
+    "contract" : "PartTime",
+    "skills" : [ "Trainee" ]
+  },{
+    "id" : "TR_13",
+    "contract" : "FullTime",
+    "skills" : [ "Trainee" ]
+  }, {
+    "id" : "TR_14",
+    "contract" : "HalfTime",
+    "skills" : [ "Trainee" ]
+  } ]
+}
