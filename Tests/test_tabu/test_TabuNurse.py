@@ -41,7 +41,6 @@ class TabuNurseTests(unittest.TestCase):
     def test_calcPC(self):
         pass
 
-    @unittest.skip("not implemented correctly")
     def test_findShiftPatterns(self):
         # This should find every possible shift-pattern for this nurse.
         self.testnurse.findShiftPatterns()
