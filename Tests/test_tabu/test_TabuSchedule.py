@@ -3,6 +3,7 @@ import unittest
 from Domain.Models.Enums.Contract import Contract
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Nurse import Nurse
+from Domain.Models.Tabu.TabuNurse import TabuNurse
 
 
 class TabuScheduleTests(unittest.TestCase):
@@ -12,7 +13,6 @@ class TabuScheduleTests(unittest.TestCase):
 
     def test_init(self):
         pass
-        self.assertEqual(True, False)  # add assertion here
 
     def test_singleMove(self):
         pass

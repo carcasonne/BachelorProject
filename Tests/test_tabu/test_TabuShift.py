@@ -19,8 +19,8 @@ class TabuShiftTests(unittest.TestCase):
         self.testnurse2 = TabuNurse(Nurse(1, Grade.TWO, Contract(3, 2)))
 
     def tearDown(self) -> None:
-        self.shiftDay.assignedNurses = [{}, {}, {}]
-        self.shiftNight.assignedNurses = [{} ,{} ,{}]
+        self.shiftDay.assignedNurses = [set(), set(), set()]
+        self.shiftNight.assignedNurses = [set(), set(), set()]
 
     @unittest.skip("Not implemented correctly")
     def test_init(self):

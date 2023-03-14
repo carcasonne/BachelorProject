@@ -15,6 +15,8 @@ class TabuNurse:
         self.findShiftPatterns()
 
     def assignShiftPattern(self, shiftPattern):  # A bit representation of ether (day, night) or (early, late, night)
+        if len(shiftPattern) != 14:
+            raise Exception("Shift pattern format is invalid")
         self.assignedShiftPattern = TabuShiftPattern(shiftPattern[0], shiftPattern[1])
 
     def shiftIsCovered(self, shift): # 1 = shift pattern covers the shift, 0 = shift pattern does not cover the shift
