@@ -1,14 +1,13 @@
 
 
 class ZeroOneKnapsack:
-    # N: Number of items to choose between
-    # xs: List of items
-    def __init__(self, N, xs):
-        self.N = N
+    # xs: List of KnapsackItems
+    # c: The capacity of the knapsack
+    def __init__(self, xs, c):
         self.xs = xs
-
-        if  N != len(xs):
-            raise ValueError("One or more lists has incorrect size")
+        self.c = c
+        self.N = len(xs)
         
         # Make sure items are sorted
+        self.xs.sort()
 

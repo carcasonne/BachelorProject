@@ -14,8 +14,7 @@ class TestKnapsackItemProperties(unittest.TestCase):
             expected = sorted[i]
             actual = random[i]
             self.assertEqual(expected, actual)
-
-            
+  
     # Get the random items in the expected, sorted order
     def _get_mock_items_sorted(self):
         # Ratios 6, 6, 5, 4, 3, 1.11112...
@@ -27,7 +26,7 @@ class TestKnapsackItemProperties(unittest.TestCase):
         for i in range(len(profits)):
             p = profits[i]
             w = weights[i]
-            item = KnapsackItem(p, w)
+            item = KnapsackItem(p, w, 0)
             items.append(item)
         
         return items
