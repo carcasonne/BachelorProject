@@ -29,7 +29,8 @@ class BranchAndBound:
             if(sum + item.w <= self.totalC):
                 sum += item.w
             else:
-                return (i, sum)
+                residualCapacity = self.totalC - sum
+                return (i, residualCapacity)
 
         raise Exception("There is no critical item!")
     
@@ -40,7 +41,7 @@ class BranchAndBound:
 
         # Go through every item until just before critical item
         for i in range(self.S):
-            sumP = self.items[i].p
+            sumP += self.items[i].p
 
         itemS = self.items[self.S]
         followingS = self.items[self.S + 1]
