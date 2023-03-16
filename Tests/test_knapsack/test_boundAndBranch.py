@@ -27,11 +27,10 @@ class TestBoundAndBranch_MODERN(unittest.TestCase):
 
         actualItems = bab.bestSolution.items
 
-        for i in range(0, len(expectedItems)):
+        for i in range(0, len(actualItems)):
             self.assertEqual(expectedItems[i], actualItems[i])
     
     def test_calculates_correct_upper_bound(self):
-        n = 8
         profits = [15, 100, 90, 60, 40, 15, 10, 1]
         weights = [2,  20,  20, 30, 40, 30, 60, 10]
         c = 102
@@ -44,8 +43,41 @@ class TestBoundAndBranch_MODERN(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
+    def test_exits_early_when_given_lower_bound(self):
+        profits = [70, 20, 39, 37, 7, 5, 10]
+        weights = [31, 10, 20, 19, 4, 3, 6]
+        c = 50
+        lowerBound = 50
 
-        pass
+        items = _generate_knapsack_items(profits, weights)
+
+        # The first item in the list has profit > lowerBound, so only first item should be inserted
+        expectedItems = []
+        expectedItems.append(items[0])
+
+        self.assert_lower_bound_search(items, c, lowerBound, expectedItems)
+
+        # This tests if the lower bound constraints doesn't pick infeasible solutions (too big weight)
+        profits = [70,  20,  39,  37, 7, 5, 10]
+        weights = [310, 100, 200, 19, 4, 3, 6]
+        c = 50
+        lowerBound = 20
+
+        items = _generate_knapsack_items(profits, weights)
+
+        expectedItems = []
+        expectedItems.append(items[3])
+
+        self.assert_lower_bound_search(items, c, lowerBound, expectedItems)
+    
+    def assert_lower_bound_search(self, items, c, lowerBound, expectedItems):
+        bab = BranchAndBound_MODERN(items, c)
+        bab.startSearchWithEarlyExit(lowerBound)
+
+        actualItems = bab.bestSolution.items
+
+        for i in range(0, len(actualItems)):
+            self.assertEqual(expectedItems[i], actualItems[i])
 
 # Incomplete test cases as we moved away from using this implementation
 class TestBoundAndBranch_MT(unittest.TestCase):

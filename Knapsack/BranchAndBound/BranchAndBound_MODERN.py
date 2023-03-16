@@ -34,7 +34,20 @@ class BranchAndBound_MODERN:
 
         self.bestSolution = self.v
 
-    def startSearch(self):
+    def resetSearch(self):
+        self.v = Node(-1, 0, 0)
+        self.v.U = BranchAndBound_MODERN.get_bound(self.v, self.items, self.C, self.N)
+        self.nodeCount = 1
+        self.PQ = Priority_Queue()
+        self.PQ.insert(self.v, self.items, self.C, self.N)
+        self.bestSolution = self.v
+
+    # lowerBound: If any suitable solution goes above this lower bound, the search is stopped
+    def startSearchWithEarlyExit(self, lowerBound):
+        self.startSearch(lowerBound)
+    
+    # lowerBound: If any suitable solution goes above this lower bound, the search is stopped
+    def startSearch(self, lowerBound = None):
         while self.PQ.length != 0:
             v = self.PQ.remove()
 
@@ -44,21 +57,23 @@ class BranchAndBound_MODERN:
                 # Make new node in tree
                 newLevel = v.level + 1
                 item = self.items[newLevel]
-                prevSolutionZ = v.Z + item.profit
-                prevSolutionC = v.usedC + item.weight
+                newSolutionZ = v.Z + item.profit
+                newSolutionC = v.usedC + item.weight
 
-                includeItemSolution = Node(newLevel, prevSolutionZ, prevSolutionC)
+                includeItemSolution = Node(newLevel, newSolutionZ, newSolutionC)
                 self.nodeCount += 1
 
                 # Add all items in current solution, then add the new item
                 includeItemSolution.items = v.items.copy()
                 includeItemSolution.items.append(item)
 
-
                 # Update best known solution if solution weight fits, and solution value is better
-                if  (includeItemSolution.usedC <= self.C and 
-                    includeItemSolution.Z > self.bestSolution.Z): 
-                    self.bestSolution = includeItemSolution
+                if  includeItemSolution.usedC <= self.C:
+                    if includeItemSolution.Z > self.bestSolution.Z: 
+                        self.bestSolution = includeItemSolution
+                    
+                    if lowerBound is not None and includeItemSolution.Z > lowerBound:
+                        return
 
                 includeItemSolution.U = BranchAndBound_MODERN.get_bound(includeItemSolution, self.items, self.C, self.N)
                 
@@ -86,9 +101,9 @@ class BranchAndBound_MODERN:
             sumZ = node.Z
             sumC = node.usedC
             # The critical item, s
-            s = None
+            s = node.level + 1
 
-            for i in range(node.level + 1, N):
+            for i in range(s, N):
                 item = items[i]
                 # If the knapsack can fit the item
                 if totalC >= sumC + item.weight:
