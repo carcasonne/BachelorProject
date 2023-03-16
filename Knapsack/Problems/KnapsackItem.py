@@ -1,32 +1,32 @@
 from functools import total_ordering
 
 @total_ordering
-class KnapsackItem():
+class KnapsackItem:
     # p (int): profit
     # w (int): weight
     # j (bool): whether this item is in the knapsack 
     def __init__(self, p, w, k):
-        self.p = p
-        self.w = w
-        self.k = k
+        self.profit = p
+        self.weight = w
+        self.inSack = k
     
     # Overwrite these methods to ensure sorting is correct
     # Sort such that p_1 / w_1 > p_2 / w_2 > p_3 / w_3...
     # Note that is should be sorted descendingly  
     def __lt__(self, obj):
-        return ((self.p / self.w) > (obj.p / obj.w))
+        return ((self.profit / self.weight) > (obj.profit / obj.weight))
   
     def __gt__(self, obj):
-        return ((self.p / self.w) < (obj.p / obj.w))
+        return ((self.profit / self.weight) < (obj.profit / obj.weight))
   
     def __le__(self, obj):
-        return ((self.p / self.w) >= (obj.p / obj.w))
+        return ((self.profit / self.weight) >= (obj.profit / obj.weight))
   
     def __ge__(self, obj):
-        return ((self.p / self.w) <= (obj.p / obj.w))
+        return ((self.profit / self.weight) <= (obj.profit / obj.weight))
   
     def __eq__(self, obj):
-        return ((self.p / self.w) == (obj.p / obj.w))
+        return ((self.profit / self.weight) == (obj.profit / obj.weight))
   
     def __repr__(self):
-        return str(f"P: {self.p}, W: {self.w}. Ratio: {self.p/self.w}")
+        return str(f"P: {self.profit}, W: {self.weight}. Ratio: {self.profit / self.weight}")

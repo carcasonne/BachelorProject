@@ -25,6 +25,11 @@ class KnapsackSolver:
         # Target, optimal value for knapsack problem
         self.Z = 0
 
+        # Make the knapsack items
+        for nurse in schedule.nurses:
+            # Not sure if this is the mapping
+            profit = nurse.contract.nights
+            weight = nurse.contract.days
+
     def requiredForGrade(self, Grade, night):
         return sum(shift.coverRequirements[Grade.THREE] for shift in self.schedule.shifts if (shift.shiftType == ShiftType.NIGHT if night else shift.shiftType != ShiftType.NIGHT))
-    

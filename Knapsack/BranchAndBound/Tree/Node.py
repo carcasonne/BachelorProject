@@ -1,10 +1,11 @@
 
 class Node:
-    def __init__(self, id, N0, N1):
-        self.id = id
-        self.var = 3
-        self.left = N0
-        self.right = N1
+    def __init__(self, level, index, profit, bound, weight):
+        self.level = level
+        self.index = index
+        self.profit = profit
+        self.bound = bound
+        self.weight = weight
 
     # Returns the variable corresponding to a node
     def f(self):
