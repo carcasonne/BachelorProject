@@ -16,4 +16,11 @@ class StandardShiftPattern(ShiftPattern):
 class TabuShiftPattern(ShiftPattern):
     def __init__(self, day, night):
         super().__init__(night)
-        self.day = day
+        self.days = day
+        self.merged = []
+        counter = 0
+        while counter < 7:
+            self.merged.append(day[counter])
+            self.merged.append(night[counter])
+            counter += 1
+

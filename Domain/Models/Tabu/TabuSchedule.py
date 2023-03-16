@@ -25,14 +25,19 @@ class TabuSchedule:
         self.updateAll()
 
     def singleMove(self, nurse, newShiftPattern):
-        oldShiftPattern = nurse.assignedShiftPattern
+        oldShiftPattern = nurse.assignedShiftPattern.merged
+        newMergedShiftPattern = newShiftPattern.merged
+        print(oldShiftPattern)
+        print(newMergedShiftPattern)
         for x in range(14):
-            if oldShiftPattern[x] is not newShiftPattern[x]:
-                if oldShiftPattern is 1:
+            if oldShiftPattern[x] is not newMergedShiftPattern[x]:
+                if oldShiftPattern[x] == 1:
                     self.shifts[x].removeNurse(nurse)
                 else:
                     self.shifts[x].assignNurse(nurse)
+        nurse.assignedShiftPattern = newShiftPattern
         self.updateAll()
+        return self
 
     def calculateCC(self):
         CC = 0

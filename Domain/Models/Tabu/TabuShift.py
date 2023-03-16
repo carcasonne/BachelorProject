@@ -16,7 +16,7 @@ class TabuShift:
             self.assignedNurses[x].add(nurse)
 
     def removeNurse(self, nurse):
-        if nurse not in self.assignedNurses[2]: raise Exception("Nurse does not exits")
+        if nurse not in self.assignedNurses[2]: raise Exception("Nurse does not exist")
         value = nurse.grade.value - 1
         for x in range(value, 3):
             self.assignedNurses[x].remove(nurse)
