@@ -8,9 +8,9 @@ class SolutionNode:
         self.upperBound = None
         self.solutionValue = None
         self.assignment = None
-        self.profit = None
-        self.weight = None
-        self.r = None
+        self.profit = 0
+        self.weight = 0
+        self.r = 0
         self.otherR = None
 
     def isNone(self):

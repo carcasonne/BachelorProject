@@ -4,6 +4,7 @@ import random
 from Knapsack.Problems.KnapsackItem import KnapsackItem
 
 class TestKnapsackItemProperties(unittest.TestCase):
+    # Make more tests than just this one!
     def test_items_sorted_correctly(self):
         random = self._get_mock_items_random_order()
         sorted = self._get_mock_items_sorted()
