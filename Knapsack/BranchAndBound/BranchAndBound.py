@@ -1,7 +1,7 @@
 import math
 
 from Knapsack.BranchAndBound.SolutionNode import SolutionNode
-
+# Built according to the branch and bound algorithm for 0/1 knapsack problems as defined by Marthello and Toth
 class BranchAndBound:
     def __init__(self, zeroOneKnapsack):
         self.items = zeroOneKnapsack.items.copy()
@@ -46,6 +46,8 @@ class BranchAndBound:
         self.markedP = 0
         self.localR = 0
         self.currentSolution = self.bestSolution.copy()
+        self.h = 0
+        self.i = 0
 
     def searchTreeWithEarlyExit(self, lowerBound):
         pass
@@ -61,7 +63,7 @@ class BranchAndBound:
                 (self.items[self.j + 1].profit /
                  self.items[self.j + 1].weight)
             )
-            if self.z >= possibleZ:
+            if self.bestZ >= possibleZ:
                 return self.backTrack()
             else:
                 self.j = self.j + 1
@@ -79,7 +81,7 @@ class BranchAndBound:
                 if(weight + sum > self.currentC):
                     r = i
                     break
-        if r == None:
+        if r is None:
             raise Exception("No 'r' value was found!")
         else:
             self.localR = r
@@ -108,7 +110,7 @@ class BranchAndBound:
         if self.bestZ >= self.currentZ + self.markedP + u:
             return self.backTrack()
         if u == 0:
-            return self.updateBestSolution(p, r, self.bestSolution)
+            return self.updateBestSolution()
 
         return self.saveCurrentSolution()
 
@@ -152,12 +154,13 @@ class BranchAndBound:
         # Update best solution
         self.bestZ = self.currentZ + self.markedP
 
-        for k in range(1, self.j-1):
+        # Update evreything up to j to be as current solution
+        for k in range(0, self.j-1):
             self.bestSolution[k] = self.currentSolution[k]
-
+        # Insert every item between j and r
         for k in range(self.j, self.localR):
             self.bestSolution[k] = 1
-
+        # Remove every item after
         for k in range(self.localR, self.N):
             self.bestSolution[k] = 0
 
@@ -169,10 +172,94 @@ class BranchAndBound:
         return self.backTrack()
 
     def backTrack(self):
-        pass
+        # Find latest item inserted into the knapsack
+        i = None
 
-    def replace_i_with_j(self):
-        pass
+        for k in range(0, self.N):
+            if k < self.j:
+                if self.currentSolution[k] == 1:
+                    i = k
+        # If no items have been inserted in knapsack return
+        # Throw exception?
+        if i is None:
+            return
+
+        self.i = i
+        iNode = self.items[self.i]
+
+        # remove this item from knapsack
+        self.currentC = self.currentC + iNode.weight
+        self.currentZ = self.currentZ - iNode.profit
+        self.currentSolution[i] = 0
+        self.j = self.i + 1 # go to next item
+
+        if self.currentC - iNode.weight >= self.M[self.i]:
+            return self.buildNewCurrentSolution()
+
+        self.j = self.i
+        self.h = self.i
+
+        return self.try_to_replace_i_with_j()
+
+    # If just python used curly brackets for scopes....
+    def try_to_replace_i_with_j(self):
+        self.h = self.h + 1
+        hItem = self.items[self.h]
+        iItem = self.items[self.i]
+
+        hZ = math.floor(
+            self.currentC *
+            (hItem.profit / hItem.weight)
+        )
+
+        # why?
+        if self.bestZ >= self.currentZ + hZ:
+            return self.backTrack()
+        # why?
+        if hItem.weight == iItem.weight:
+            return self.try_to_replace_i_with_j()
+        # why?
+        if hItem.weight > iItem.weight:
+            # why?
+            if(hItem.weight > self.currentC or self.bestZ >= self.currentZ + hItem.profit):
+                return self.try_to_replace_i_with_j()
+
+            self.bestZ = self.currentZ + hItem.profit
+            for k in range(0, self.N):
+                self.bestSolution[k] = self.currentSolution[k]
+
+            self.bestSolution[self.h] = 1
+
+            if self.bestZ == self.U:
+                return
+
+            self.i = self.h
+
+            return self.try_to_replace_i_with_j()
+        else:
+            # why?
+            if self.currentC - hItem.weight < self.M[self.h]:
+                return self.try_to_replace_i_with_j()
+
+            self.currentC = self.currentC - hItem.weight
+            self.currentZ = self.currentZ + hItem.profit
+
+            self.currentSolution[self.h] = 1
+            self.j = self.h + 1
+
+            hNode = self.nodes[self.h]
+            hNode.weight = hItem.weight
+            hNode.profit = hItem.profit
+            hNode.r = self.h + 1
+
+            for k in range(self.h + 1, self.r):
+                node = self.nodes[k]
+                node.weight = 0
+                node.profit = 0
+                node.r = k
+
+            self.r = self.h
+            return self.buildNewCurrentSolution()
 
     #As according to...
     # Returns tuple (index, residualCapacity)
