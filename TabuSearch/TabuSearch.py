@@ -1,75 +1,85 @@
 # Based on this article https://towardsdatascience.com/optimization-techniques-tabu-search-36f197ef8e25
 import sys
+import random
+import numpy as np
+import copy
+
+from Domain.Models.ShiftPatterns.ShiftPattern import TabuShiftPattern
+from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 
 
 class TabuSearch:
-    def __init__(self, initialSchedule, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure):
-        self.currSolution = initialSchedule
-        self.bestSolution = initialSchedule
-        self.evaluate = solutionEvaluator
-        self.aspirationCriteria = aspirationCriteria
-        self.neighborOperator = neighborOperator
-        self.acceptableScoreThreshold = acceptableScoreThreshold
-        self.PC = sys.maxsize # Z - Penalty Cost
-        self.CC = sys.maxsize # CC - Covering Cost
-        self.tabuTenure = tabuTenure
+    def __init__(self, initialSchedule):
+        tabuSchedule = TabuSchedule(initialSchedule)
+        for nurse in tabuSchedule.nurses:
+            pattern = random.choice(nurse.feasibleShiftPatterns)
+            counter = 0
+            for dayOrNightShifts in pattern:
+                for weekday in range(7):
+                    if dayOrNightShifts[weekday] == 1:
+                        tabuSchedule.shifts[weekday*2+counter].assignNurse(nurse)
+                counter += 1
+            nurse.assignShiftPattern(pattern)
+        tabuSchedule.updateAll()
 
-    def isTerminationCriteriaMet(self):
-        # can add more termination criteria
-        return self.evaluate(self.bestSolution) < self.acceptableScoreThreshold \
-               or self.neighborOperator(self.currSolution) == 0
-
-    def Initialize(self, schedule):
-        pass
+        self.currSolution = tabuSchedule
+        self.bestSolution = tabuSchedule
+        self.dayNightTabuList = []
+        self.nurseTabuList = []
+        self.dayNightCounter = 0
 
 
     def run(self):
-        tabuList = {}
+        # Phase 1
+        pass
+        #while self.currSolution.CC != 0:
+        move = self.randomDescent()
+        if move is None: self.balanceRestoration()
+        if move is None: self.shiftChainMoves()
+        if move is None: self.nurseChainMoves()
+        if move is None: self.moveUnderCovering()
+        if move is None: self.randomKick()
+        self.makeMove(move)
 
-        while not self.isTerminationCriteriaMet():
-            # get all of the neighbors
-            neighbors = self.neighborOperator(self.currSolution)
-            # find all tabuSolutions other than those
-            # that fit the aspiration criteria
-            tabuSolutions = tabuList.keys()
-            # find all neighbors that are not part of the Tabu list
-            neighbors = filter(lambda n: self.aspirationCriteria(n), neighbors)
-            # pick the best neighbor solution
-            newSolution = sorted(neighbors, key=lambda n: self.evaluate(n))[0]
-            # get the cost between the two solutions
-            cost = self.evaluate(self.solution) - self.evaluate(newSolution)
-            # if the new solution is better,
-            # update the best solution with the new solution
-            if cost >= 0:
-                self.bestSolution = newSolution
-            # update the current solution with the new solution
-            self.currSolution = newSolution
+        # Phase 2
 
-            # decrement the Tabu Tenure of all tabu list solutions
-            for sol in tabuList:
-                tabuList[sol] -= 1
-                if tabuList[sol] == 0:
-                    del tabuList[sol]
-            # add new solution to the Tabu list
-            tabuList[newSolution] = self.tabuTenure
-
-        # return best solution found
+        pass
         return self.bestSolution
 
-    def StandardMove(self):
+    def makeMove(self, move):
+        self.bestSolution = move[0]
+        self.nurseTabuList.insert(0, move[1])
+
+    # PHASE 1:
+    def randomDescent(self):
+        while True:
+            nurse = np.random.choice(self.currSolution.nurses)
+            newShiftPattern = nurse.feasibleShiftPatterns[random.randint(0, len(nurse.feasibleShiftPatterns) - 1)]
+            print(self.currSolution.CC)
+            neighbor = copy.copy(self.currSolution)
+            neighbor.singleMove(nurse, TabuShiftPattern(newShiftPattern[0], newShiftPattern[1]))
+            print(neighbor.CC)
+            if neighbor.CC < self.bestSolution.CC: #and neighbor.PC <= self.currSolution.PC:
+                return neighbor, nurse
+
+    def balanceRestoration(self):
         pass
 
-    def SwapMove(self):
+    def shiftChainMoves(self):
         pass
 
-    def ShiftMove(self):
+    def nurseChainMoves(self):
         pass
 
-    def ChainMove(self):
+    def moveUnderCovering(self):
         pass
 
-    def EvaluateCC(self):
+    def randomKick(self):
         pass
 
-    def EvaluatePC(self):
+
+
+    # PHASE 2:
+
+    def storeDetails(self):
         pass
