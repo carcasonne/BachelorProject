@@ -2,8 +2,12 @@ import unittest
 import json
 
 from Parser.NurseParser import NurseParser, JSONParser
-from Domain.Models.Enums import Grade, ShiftType, Days
-from Domain.Models import Nurse, Shift, Schedule
+from Domain.Models import Nurse
+from Domain.Models import Shift
+from Domain.Models import Schedule
+from Domain.Models.Enums.Grade import Grade
+from Domain.Models.Enums.Days import Days
+from Domain.Models.Enums.ShiftType import ShiftType
 
 
 class TestOldJsonParser(unittest.TestCase):
