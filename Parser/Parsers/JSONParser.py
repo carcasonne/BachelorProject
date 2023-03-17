@@ -9,12 +9,13 @@ from Domain.Models.Schedule import Schedule
 import json
 from itertools import chain
 
+
 class JSONParser:
-    def parseNRC(self, scenario, example = False):
+    def parseNRC(self, scenario, example=False):
         historyJson = None
         nursesJson = None
         workdaysJson = None
-        try: 
+        try:
             folder = "Example/" if example else "NurseRosteringCompetition/" 
             historyFile = open("Data/" + folder + scenario + "/history.json")
             historyJson = json.load(historyFile)
@@ -140,17 +141,16 @@ class JSONParser:
         grade = rawId[0]
         id = int(rawId[1])
 
-        if(grade == "HN"):
+        if grade == "HN":
             grade = Grade.ONE
-        elif(grade == "NU"):
+        elif grade == "NU":
             grade = Grade.TWO
-        elif(grade == "CT"):
+        elif grade == "CT":
             grade = Grade.TWO
-        elif(grade == "TR"):
+        elif grade == "TR":
             grade = Grade.THREE
-        
         return (grade, id)
-    
+     
     def skillToGrade(self, skill):
         match skill:
             case "HeadNurse":
@@ -161,7 +161,7 @@ class JSONParser:
                 return Grade.TWO
             case "Trainee":
                 return Grade.THREE
-            case _ :
+            case _:
                 raise ValueError(f'{skill} not recognized')
 
     def getContractDays(self, contract):

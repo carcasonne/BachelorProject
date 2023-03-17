@@ -1,7 +1,8 @@
 import math
 
 from Knapsack.BranchAndBound.SolutionNode import SolutionNode
-# Built according to the branch and bound algorithm for 0/1 knapsack problems as defined by Marthello and Toth
+# Built according to the branch and bound algorithm for 0/1 knapsack problems
+# as defined by Marthello and Toth
 # DOESNT WORK :(
 class BranchAndBound_MT:
     def __init__(self, zeroOneKnapsack):
@@ -20,7 +21,8 @@ class BranchAndBound_MT:
         self.U = self.optimalSolutionValue()
 
         # Set every item to be outside the knapsack
-        # List of 0/1 where inKnapsack[i] represent if items[i] is inside the knapsack
+        # List of 0/1 where inKnapsack[i] represent if items[i] 
+        # is inside the knapsack
         self.bestSolution = [0] * len(self.items)
 
         # maybe make this into 3 separate lists instead..
@@ -32,7 +34,7 @@ class BranchAndBound_MT:
 
         self.nodes[1].weight = 0
         self.nodes[1].profit = 0
-        self.nodes[1].r = 1 # maybe 0 if some index shit
+        self.nodes[1].r = 1  # maybe 0 if some index shit
 
         # I have no idea why we do this
         # M: List of M[i] corresponding value to items[i]
@@ -41,7 +43,7 @@ class BranchAndBound_MT:
         min = float("inf")
         for i in range(len(self.items)-1, 0, -1):
             thisMin = self.items[i].weight
-            if(thisMin < min):
+            if thisMin < min:
                 min = thisMin
             self.M[i] = min
 
@@ -330,13 +332,13 @@ class BranchAndBound_MT:
         U_0 = 0
         U_1 = 0
 
-        if(len(self.items) < r):
+        if (len(self.items) < r):
             followingR = self.items[r + 1]
             followingRatio = followingR.profit / followingR.weight
             U_0 = weightSum + math.floor((self.SC * followingRatio))
               
-        if(len(self.items) == r):
-            r = r -1
+        if (len(self.items) == r):
+            r = r - 1
 
         itemR = self.items[r]
         precedingR = self.items[r - 1]

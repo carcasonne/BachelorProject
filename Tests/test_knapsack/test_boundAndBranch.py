@@ -1,7 +1,6 @@
 import unittest
 import random
 
-from Tests.test_knapsack.test_knapsackItem import TestKnapsackItemProperties
 from Knapsack.BranchAndBound.BranchAndBound_MT import BranchAndBound_MT
 from Knapsack.BranchAndBound.BranchAndBound_MODERN import BranchAndBound_MODERN
 from Knapsack.Problems.KnapsackItem import KnapsackItem
@@ -10,7 +9,6 @@ from Knapsack.Problems.ZeroOneKnapsack import ZeroOneKnapsack
 
 class TestBoundAndBranch_MODERN(unittest.TestCase):
     # Based on example 2.2 from the book
-
     def test_finds_optimal_solution(self):
         profits = [70, 20, 39, 37, 7, 5, 10]
         weights = [31, 10, 20, 19, 4, 3, 6]

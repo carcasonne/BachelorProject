@@ -1,6 +1,14 @@
 import unittest
+import json
 
-from Parser.NurseParser import *
+from Parser.NurseParser import NurseParser, JSONParser
+from Domain.Models import Nurse
+from Domain.Models import Shift
+from Domain.Models import Schedule
+from Domain.Models.Enums import Grade
+from Domain.Models.Enums import Days
+from Domain.Models.Enums import ShiftType
+
 
 class TestOldJsonParser(unittest.TestCase):
 
@@ -15,7 +23,7 @@ class TestOldJsonParser(unittest.TestCase):
 
     def test_fails_on_empty_input(self):
         parser = JSONParser()
-        empty_json = json.loads('{}') 
+        empty_json = json.loads('{}')
 
         self.assertRaises(ValueError, parser.parse, empty_json)
 
@@ -48,7 +56,7 @@ class TestOldJsonParser(unittest.TestCase):
 
         shifts = []
         for i in range(7):
-            n = i + 1;
+            n = i + 1
             day = self.intToDay(n)
 
             for i in range(3):
@@ -77,7 +85,7 @@ class TestOldJsonParser(unittest.TestCase):
             case 1:
                 return Days.MONDAY
             case 2:
-                return Days.TUESDAY 
+                return Days.TUESDAY
             case 3:
                 return Days.WEDNESDAY
             case 4:
@@ -90,6 +98,7 @@ class TestOldJsonParser(unittest.TestCase):
                 return Days.SUNDAY
             case _:
                 raise ValueError(f'{i} not recognized as a valid index for day')
+
 
 if __name__ == '__main__':
     unittest.main()
