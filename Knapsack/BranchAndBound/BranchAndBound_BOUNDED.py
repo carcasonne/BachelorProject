@@ -28,7 +28,7 @@ class BranchAndBound_BOUNDED:
         self.PQ = Priority_Queue()
 
         self.v = Node(-1, 0, 0)
-        self.v.U = BranchAndBound_MODERN.get_bound(self.v, self.items, self.C, self.N)
+        self.v.U = BranchAndBound_BOUNDED.get_bound(self.v, self.items, self.C, self.N)
         self.nodeCount = 1
         self.PQ.insert(self.v, self.items, self.C, self.N)
 
@@ -36,7 +36,7 @@ class BranchAndBound_BOUNDED:
 
     def resetSearch(self):
         self.v = Node(-1, 0, 0)
-        self.v.U = BranchAndBound_MODERN.get_bound(self.v, self.items, self.C, self.N)
+        self.v.U = BranchAndBound_BOUNDED.get_bound(self.v, self.items, self.C, self.N)
         self.nodeCount = 1
         self.PQ = Priority_Queue()
         self.PQ.insert(self.v, self.items, self.C, self.N)
@@ -67,7 +67,7 @@ class BranchAndBound_BOUNDED:
                 includeItemSolution.items = v.items.copy()
                 includeItemSolution.items.append(item)
 
-                includeItemSolution.U = BranchAndBound_MODERN.get_bound(includeItemSolution, self.items, self.C, self.N)
+                includeItemSolution.U = BranchAndBound_BOUNDED.get_bound(includeItemSolution, self.items, self.C, self.N)
 
                 # Update best known solution if solution weight fits, and solution value is better
                 if  includeItemSolution.usedC <= self.C:
@@ -86,7 +86,7 @@ class BranchAndBound_BOUNDED:
                 self.nodeCount += 1
 
                 excludeItemSolution.items = v.items.copy()
-                excludeItemSolution.U = BranchAndBound_MODERN.get_bound(excludeItemSolution, self.items, self.C, self.N)
+                excludeItemSolution.U = BranchAndBound_BOUNDED.get_bound(excludeItemSolution, self.items, self.C, self.N)
 
                 # If potential to be better than best solution, even without adding the item, then add to PQ
                 if excludeItemSolution.U > self.bestSolution.Z:
