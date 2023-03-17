@@ -331,8 +331,8 @@ class BranchAndBound_MT:
         U_1 = 0
 
         if(len(self.items) < r):
-            followingRatio = followingR.profit / followingR.weight
             followingR = self.items[r + 1]
+            followingRatio = followingR.profit / followingR.weight
             U_0 = weightSum + math.floor((self.SC * followingRatio))
               
         if(len(self.items) == r):
