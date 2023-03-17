@@ -13,7 +13,7 @@ class Node:
         self.items = []
         self.U = None # Will be set later
 
-class BranchAndBound_MODERN:
+class BranchAndBound_BOUNDED:
     # items: All possible items which can be in the knapsacl
     # C: Total capacity of the knapsack
     # N: Number of items

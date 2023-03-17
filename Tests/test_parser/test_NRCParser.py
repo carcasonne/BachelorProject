@@ -1,6 +1,6 @@
 import unittest
 
-from Parser.NurseParser import *
+from Parser.NurseParser import NurseParser
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Enums.ShiftType import ShiftType
 from Domain.Models.Enums.Days import Days
