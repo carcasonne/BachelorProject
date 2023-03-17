@@ -2,9 +2,9 @@ import unittest
 import json
 
 from Parser.NurseParser import NurseParser, JSONParser
-from Domain.Models import Nurse
-from Domain.Models import Shift
-from Domain.Models import Schedule
+from Domain.Models.Nurse import Nurse
+from Domain.Models.Shift import Shift
+from Domain.Models.Schedule import Schedule
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Enums.Days import Days
 from Domain.Models.Enums.ShiftType import ShiftType

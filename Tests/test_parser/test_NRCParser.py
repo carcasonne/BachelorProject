@@ -1,8 +1,13 @@
 import unittest
 
 from Parser.NurseParser import *
-from Domain.Models.Enums import Contract, Grade, ShiftType, Days
-from Domain.Models import Nurse, Shift, Schedule
+from Domain.Models.Enums.Grade import Grade
+from Domain.Models.Enums.ShiftType import ShiftType
+from Domain.Models.Enums.Days import Days
+from Domain.Models.Enums.Contract import Contract
+from Domain.Models.Nurse import Nurse
+from Domain.Models.Shift import Shift
+from Domain.Models.Schedule import Schedule
 
 class TestNewJsonParser(unittest.TestCase):
     def test_parses_example(self):
