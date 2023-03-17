@@ -1,7 +1,12 @@
 
 class BoundedKnapsack:
-    def __init__(self):
+    def __init__(self, nurses):
+
+        # Each bound is a type of contract
+
+        self.bounds = []
+
         pass
 
-    def to01Knapsack(self):
+    def convertToZeroOne(self):
         pass
