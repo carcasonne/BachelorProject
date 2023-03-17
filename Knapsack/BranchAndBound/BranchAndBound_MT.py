@@ -346,5 +346,3 @@ class BranchAndBound_MT:
         U_1 = weightSum + math.floor(itemR.profit - (itemR.weight - self.SC) * precedingRatio)
 
         return max(U_0, U_1)
-
-        pass
