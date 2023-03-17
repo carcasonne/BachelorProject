@@ -67,6 +67,8 @@ class BranchAndBound_MODERN:
                 includeItemSolution.items = v.items.copy()
                 includeItemSolution.items.append(item)
 
+                includeItemSolution.U = BranchAndBound_MODERN.get_bound(includeItemSolution, self.items, self.C, self.N)
+
                 # Update best known solution if solution weight fits, and solution value is better
                 if  includeItemSolution.usedC <= self.C:
                     if includeItemSolution.Z > self.bestSolution.Z: 
@@ -75,8 +77,6 @@ class BranchAndBound_MODERN:
                     if lowerBound is not None and includeItemSolution.Z > lowerBound:
                         return
 
-                includeItemSolution.U = BranchAndBound_MODERN.get_bound(includeItemSolution, self.items, self.C, self.N)
-                
                 # If the new solution could potentiall be better, add it to PQ
                 if includeItemSolution.U > self.bestSolution.Z:
                     self.PQ.insert(includeItemSolution, self.items, self.C, self.N)
@@ -88,7 +88,7 @@ class BranchAndBound_MODERN:
                 excludeItemSolution.items = v.items.copy()
                 excludeItemSolution.U = BranchAndBound_MODERN.get_bound(excludeItemSolution, self.items, self.C, self.N)
 
-                # If solution value is greater than upper bound, even without adding the item, then add to PQ
+                # If potential to be better than best solution, even without adding the item, then add to PQ
                 if excludeItemSolution.U > self.bestSolution.Z:
                     self.PQ.insert(excludeItemSolution, self.items, self.C, self.N)
 

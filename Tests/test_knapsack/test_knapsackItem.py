@@ -4,7 +4,6 @@ import random
 from Knapsack.Problems.KnapsackItem import KnapsackItem
 
 class TestKnapsackItemProperties(unittest.TestCase):
-    # Make more tests than just this one!
     def test_items_sorted_correctly(self):
         random = self._get_mock_items_random_order()
         sorted = self._get_mock_items_sorted()
@@ -19,8 +18,8 @@ class TestKnapsackItemProperties(unittest.TestCase):
     # Get the random items in the expected, sorted order
     def _get_mock_items_sorted(self):
         # Ratios 6, 6, 5, 4, 3, 1.11112...
-        profits = [60, 60, 100, 120, 60, 10]
-        weights = [10, 10, 20, 30, 20, 9]
+        profits = [100, 60, 60, 100, 120, 60, 10, 1, 1, 2, 100]
+        weights = [12,  10, 10, 20,  30,  20, 9,  1, 1, 3, 150]
 
         items = []
 

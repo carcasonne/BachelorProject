@@ -8,7 +8,6 @@ class KnapsackItem:
     def __init__(self, p, w, k):
         self.profit = p
         self.weight = w
-        self.inSack = k
     
     # Overwrite these methods to ensure sorting is correct
     # Sort such that p_1 / w_1 > p_2 / w_2 > p_3 / w_3...
@@ -29,4 +28,4 @@ class KnapsackItem:
         return ((self.profit / self.weight) == (obj.profit / obj.weight))
   
     def __repr__(self):
-        return str(f"P: {self.profit}, W: {self.weight}. Ratio: {self.profit / self.weight}")
+        return str(f"KnapsackItem; P: {self.profit}, W: {self.weight}. Ratio: {self.profit / self.weight}")

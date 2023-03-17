@@ -1,7 +1,7 @@
-from Parser.Parsers.IdiotParser import *
-from Parser.Parsers.JSONParser import *
+from Parser.Parsers.JSONParser import JSONParser
 
 import json
+
 
 class NurseParser:
     def __init__(self):
@@ -13,5 +13,5 @@ class NurseParser:
         parsedData = self.jsonParser.parse(jsonData)
         return parsedData
 
-    def parseScenario(self, scenario, example = False):
+    def parseScenario(self, scenario, example=False):
         return self.jsonParser.parseNRC(scenario, example)

@@ -1,7 +1,6 @@
 import unittest
 import random
 
-from Tests.test_knapsack.test_knapsackItem import TestKnapsackItemProperties
 from Knapsack.BranchAndBound.BranchAndBound_MT import BranchAndBound_MT
 from Knapsack.BranchAndBound.BranchAndBound_MODERN import BranchAndBound_MODERN
 from Knapsack.Problems.KnapsackItem import KnapsackItem
@@ -10,8 +9,7 @@ from Knapsack.Problems.ZeroOneKnapsack import ZeroOneKnapsack
 
 class TestBoundAndBranch_MODERN(unittest.TestCase):
     # Based on example 2.2 from the book
-
-    def test_finds_correct_solution(self):
+    def test_finds_optimal_solution(self):
         profits = [70, 20, 39, 37, 7, 5, 10]
         weights = [31, 10, 20, 19, 4, 3, 6]
         c = 50
@@ -29,6 +27,58 @@ class TestBoundAndBranch_MODERN(unittest.TestCase):
 
         for i in range(0, len(actualItems)):
             self.assertEqual(expectedItems[i], actualItems[i])
+    
+    # Branch and Bound relies on items recieved to be given in sorted order
+    # This checks if the algorithm finds a suboptimal solution if given items in a wrong order
+    def test_given_unsorted_items_gives_suboptimal_solution(self):
+        profits = [70, 20, 39, 37, 7, 5, 10]
+        weights = [31, 10, 20, 19, 4, 3, 6]
+        c = 50
+
+        items = _generate_knapsack_items(profits, weights)
+
+        # Make items be in random order
+        random.shuffle(items)
+
+        # The test can randomly fail if the items are randomly set to be in sorted order :D
+        # This makes sure that aint the case
+        sortedItems = items.copy()
+        sortedItems.sort()
+        notSorted = False
+
+        while not notSorted:
+            for i in range(len(items)):
+                current = items[i]
+                sortedItem = sortedItems[i]
+
+                if current != sortedItem:
+                    notSorted = True
+
+        bab = BranchAndBound_MODERN(items, c)
+        bab.startSearch()
+
+        optimalItems = []
+        optimalItems.append(items[0])
+        optimalItems.append(items[3])
+
+        bab = BranchAndBound_MODERN(items, c)
+        bab.startSearch()
+
+        actualItems = bab.bestSolution.items
+
+        # TODO: would make a lot of sense to compare both solutions Z value
+        # If not same length, BAB has found an incorrect solution
+        if len(optimalItems) != len(actualItems):
+            self.assertTrue(True)
+            return
+
+        # Check if actual and optimalItems differ by any 1 item
+        equality = [0] * len(optimalItems)
+        for i in range(len(optimalItems)):
+            actual = actualItems[i]
+            equality[i] = actual in optimalItems
+        
+        self.assertTrue(0 in equality)
     
     def test_calculates_correct_upper_bound(self):
         profits = [15, 100, 90, 60, 40, 15, 10, 1]
