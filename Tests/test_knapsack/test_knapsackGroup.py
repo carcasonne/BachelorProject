@@ -8,7 +8,7 @@ from Knapsack.Problems.BoundedKnapsack import BoundedKnapsack
 from Knapsack.BranchAndBound.BranchAndBound_MODERN import BranchAndBound_MODERN
 
 class TestKnapsackItemProperties(unittest.TestCase):
-    def test_converted_correctly_to_zeroOneKnapsack(self):
+    def test_converted_correctly_to_zeroOneKnapsack_efficient(self):
         expectedProfits = [10, 20, 30, 15, 30, 15, 11, 11]
         expectedWeights = [1,   2,  3,  3,  6,  3,  5,  5]
         expectedItems = _generate_knapsack_items(expectedProfits, expectedWeights)
@@ -18,7 +18,23 @@ class TestKnapsackItemProperties(unittest.TestCase):
         mockItems = self._get_mock_items_sorted()
 
         boundedProblem = BoundedKnapsack(mockItems, c)
-        zeroOneProblem = boundedProblem.asZeroOne()
+        zeroOneProblem = boundedProblem.asZeroOne_efficient()
+
+        actualItems = zeroOneProblem.items
+
+        self.assertListEqual(expectedItems, actualItems)
+
+    def test_converted_correctly_to_zeroOneKnapsack_simple(self):
+        expectedProfits = [10, 10, 10, 10, 10, 10, 15, 15, 15, 15, 11, 11]
+        expectedWeights = [1,   1,  1,  1,  1,  1,  3,  3,  3,  3,  5,  5]
+        expectedItems = _generate_knapsack_items(expectedProfits, expectedWeights)
+
+        c = 10 # Not important for test, but needed to create instances
+
+        mockItems = self._get_mock_items_sorted()
+
+        boundedProblem = BoundedKnapsack(mockItems, c)
+        zeroOneProblem = boundedProblem.asZeroOne_simple()
 
         actualItems = zeroOneProblem.items
 
