@@ -1,4 +1,5 @@
 from Domain.Models.Schedule import Schedule
+from Domain.Models.Nurse import Nurse
 #from Domain.Models.Shift import Shift
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Enums.ShiftType import ShiftType
@@ -25,8 +26,8 @@ class KnapsackSolver:
         #self.boundedItemGroups = None
 
         # This is a 'dirty' way to do it. Should be based on which kind of contracts the given nurses have
-        contract1 = Contract(4, 5)
-        contract2 = Contract(3, 4)
+        contract1 = Contract(5, 4)
+        contract2 = Contract(4, 3)
         contract3 = Contract(3, 2)
 
         self.contracts = [contract1, contract2, contract3]
@@ -39,6 +40,8 @@ class KnapsackSolver:
     # If any solution has no feasible solutions, add bank nurses
     # TODO: Also account for prefered level of coverage
     def solve(self):
+        # TODO: make solution able to backtrack
+
         # A feasible solution for grade 3
         SOLUTION_3 = self.getOverallSolution()
         # A feasible solution for grade 2
@@ -51,18 +54,17 @@ class KnapsackSolver:
         return SOLUTION_1       
 
     def getOverallSolution(self):
-        # This also sets self.upperBounds
-        tuple = self.createBoundedItemGroups(Grade.THREE)
-        boundedItemGroups = tuple[0]
-        upperBounds = tuple[1]
-        # The weight of the knapsack is defined by equation 6' in the article
-        C_3 = self.costForGrade(upperBounds)
-        lowerBound = self.E
-
         # Find a feasible solution for grade 3
         SOLUTION_3 = None
         grade_three_solution_exists = False
+        
         while not grade_three_solution_exists:
+            upperBounds = self.getOverallUpperBounds()
+            boundedItemGroups = self.createBoundedItemGroups(upperBounds)
+            # The weight of the knapsack is defined by equation 6' in the article
+            C_3 = self.costForBounds(upperBounds)
+            lowerBound = self.E
+
             boundedKnapsack = BoundedKnapsack(boundedItemGroups, C_3)
             zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
             branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack)
@@ -73,8 +75,17 @@ class KnapsackSolver:
             # If solution.level is -1, then no feasible solution exists
             # Else we have found a solution and exit the while loop
             if solution.level == -1:
-                # add extra (bank) nurses and try again
-                pass
+                # Add nurses equivelant to difference between lower and upper bound
+                bankN = C_3 - lowerBound
+                # paper doesn't mention contract of bank nurses...
+                bankContract = Contract(5, 4)
+                # paper doesn't mention grade of bank nurses...
+                bankGrade = Grade.ONE
+
+                newNurses = []
+                for i in range(bankN):
+                    bankNurse = Nurse(1000 + i, bankGrade, bankContract)
+                    self.schedule.nurses.append(bankNurse)
             else:
                 SOLUTION_3 = solution
                 grade_three_solution_exists = True
@@ -242,24 +253,26 @@ class KnapsackSolver:
 
         return dicti
 
-    def createBoundedItemGroups(self, upperBounds=None):
+    def getOverallUpperBounds(self):
+        # Quick and dirty, make it dynamic in future TODO
+        upperBounds = {
+            self.contracts[0]: 0,
+            self.contracts[1]: 0,
+            self.contracts[2]: 0
+        }
+
+        for nurse in self.schedule.nurses:
+            contract = nurse.contract
+            if contract.__eq__(self.contracts[0]):
+                upperBounds[self.contracts[0]] += 1
+            elif contract.__eq__(self.contracts[1]):
+                upperBounds[self.contracts[1]] += 1
+            elif contract.__eq__(self.contracts[2]):
+                upperBounds[self.contracts[2]] += 1
         
-        if upperBounds is None:
-            upperBounds = {
-                self.contract1: 0,
-                self.contract2: 0,
-                self.contract3: 0
-            }
+        return upperBounds
 
-            for nurse in self.schedule.nurses:
-                contract = nurse.contract
-                if contract.__eq__(self.contract1):
-                    upperBounds[self.contract1] += 1
-                elif contract.__eq__(self.contract2):
-                    upperBounds[self.contract2] += 1
-                elif contract.__eq__(self.contract3):
-                    upperBounds[self.contract3] += 1
-
+    def createBoundedItemGroups(self, upperBounds):
         boundedItemGroups = []
 
         # Represent the problem in bounded knapsack item groups
@@ -274,12 +287,12 @@ class KnapsackSolver:
         return boundedItemGroups
 
     # Returns the knapsack cost for a given grade with given upper bounds for each type of contract
-    def costForBounds(self, upperBounds):
+    def costForBounds(self, upperBounds: dict):
         C = 0
         for i in range(len(self.contracts)):
-            contract = upperBounds[i]
+            contract = self.contracts[i]
             d = contract.days
-            n = upperBounds[i]
+            n = upperBounds[contract]
             C += d * n
 
         C = C - self.D

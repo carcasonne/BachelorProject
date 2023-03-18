@@ -57,7 +57,13 @@ class BranchAndBound_MODERN:
             if v.U > self.bestSolution.Z: 
                 # Make new node in tree
                 newLevel = v.level + 1
+
+                # means we have run through all items without finding a feasible solution
+                if newLevel >= len(self.items):
+                    return
+
                 item = self.items[newLevel]
+
                 newSolutionZ = v.Z + item.profit
                 newSolutionC = v.usedC + item.weight
 
@@ -74,14 +80,14 @@ class BranchAndBound_MODERN:
                 if  includeItemSolution.usedC <= self.C:
                     # If a lower bound is given, we must take into consideration
                     # whether to update the solution or just stop now
-                    if(lowerBound is not None and includeItemSolution.Z >= lowerBound):
-                        if earlyExit:
-                            return
-                        elif includeItemSolution.Z > self.bestSolution.Z:
-                            self.bestSolution = includeItemSolution
-                    else:
-                        if includeItemSolution.Z > self.bestSolution.Z:
-                            self.bestSolution = includeItemSolution
+                    if lowerBound is not None:
+                        if includeItemSolution.Z >= lowerBound:
+                            if earlyExit:
+                                return
+                            elif includeItemSolution.Z > self.bestSolution.Z:
+                                self.bestSolution = includeItemSolution
+                    elif includeItemSolution.Z > self.bestSolution.Z:
+                        self.bestSolution = includeItemSolution
 
                 # If the new solution could potentiall be better, add it to PQ
                 if includeItemSolution.U > self.bestSolution.Z:

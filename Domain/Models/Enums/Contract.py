@@ -10,3 +10,6 @@ class Contract():
 
         return  (self.days == other.days and 
                  self.nights == other.nights)
+
+    def __hash__(self):
+        return hash(f"{self.days}, {self.nights}")

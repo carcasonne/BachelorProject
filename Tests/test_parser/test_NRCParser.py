@@ -22,8 +22,8 @@ class TestNewJsonParser(unittest.TestCase):
     # What is expected from Data/Example/SimpleScenario
     def create_example_model(self):
         fullTime = Contract(5, 4)
-        partTime = Contract(4,3)
-        halfTime = Contract(3,2)
+        partTime = Contract(4, 3)
+        halfTime = Contract(3, 2)
         nurses = [
             Nurse(0, Grade.ONE, fullTime),
             Nurse(1, Grade.ONE, halfTime),
