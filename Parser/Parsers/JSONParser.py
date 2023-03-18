@@ -24,7 +24,7 @@ class JSONParser:
             workdaysFile = open("Data/" + folder + scenario + "/workdays.json")
             workdaysJson = json.load(workdaysFile)
         except Exception as e:
-            raise FileNotFoundError(str(e))
+            raise FileNotFoundError(str(e)) from e
         
         nurses = []
         shifts = []
@@ -233,7 +233,7 @@ class JSONParser:
 
             return Schedule(shifts, nurses)
         except Exception as e:
-            raise ValueError("Failed to parse json: " + str(e))
+            raise ValueError("Failed to parse json: " + str(e)) from e
 
 
     def intToGrade(self, i):

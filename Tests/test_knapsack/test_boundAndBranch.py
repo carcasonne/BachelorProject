@@ -20,7 +20,8 @@ class TestBoundAndBranch_MODERN(unittest.TestCase):
         expectedItems.append(items[0])
         expectedItems.append(items[3])
 
-        bab = BranchAndBound_MODERN(items, c)
+        problem = ZeroOneKnapsack(items, c)
+        bab = BranchAndBound_MODERN(problem)
         bab.startSearch()
 
         actualItems = bab.bestSolution.items
@@ -54,14 +55,12 @@ class TestBoundAndBranch_MODERN(unittest.TestCase):
                 if current != sortedItem:
                     notSorted = True
 
-        bab = BranchAndBound_MODERN(items, c)
-        bab.startSearch()
-
         optimalItems = []
         optimalItems.append(items[0])
         optimalItems.append(items[3])
 
-        bab = BranchAndBound_MODERN(items, c)
+        problem = ZeroOneKnapsack(items, c)
+        bab = BranchAndBound_MODERN(problem)
         bab.startSearch()
 
         actualItems = bab.bestSolution.items
@@ -88,7 +87,8 @@ class TestBoundAndBranch_MODERN(unittest.TestCase):
 
         items = _generate_knapsack_items(profits, weights)
         
-        bab = BranchAndBound_MODERN(items, c)
+        problem = ZeroOneKnapsack(items, c)
+        bab = BranchAndBound_MODERN(problem)
         actual = bab.bestSolution.U
 
         self.assertEqual(expected, actual)
@@ -121,7 +121,8 @@ class TestBoundAndBranch_MODERN(unittest.TestCase):
         self.assert_lower_bound_search(items, c, lowerBound, expectedItems)
     
     def assert_lower_bound_search(self, items, c, lowerBound, expectedItems):
-        bab = BranchAndBound_MODERN(items, c)
+        problem = ZeroOneKnapsack(items, c)
+        bab = BranchAndBound_MODERN(problem)
         bab.startSearchWithEarlyExit(lowerBound)
 
         actualItems = bab.bestSolution.items

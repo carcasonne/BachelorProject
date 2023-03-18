@@ -11,7 +11,7 @@ class BranchAndBound_MT:
         self.N = len(self.items)
         self.bestZ = 0
         self.currentZ = 0
-        self.totalC = zeroOneKnapsack.c
+        self.totalC = zeroOneKnapsack.C
         self.currentC = self.totalC
         # S: critical item
         # SC: the sum weight of all items untill critical item
@@ -29,7 +29,7 @@ class BranchAndBound_MT:
         # Now it is a list of object SolutionNode, each node containing the 3 important fields
         self.nodes = []
 
-        for i in range(len(self.items)):
+        for _ in range(len(self.items)):
             self.nodes.append(SolutionNode())
 
         self.nodes[1].weight = 0
@@ -83,15 +83,12 @@ class BranchAndBound_MT:
             else:
                 self.j = self.j + 1
 
-        display = self.currentSolution
         possibleRs = []
         jNode = self.nodes[self.j]
         for i in range(jNode.r, self.N+1):
             sum = 0
             for k in range(jNode.r, i):
                 print(k)
-                item = self.items[k]
-                weight = item.weight
                 sum += self.items[k].weight
             if(jNode.weight + sum > self.currentC):
                 possibleRs.append(i)
@@ -130,8 +127,6 @@ class BranchAndBound_MT:
         print("saving best solution")
         self.currentC = self.currentC - self.markedW
         self.currentZ = self.currentZ + self.markedP
-
-        display = self.currentSolution
 
         # TODO: looping?
         for k in range(self.j, self.localR - 1):
@@ -173,8 +168,6 @@ class BranchAndBound_MT:
         print("updating best solution")
         # Update best solution
         self.bestZ = self.currentZ + self.markedP
-        display = self.currentSolution
-        display2 = self.bestSolution
 
         print("updating from:")
         print(self.bestSolution)
@@ -204,8 +197,6 @@ class BranchAndBound_MT:
         print("backtracking")
         # Find latest item inserted into the knapsack
         i = None
-
-        display = self.currentSolution
 
         for k in range(0, self.N):
             if k < self.j:
@@ -307,7 +298,6 @@ class BranchAndBound_MT:
     def findCriticalItemAndResidualCapacity(self):
         items = self.items.copy()
         sum = 0
-        counter = 0
         for i in range(1, len(items)):
             item = items[i]
             if(sum + item.weight <= self.totalC):

@@ -5,9 +5,10 @@ class KnapsackItem:
     # p (int): profit
     # w (int): weight
     # j (bool): whether this item is in the knapsack 
-    def __init__(self, p, w, k):
+    def __init__(self, p, w, itemType):
         self.profit = p
         self.weight = w
+        self.itemType = itemType
     
     # Overwrite these methods to ensure sorting is correct
     # Sort such that p_1 / w_1 > p_2 / w_2 > p_3 / w_3...
