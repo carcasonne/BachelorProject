@@ -83,6 +83,7 @@ class BranchAndBound_MODERN:
                     if lowerBound is not None:
                         if includeItemSolution.Z >= lowerBound:
                             if earlyExit:
+                                self.bestSolution = includeItemSolution
                                 return
                             elif includeItemSolution.Z > self.bestSolution.Z:
                                 self.bestSolution = includeItemSolution
