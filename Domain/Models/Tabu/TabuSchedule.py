@@ -39,6 +39,9 @@ class TabuSchedule:
         self.updateAll()
         return self
 
+    def checkMove(self, nurse, newShiftPattern):
+        pass
+
     def calculateCC(self):
         CC = 0
         for shift in self.shifts:

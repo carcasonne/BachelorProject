@@ -21,8 +21,6 @@ class TabuSearch:
                 counter += 1
             nurse.assignShiftPattern(pattern)
         tabuSchedule.updateAll()
-
-        self.currSolution = tabuSchedule
         self.bestSolution = tabuSchedule
         self.dayNightTabuList = []
         self.nurseTabuList = []
@@ -32,14 +30,16 @@ class TabuSearch:
     def run(self):
         # Phase 1
         pass
-        #while self.currSolution.CC != 0:
-        move = self.randomDescent()
-        if move is None: self.balanceRestoration()
-        if move is None: self.shiftChainMoves()
-        if move is None: self.nurseChainMoves()
-        if move is None: self.moveUnderCovering()
-        if move is None: self.randomKick()
-        self.makeMove(move)
+        counter = 0
+        while counter < 10:
+            move = self.randomDescent()
+            if move is None: self.balanceRestoration()
+            if move is None: self.shiftChainMoves()
+            if move is None: self.nurseChainMoves()
+            if move is None: self.moveUnderCovering()
+            if move is None: self.randomKick()
+            self.makeMove(move)
+            counter += 1
 
         # Phase 2
 
@@ -52,11 +52,26 @@ class TabuSearch:
 
     # PHASE 1:
     def randomDescent(self):
+        neighbor = copy.copy(self.bestSolution)
+        for n in neighbor.nurses:
+            if n not in self.nurseTabuList:
+                if n.assignedShiftPattern[1] == [0] * 7:
+                    p = n.feasibleShiftPatterns
+                    for x in range(len(p)//2, len(p)):
+                        if neighbor.checkMove(n, p[x]) < 0:
+                            return neighbor.singleMove(n, p), n
+                else:
+                    p = n.feasibleShiftPatterns
+                    for x in range(len(p) // 2):
+                        if neighbor.checkMove(n, p[x]) < 0:
+                            return neighbor.singleMove(n, p), n
+
         while True:
-            nurse = np.random.choice(self.currSolution.nurses)
+            nurse = np.random.choice(self.bestSolution.nurses)
             newShiftPattern = nurse.feasibleShiftPatterns[random.randint(0, len(nurse.feasibleShiftPatterns) - 1)]
-            print(self.currSolution.CC)
-            neighbor = copy.copy(self.currSolution)
+            print(self.bestSolution.CC)
+            neighbor = copy.copy(self.bestSolution)
+
             neighbor.singleMove(nurse, TabuShiftPattern(newShiftPattern[0], newShiftPattern[1]))
             print(neighbor.CC)
             if neighbor.CC < self.bestSolution.CC: #and neighbor.PC <= self.currSolution.PC:
