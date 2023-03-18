@@ -276,7 +276,7 @@ class KnapsackSolver:
     # Returns the knapsack cost for a given grade with given upper bounds for each type of contract
     def costForBounds(self, upperBounds):
         C = 0
-        for i in range(len(contract)):
+        for i in range(len(self.contracts)):
             contract = upperBounds[i]
             d = contract.days
             n = upperBounds[i]
