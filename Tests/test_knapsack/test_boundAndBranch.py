@@ -122,8 +122,8 @@ class TestBoundAndBranch_MODERN(unittest.TestCase):
     
     def assert_lower_bound_search(self, items, c, lowerBound, expectedItems):
         problem = ZeroOneKnapsack(items, c)
-        bab = BranchAndBound_MODERN(problem)
-        bab.startSearchWithEarlyExit(lowerBound)
+        bab = BranchAndBound_MODERN(problem, lowerBound)
+        bab.startSearch(True)
 
         actualItems = bab.bestSolution.items
 
