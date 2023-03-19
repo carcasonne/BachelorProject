@@ -47,8 +47,9 @@ class TabuSearch:
         return self.bestSolution
 
     def makeMove(self, move):
-        self.bestSolution = move[0]
-        self.nurseTabuList.insert(0, move[1])
+        if not None:
+            self.bestSolution = move[0]
+            self.nurseTabuList.insert(0, move[1])
 
     # PHASE 1:
     def randomDescent(self):
@@ -65,17 +66,7 @@ class TabuSearch:
                     for x in range(len(p) // 2):
                         if neighbor.checkMove(n, p[x]) < 0:
                             return neighbor.singleMove(n, p), n
-
-        while True:
-            nurse = np.random.choice(self.bestSolution.nurses)
-            newShiftPattern = nurse.feasibleShiftPatterns[random.randint(0, len(nurse.feasibleShiftPatterns) - 1)]
-            print(self.bestSolution.CC)
-            neighbor = copy.copy(self.bestSolution)
-
-            neighbor.singleMove(nurse, TabuShiftPattern(newShiftPattern[0], newShiftPattern[1]))
-            print(neighbor.CC)
-            if neighbor.CC < self.bestSolution.CC: #and neighbor.PC <= self.currSolution.PC:
-                return neighbor, nurse
+        return None
 
     def balanceRestoration(self):
         pass
