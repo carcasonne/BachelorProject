@@ -84,11 +84,14 @@ class TestKnapsackSolver(unittest.TestCase):
         self.assertEqual(0, len(nurselessSchedule.nurses))
 
         grade_3_solution = solver.getOverallSolution()
+        grade_2_solution = solver.getOverallSolution()
+        grade_1_solution = solver.getOverallSolution()
+        nurses = solver.schedule.nurses
 
         # A feasible solution should have been generated
-        self.assertTrue(len(grade_3_solution.items) > 0)
-        self.assertTrue(grade_3_solution.level != -1)
-        self.assertTrue(grade_3_solution.Z > 0)
+        self.assertTrue(len(grade_1_solution.items) > 0)
+        self.assertTrue(grade_1_solution.level != -1)
+        self.assertTrue(grade_1_solution.Z > 0)
 
         pass
     

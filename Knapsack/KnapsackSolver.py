@@ -67,7 +67,7 @@ class KnapsackSolver:
 
             # If the upper bound is smaller then lower bound, the problem is infeasible
             # Therefor we add a bank nurse to the solution and try again
-            if(C_3 < lowerBound):
+            if(C_3 <= lowerBound):
                 self.addBankNurse()
                 continue
 
@@ -95,7 +95,7 @@ class KnapsackSolver:
     
     def addBankNurse(self):
         # paper doesn't mention contract of bank nurses...
-        bankContract = Contract(5, 4)
+        bankContract = Contract(3, 2)
         # paper doesn't mention grade of bank nurses...
         bankGrade = Grade.ONE
         bankNurse = Nurse(1000, bankGrade, bankContract)
