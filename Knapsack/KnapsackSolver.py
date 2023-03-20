@@ -71,7 +71,7 @@ class KnapsackSolver:
         #SEARCH_1 = self.getGradeOneSolution(SEARCH_2.bestSolution)
         feasible_grade_1_solution_exists = False
         while not feasible_grade_1_solution_exists:
-            SEARCH_1 = self.getGradeTwoSolution(SEARCH_2.bestSolution)
+            SEARCH_1 = self.getGradeOneSolution(SEARCH_2.bestSolution)
             solution = SEARCH_1.bestSolution
 
              # If no solution could be found, we backtrack to grade 2 tree, 
