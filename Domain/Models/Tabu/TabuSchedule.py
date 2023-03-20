@@ -1,7 +1,7 @@
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuShift import TabuShift
-from Domain.Models.Tabu.TabuShiftType import TabuShiftType
+from Domain.Models.Enums.ShiftType import TabuShiftType
 
 class TabuSchedule:
     def __init__(self, Schedule):
