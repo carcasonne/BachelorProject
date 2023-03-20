@@ -17,8 +17,8 @@ from Knapsack.KnapsackSolver import KnapsackSolver
 
 
 class TestKnapsackSolver(unittest.TestCase):
-    def test_finds_grade_three_solution(self):
-        schedule = self._get_grade_three_feasible_schedule()
+    def test_finds_grade_3_solution(self):
+        schedule = self._get_grade_3_feasible_schedule()
         solver = KnapsackSolver(schedule)
 
         grade_3_search = solver.getOverallSolution()
@@ -28,31 +28,8 @@ class TestKnapsackSolver(unittest.TestCase):
         self.assertTrue(grade_3_solution.level != -1)
         self.assertTrue(grade_3_solution.Z > 0)
     
-    def test_infeasible_schedule_grade_3_gets_assigned_bank_nurses(self):
-        schedule = self._get_grade_three_infeasible_schedule()
-        originalNurses = len(schedule.nurses)
-
-        solver = KnapsackSolver(schedule)
-
-        # Nurses are added to the solver as a side-effect
-        grade_3_search = solver.getOverallSolution()
-        newNurses = len(solver.schedule.nurses)
-
-        self.assertNotEqual(originalNurses, newNurses)
-    
-    def test_finds_feasible_grade_three_solution_for_feasible_grade_two_schedule(self):
-        schedule = self._get_grade_two_feasible_schedule()
-        solver = KnapsackSolver(schedule)
-
-        grade_3_search = solver.getOverallSolution()
-        grade_3_solution = grade_3_search.bestSolution
-
-        # If not equal to -1, then a feasible solution exists
-        self.assertTrue(grade_3_solution.level != -1)
-        self.assertTrue(grade_3_solution.Z > 0)
-
-    def test_finds_grade_two_solution(self):
-        schedule = self._get_grade_two_feasible_schedule()
+    def test_finds_grade_2_solution(self):
+        schedule = self._get_grade_2_feasible_schedule()
         solver = KnapsackSolver(schedule)
 
         grade_3_search = solver.getOverallSolution()
@@ -64,13 +41,9 @@ class TestKnapsackSolver(unittest.TestCase):
         self.assertTrue(grade_2_solution.level != -1)
         self.assertTrue(grade_2_solution.Z > 0)
     
-    # Not implemented yet
-    # When no feasible solution exists at level 2, the tree should continue its search at level 3
-    def test_infeasible_schedule_grade_2_gets_assigned_bank_nurses(self):
-        pass
 
-    def test_finds_grade_one_solution(self):
-        schedule = self._get_grade_one_feasible_schedule()
+    def test_finds_grade_1_solution(self):
+        schedule = self._get_grade_1_feasible_schedule()
         solver = KnapsackSolver(schedule)
 
         grade_3_search = solver.getOverallSolution()
@@ -83,9 +56,44 @@ class TestKnapsackSolver(unittest.TestCase):
         # If not equal to -1, then a feasible solution exists
         self.assertTrue(grade_1_solution.level != -1)
         self.assertTrue(grade_1_solution.Z > 0)
+    
+    def test_finds_feasible_grade_3_solution_for_feasible_grade_2_schedule(self):
+        schedule = self._get_grade_2_feasible_schedule()
+        solver = KnapsackSolver(schedule)
 
-    def test_solves_feasible_grade_two_schedule(self):
-        schedule = self._get_grade_three_feasible_schedule()
+        grade_3_search = solver.getOverallSolution()
+        grade_3_solution = grade_3_search.bestSolution
+
+        # If not equal to -1, then a feasible solution exists
+        self.assertTrue(grade_3_solution.level != -1)
+        self.assertTrue(grade_3_solution.Z > 0)
+
+    def test_finds_feasible_grade_3_solution_for_feasible_grade_1_schedule(self):
+        schedule = self._get_grade_1_feasible_schedule()
+        solver = KnapsackSolver(schedule)
+
+        grade_3_search = solver.getOverallSolution()
+        grade_3_solution = grade_3_search.bestSolution
+
+        # If not equal to -1, then a feasible solution exists
+        self.assertTrue(grade_3_solution.level != -1)
+        self.assertTrue(grade_3_solution.Z > 0)
+    
+    def test_finds_feasible_grade_2_solution_for_feasible_grade_1_schedule(self):
+        schedule = self._get_grade_1_feasible_schedule()
+        solver = KnapsackSolver(schedule)
+
+        grade_3_search = solver.getOverallSolution()
+        grade_3_solution = grade_3_search.bestSolution
+        grade_2_search = solver.getGradeTwoSolution(grade_3_solution)
+        grade_2_solution = grade_2_search.bestSolution
+
+        # If not equal to -1, then a feasible solution exists
+        self.assertTrue(grade_2_solution.level != -1)
+        self.assertTrue(grade_2_solution.Z > 0)
+
+    def test_solves_feasible_grade_3_schedule(self):
+        schedule = self._get_grade_3_feasible_schedule()
         solver = KnapsackSolver(schedule)
 
         branchAndBound = solver.solve()
@@ -97,8 +105,8 @@ class TestKnapsackSolver(unittest.TestCase):
 
         self.assertTrue(feasibleSolution.level != -1)
     
-    def test_solves_feasible_grade_one_schedule(self):
-        schedule = self._get_grade_two_feasible_schedule()
+    def test_solves_feasible_grade_2_schedule(self):
+        schedule = self._get_grade_2_feasible_schedule()
         solver = KnapsackSolver(schedule)
 
         branchAndBound = solver.solve()
@@ -109,6 +117,73 @@ class TestKnapsackSolver(unittest.TestCase):
         # self.assertTrue(grade_1_solution.Z > 0)
 
         self.assertTrue(feasibleSolution.level != -1)
+    
+    def test_solves_feasible_grade_1_schedule(self):
+        schedule = self._get_grade_1_feasible_schedule()
+        solver = KnapsackSolver(schedule)
+
+        branchAndBound = solver.solve()
+        feasibleSolution = branchAndBound.bestSolution
+
+        self.assertTrue(feasibleSolution.level != -1)
+        self.assertTrue(feasibleSolution.Z > 0)
+    
+    # Shoul solve it by adding bank nurses
+    def test_solves_infeasible_grade_3_schedule(self):
+        schedule = self._get_grade_3_infeasible_schedule()
+        solver = KnapsackSolver(schedule)
+        originalNurseLength = len(solver.schedule.nurses)
+
+        branchAndBound = solver.solve()
+        feasibleSolution = branchAndBound.bestSolution
+
+        newNurseLength = len(solver.schedule.nurses)
+        
+        self.assertTrue(originalNurseLength != newNurseLength)
+        self.assertTrue(feasibleSolution.level != -1)
+        self.assertTrue(feasibleSolution.Z > 0)
+
+    def test_solves_infeasible_grade_2_schedule(self):
+        schedule = self._get_grade_2_infeasible_schedule()
+        solver = KnapsackSolver(schedule)
+        originalNurseLength = len(solver.schedule.nurses)
+
+        branchAndBound = solver.solve()
+        feasibleSolution = branchAndBound.bestSolution
+
+        newNurseLength = len(solver.schedule.nurses)
+        
+        self.assertTrue(originalNurseLength != newNurseLength)
+        self.assertTrue(feasibleSolution.level != -1)
+        self.assertTrue(feasibleSolution.Z > 0)
+
+    def test_solves_infeasible_grade_1_schedule(self):
+        schedule = self._get_grade_1_infeasible_schedule()
+        solver = KnapsackSolver(schedule)
+        originalNurseLength = len(solver.schedule.nurses)
+
+        branchAndBound = solver.solve()
+        feasibleSolution = branchAndBound.bestSolution
+
+        newNurseLength = len(solver.schedule.nurses)
+        
+        self.assertTrue(originalNurseLength != newNurseLength)
+        self.assertTrue(feasibleSolution.level != -1)
+        self.assertTrue(feasibleSolution.Z > 0)
+    
+    # If the schedule has no nurses, it should find a solution consisting only of bank nurses
+    def test_solves_empty_schedule(self):
+        emptySchedule = self._get_schedule_with_no_nurses()
+        solver = KnapsackSolver(emptySchedule)
+
+        branchAndBound = solver.solve()
+        feasibleSolution = branchAndBound.bestSolution
+
+        nurses = len(solver.schedule.nurses)
+
+        self.assertTrue(nurses > 0)
+        self.assertTrue(feasibleSolution.level != -1)
+        self.assertTrue(feasibleSolution.Z > 0)
 
     def test_schedule_with_no_nurses_gets_bank_nurse_solution(self):
         nurselessSchedule = self._get_schedule_with_no_nurses()
@@ -131,19 +206,64 @@ class TestKnapsackSolver(unittest.TestCase):
         self.assertTrue(grade_1_solution.level != -1)
         self.assertTrue(grade_1_solution.Z > 0)
 
-     # Not implemented yet
-    # When no feasible solution exists at level 2, the tree should continue its search at level 3
-    def test_infeasible_grade_2_search_finds_no_solution(self):
-        pass
+    # Grade 3 will always return a feasible schedule, as it implicitly adds bank nurses
+    def test_infeasible_grade_3_assigned_bank_nurses(self):
+        infeasibleSchedule = self._get_grade_3_infeasible_schedule()
+        originalNurses = len(infeasibleSchedule.nurses)
+
+        solver = KnapsackSolver(infeasibleSchedule)
+
+        # Nurses are added to the solver as a side-effect
+        grade_3_search = solver.getOverallSolution()
+        grade_3_solution = grade_3_search.bestSolution
+        newNurses = len(solver.schedule.nurses)
+
+        self.assertNotEqual(originalNurses, newNurses)
+
+        # Make sure that a solution was found
+        self.assertTrue(newNurses > 0)
+        self.assertTrue(grade_3_solution.level != -1)
+        self.assertTrue(grade_3_solution.Z > 0)
 
     # Not implemented yet
-    # When no feasible solution exists at level 1, the tree should continue its search at level 2
-    def test_infeasible_grade_3_search_finds_no_solution(self):
-        pass
-    
+    # This DOES NOT test the solver. The solver backtracks in previous tree, and adds bank nurses
+    # This methods tests that searching an infeasible tree gives no feasible solutions
+    def test_infeasible_grade_2_search_finds_no_solution(self):
+        infeasibleSchedule = self._get_grade_2_infeasible_schedule()
+        solver = KnapsackSolver(infeasibleSchedule)
+        
+        # Grade 3 solution should exist
+        grade_3_search = solver.getOverallSolution()
+        grade_3_solution = grade_3_search.bestSolution
+        self.assertTrue(grade_3_solution.level != -1)
+        
+        # Grade 2 solution should not exist
+        grade_2_search = solver.getGradeTwoSolution(grade_3_solution)
+        grade_2_solution = grade_2_search.bestSolution
+        self.assertTrue(grade_2_solution.level == -1)
+
+    # Not implemented yet
+    # This DOES NOT test the solver. The solver backtracks in previous tree, and adds bank nurses
+    # This methods tests that searching an infeasible tree gives no feasible solutions
+    def test_infeasible_grade_1_search_finds_no_solution(self):
+        infeasibleSchedule = self._get_grade_1_infeasible_schedule()
+        solver = KnapsackSolver(infeasibleSchedule)
+
+        # Grade 3 solution should exist
+        grade_3_search = solver.getOverallSolution()
+        grade_3_solution = grade_3_search.bestSolution
+        self.assertTrue(grade_3_solution.level != -1)
+
+        # Grade 1 solution should not exist
+        # It would probably fail already at grade 2, so we go directly to grade 1 to ensure test
+        grade_1_search = solver.getGradeOneSolution(grade_3_solution)
+        grade_1_solution = grade_1_search.bestSolution
+
+        self.assertTrue(grade_1_solution.level == -1)
+
     # Tests if the solver's .requiredForGrade() functions as expected
     def test_solver_gets_correct_shiftRequirements_for_grade(self):
-        schedule = self._get_grade_three_feasible_schedule()
+        schedule = self._get_grade_3_feasible_schedule()
 
         # actual values
         solver = KnapsackSolver(schedule)
@@ -178,7 +298,7 @@ class TestKnapsackSolver(unittest.TestCase):
     # 
     # Day nurse potential coverage: Grade1: 0, Grade2: 0, Grade3: 14
     # Night nurse potential coverage: Grade1: 0, Grade2: 0, Grade3: 11
-    def _get_grade_three_feasible_schedule(self):
+    def _get_grade_3_feasible_schedule(self):
         # Static
         contract1 = Contract(5, 4)
         contract2 = Contract(4, 3)
@@ -237,12 +357,12 @@ class TestKnapsackSolver(unittest.TestCase):
         return Schedule(shifts, nurses)
     
     def _get_schedule_with_no_nurses(self):
-        schedule = self._get_grade_three_feasible_schedule()
+        schedule = self._get_grade_3_feasible_schedule()
         schedule.nurses = []
         return schedule
     
-    def _get_grade_three_infeasible_schedule(self):
-        feasibleSchedule = self._get_grade_three_feasible_schedule()
+    def _get_grade_3_infeasible_schedule(self):
+        feasibleSchedule = self._get_grade_3_feasible_schedule()
 
         # I miss c# linq :(
         nightShift = next((shift for shift in feasibleSchedule.shifts if shift.shiftType == ShiftType.NIGHT), None)
@@ -259,7 +379,7 @@ class TestKnapsackSolver(unittest.TestCase):
     # 
     # Day nurse potential coverage: Grade1: 0, Grade2: 14, Grade3: 14
     # Night nurse potential coverage: Grade1: 0, Grade2: 11, Grade3: 11
-    def _get_grade_two_feasible_schedule(self):
+    def _get_grade_2_feasible_schedule(self):
         # Static
         contract1 = Contract(5, 4)
         contract2 = Contract(4, 3)
@@ -317,8 +437,8 @@ class TestKnapsackSolver(unittest.TestCase):
 
         return Schedule(shifts, nurses)
     
-    def _get_grade_two_infeasible_schedule(self):
-        feasibleSchedule = self._get_grade_two_feasible_schedule()
+    def _get_grade_2_infeasible_schedule(self):
+        feasibleSchedule = self._get_grade_2_feasible_schedule()
 
         # I miss c# linq :(
         nightShift = next((shift for shift in feasibleSchedule.shifts if shift.shiftType == ShiftType.NIGHT), None)
@@ -326,6 +446,8 @@ class TestKnapsackSolver(unittest.TestCase):
         # the schedule will no longer have a feasible solution for Grade3
         nightShift.coverRequirements[Grade.TWO] += 3
         nightShift.coverRequirements[Grade.TWO] += 3
+        nightShift.coverRequirements[Grade.THREE] += 3
+        nightShift.coverRequirements[Grade.THREE] += 3
 
         return feasibleSchedule
     
@@ -336,7 +458,7 @@ class TestKnapsackSolver(unittest.TestCase):
     # 
     # Day nurse potential coverage: Grade1: 14, Grade2: 14, Grade3: 14
     # Night nurse potential coverage: Grade1: 11, Grade2: 11, Grade3: 11
-    def _get_grade_one_feasible_schedule(self):
+    def _get_grade_1_feasible_schedule(self):
         # Static
         contract1 = Contract(5, 4)
         contract2 = Contract(4, 3)
@@ -389,10 +511,28 @@ class TestKnapsackSolver(unittest.TestCase):
         nurse1 = Nurse(0, Grade.ONE, contract1)
         nurse2 = Nurse(1, Grade.ONE, contract1)
         nurse3 = Nurse(2, Grade.ONE, contract2)
+        # nurse4 = Nurse(2, Grade.ONE, contract1)
+        # nurse5 = Nurse(2, Grade.ONE, contract1)
 
         nurses = [nurse1, nurse2, nurse3]
 
         return Schedule(shifts, nurses)
+    
+    def _get_grade_1_infeasible_schedule(self):
+        feasibleSchedule = self._get_grade_1_feasible_schedule()
+
+        # I miss c# linq :(
+        nightShift = next((shift for shift in feasibleSchedule.shifts if shift.shiftType == ShiftType.NIGHT), None)
+        # By adding 1 Grade3 nurse to the night shift requirements, 
+        # the schedule will no longer have a feasible solution for Grade3
+        nightShift.coverRequirements[Grade.ONE] += 3
+        nightShift.coverRequirements[Grade.ONE] += 3
+        nightShift.coverRequirements[Grade.TWO] += 3
+        nightShift.coverRequirements[Grade.TWO] += 3
+        nightShift.coverRequirements[Grade.THREE] += 3
+        nightShift.coverRequirements[Grade.THREE] += 3
+
+        return feasibleSchedule
         
 
 if __name__ == '__main__':

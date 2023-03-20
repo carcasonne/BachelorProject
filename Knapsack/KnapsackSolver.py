@@ -50,9 +50,11 @@ class KnapsackSolver:
         # TODO: VERY IMPORTANT! MAKE SOLUTION 2 AND 1 FINDERS ABLE TO ADD BANK NURSES AS NEEDED
 
         # A feasible solution for grade 3
+        # Important note: Solution to this search only shows how many grade 3 nurses should work nightshift
         SEARCH_3 = self.getOverallSolution()
 
         # A feasible solution for grade 2
+        # Important note: Solution to this search only shows how many grade 2 nurses should work nightshift
         feasible_grade_2_solution_exists = False
         while not feasible_grade_2_solution_exists:
             prevSolution = SEARCH_3.bestSolution
@@ -76,8 +78,8 @@ class KnapsackSolver:
                 feasible_grade_2_solution_exists = True
 
 
-        # A feasible solutino for grade 1
-        #SEARCH_1 = self.getGradeOneSolution(SEARCH_2.bestSolution)
+        # A feasible solutino for grade 2
+        # Important note: Solution to this search only shows how many grade 1 nurses should work nightshift
         feasible_grade_1_solution_exists = False
         while not feasible_grade_1_solution_exists:
             prevSolution = SEARCH_2.bestSolution
@@ -101,11 +103,10 @@ class KnapsackSolver:
                     bankNurseItem = KnapsackItem(bankNurseProfit, bankNurseWeight, 2)
                     prevSolution.items.append(bankNurseItem)
                     self.addBankNurse()
-                    SEARCH_2 = self.getGradeTwoSolution()
+                    SEARCH_2 = self.getGradeTwoSolution(prevSolution)
+                    print("hej")
             else:
                 feasible_grade_1_solution_exists = True
-
-        # what now????
 
         return SEARCH_1   
 
@@ -151,6 +152,7 @@ class KnapsackSolver:
         bankContract = self.bankNurseContract
         bankGrade = self.bankNurseGrade
         bankNurse = Nurse(1000, bankGrade, bankContract)
+        self.globalC += bankContract.days
         self.schedule.nurses.append(bankNurse)
 
     def getGradeTwoSolution(self, previousSolution):
