@@ -80,11 +80,10 @@ class BranchAndBound_MODERN:
                     # If a lower bound is given, we must take into consideration
                     # whether to update the solution or just stop now
                     if self.lowerBound is not None:
-                        if includeItemSolution.Z >= self.lowerBound:
-                            if earlyExit:
-                                exit = True
+                        if includeItemSolution.Z > self.lowerBound:
                             if includeItemSolution.Z > self.bestSolution.Z:
                                 self.bestSolution = includeItemSolution
+                                exit = earlyExit
                     elif includeItemSolution.Z > self.bestSolution.Z:
                         self.bestSolution = includeItemSolution
 

@@ -83,9 +83,9 @@ class TestKnapsackSolver(unittest.TestCase):
         # If not equal to -1, then a feasible solution exists
         self.assertTrue(grade_1_solution.level != -1)
         self.assertTrue(grade_1_solution.Z > 0)
-    
-    def test_solves_feasible_grade_one_schedule(self):
-        schedule = self._get_grade_one_feasible_schedule()
+
+    def test_solves_feasible_grade_two_schedule(self):
+        schedule = self._get_grade_three_feasible_schedule()
         solver = KnapsackSolver(schedule)
 
         branchAndBound = solver.solve()
@@ -96,8 +96,19 @@ class TestKnapsackSolver(unittest.TestCase):
         # self.assertTrue(grade_1_solution.Z > 0)
 
         self.assertTrue(feasibleSolution.level != -1)
+    
+    def test_solves_feasible_grade_one_schedule(self):
+        schedule = self._get_grade_two_feasible_schedule()
+        solver = KnapsackSolver(schedule)
 
-        pass
+        branchAndBound = solver.solve()
+        feasibleSolution = branchAndBound.bestSolution
+
+        # If not equal to -1, then a feasible solution exists
+        # self.assertTrue(grade_1_solution.level != -1)
+        # self.assertTrue(grade_1_solution.Z > 0)
+
+        self.assertTrue(feasibleSolution.level != -1)
 
     def test_schedule_with_no_nurses_gets_bank_nurse_solution(self):
         nurselessSchedule = self._get_schedule_with_no_nurses()
