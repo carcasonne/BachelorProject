@@ -1,6 +1,9 @@
 """
 Tabu Search Class
 """
+from Domain.Models.Enums.Grade import Grade
+
+# TODO: THIS SOLUTION IS ONLY BASED ON GRADE THREE
 
 class TabuSearch_SIMPLE:
     def __init__(self, initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria,
@@ -50,3 +53,10 @@ class TabuSearch_SIMPLE:
 
         # return best solution found
         return self.bestSolution
+
+    # TODO: THIS IS CURRENTLY ONLY BASED ON GRADE THREE
+    def _evaluateCC(self, schedule):
+        CC = 0
+        for s in schedule.shifts:
+            CC += s.coverRequirements[Grade.THREE] - len(s.assignedNurses[Grade.THREE])
+        return max(0, CC)

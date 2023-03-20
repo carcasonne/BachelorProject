@@ -35,26 +35,35 @@ class Test_TabuShiftTests(unittest.TestCase):
         self.assertEqual(Days.MONDAY, shiftDay.shiftDay)
         self.assertEqual(Days.TUESDAY, shiftNight.shiftDay)
 
-    def test_assign_nurse_grade1_to_shift_changes_field_nurses_assigned(self):
+    def test_add_nurse_grade1_to_shift_changes_field_nurses_assigned(self):
         self.shiftDay.addNurse(self.n1)
         self.assertEqual(True, (self.n1.id in self.shiftDay.assignedNurses[Grade.ONE]))
         self.assertEqual(True, (self.n1.id in self.shiftDay.assignedNurses[Grade.TWO]))
         self.assertEqual(True, (self.n1.id in self.shiftDay.assignedNurses[Grade.THREE]))
 
-    def test_assign_nurse_grade2_to_shift_changes_field_nurses_assigned(self):
+    def test_add_nurse_grade2_changes_field_nurses_assigned(self):
         self.shiftDay.addNurse(self.n2)
         self.assertEqual(False, (self.n2.id in self.shiftDay.assignedNurses[Grade.ONE]))
         self.assertEqual(True, (self.n2.id in self.shiftDay.assignedNurses[Grade.TWO]))
         self.assertEqual(True, (self.n2.id in self.shiftDay.assignedNurses[Grade.THREE]))
 
-    def test_remove_nurse_from_shift_changes_field_nurses_assigned(self):
+    def test_add_nurse_that_exists_raises_exception(self):
+        self.shiftNight.addNurse(self.n2)
+        with self.assertRaises(Exception) as context:
+            self.shiftNight.addNurse(self.n2)
+        self.assertEqual('Add Nurse Error: Nurse is already assigned to this shift', str(context.exception))
+
+    def test_remove_nurse_changes_field_nurses_assigned(self):
         self.shiftDay.addNurse(self.n1)
         self.shiftDay.removeNurse(self.n1)
         self.assertEqual(False, (self.n1.id in self.shiftDay.assignedNurses[Grade.ONE]))
         self.assertEqual(False, (self.n1.id in self.shiftDay.assignedNurses[Grade.TWO]))
         self.assertEqual(False, (self.n1.id in self.shiftDay.assignedNurses[Grade.THREE]))
 
-    # TODO : Test remove not assigned nurse -> Execption
+    def test_remove_not_assigned_nurse_returns_exception(self):
+        with self.assertRaises(Exception) as context:
+            self.shiftNight.removeNurse(self.n2)
+        self.assertEqual('Remove Nurse Error: Nurse is not assigned to this shift', str(context.exception))
     # TODO : Test add already assigned nurse -> Exception
 
 if __name__ == '__main__':

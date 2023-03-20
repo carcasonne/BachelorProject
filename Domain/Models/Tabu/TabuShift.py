@@ -12,7 +12,7 @@ class TabuShift:
         for grade in self.assignedNurses.keys():
             if nurse.grade.value <= grade.value:
                 if nurse.id in self.assignedNurses[grade]:
-                    raise Exception("Assign Nurse Error: Nurse is already assigned to this shift")
+                    raise Exception("Add Nurse Error: Nurse is already assigned to this shift")
                 self.assignedNurses[grade].add(nurse.id)
 
     def removeNurse(self, nurse):
