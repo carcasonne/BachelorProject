@@ -21,7 +21,7 @@ class BranchAndBound_MODERN:
     # v: The node currently being looked at (dummy node at init)
     # nodeCount: Amount of nodes generated (possible solutions generated)
     # bestSolution: The best solution found so far
-    def __init__(self, zeroOneKnapsack: ZeroOneKnapsack):
+    def __init__(self, zeroOneKnapsack: ZeroOneKnapsack, lowerBound=None):
         self.items = zeroOneKnapsack.items
         self.C = zeroOneKnapsack.C
         self.N = len(self.items)
@@ -33,6 +33,7 @@ class BranchAndBound_MODERN:
         self.PQ.insert(self.v, self.items, self.C, self.N)
 
         self.bestSolution = self.v
+        self.lowerBound = lowerBound
 
     def resetSearch(self):
         self.v = Node(-1, 0, 0)
@@ -41,14 +42,10 @@ class BranchAndBound_MODERN:
         self.PQ = Priority_Queue()
         self.PQ.insert(self.v, self.items, self.C, self.N)
         self.bestSolution = self.v
-
-    # lowerBound: If any suitable solution goes above this lower bound, the search is stopped
-    def startSearchWithEarlyExit(self, lowerBound):
-        self.startSearch(lowerBound, True)
     
     # lowerBound: if not None, any solution must havr Z value greater than lowerBound
     # earlyExit: Whether the solution should exit at first found, feasible solution (bound to lowerBound)
-    def startSearch(self, lowerBound = None, earlyExit=False):
+    def startSearch(self, earlyExit=False):
         while self.PQ.length != 0:
             v = self.PQ.remove()
 
@@ -76,16 +73,17 @@ class BranchAndBound_MODERN:
 
                 includeItemSolution.U = BranchAndBound_MODERN.get_bound(includeItemSolution, self.items, self.C, self.N)
 
+                exit = False
+
                 # Update best known solution if solution weight fits, and solution value is better
                 if  includeItemSolution.usedC <= self.C:
                     # If a lower bound is given, we must take into consideration
                     # whether to update the solution or just stop now
-                    if lowerBound is not None:
-                        if includeItemSolution.Z >= lowerBound:
-                            if earlyExit:
-                                return
-                            elif includeItemSolution.Z > self.bestSolution.Z:
+                    if self.lowerBound is not None:
+                        if includeItemSolution.Z >= self.lowerBound:
+                            if includeItemSolution.Z > self.bestSolution.Z:
                                 self.bestSolution = includeItemSolution
+                                exit = earlyExit
                     elif includeItemSolution.Z > self.bestSolution.Z:
                         self.bestSolution = includeItemSolution
 
@@ -103,6 +101,9 @@ class BranchAndBound_MODERN:
                 # If potential to be better than best solution, even without adding the item, then add to PQ
                 if excludeItemSolution.U > self.bestSolution.Z:
                     self.PQ.insert(excludeItemSolution, self.items, self.C, self.N)
+                
+                if exit: 
+                    return
 
 
     def get_bound(node, items, totalC, N):
