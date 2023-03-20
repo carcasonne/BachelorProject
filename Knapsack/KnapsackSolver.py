@@ -5,6 +5,7 @@ from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Enums.ShiftType import ShiftType
 from Domain.Models.Enums.Contract import Contract
 
+from Knapsack.Problems.KnapsackItem import KnapsackItem
 from Knapsack.Problems.ItemGroup import ItemGroup
 from Knapsack.Problems.BoundedKnapsack import BoundedKnapsack
 from Knapsack.BranchAndBound.BranchAndBound_MODERN import BranchAndBound_MODERN
@@ -27,11 +28,16 @@ class KnapsackSolver:
         self.globalC = 0
 
         # This is a 'dirty' way to do it. Should be based on which kind of contracts the given nurses have
+        # TODO: dont hardcode this
         contract1 = Contract(5, 4)
         contract2 = Contract(4, 3)
         contract3 = Contract(3, 2)
 
         self.contracts = [contract1, contract2, contract3]
+        # paper doesn't mention contract of bank nurses...
+        # paper doesn't mention grade of bank nurses...
+        self.bankNurseContract = contract3
+        self.bankNurseGrade = Grade.ONE
 
     # Strategy consists of 3 parts:
     # 1. Find the first feasible solution above lower bound E (feasible for all grades)
@@ -41,18 +47,18 @@ class KnapsackSolver:
     # If any solution has no feasible solutions, add bank nurses
     # TODO: Also account for prefered level of coverage
     def solve(self):
-        # TODO: make solution able to backtrack
-        # idea: make .getXXXXSolution() return the tree it has looked at
-        # run all branch and bound searches with early exit: We don't which feasible solution is found
-        # if the next search fails, it is easy to just continue the search in the previous tree and try with a new solution
+        # TODO: VERY IMPORTANT! MAKE SOLUTION 2 AND 1 FINDERS ABLE TO ADD BANK NURSES AS NEEDED
 
         # A feasible solution for grade 3
+        # Important note: Solution to this search only shows how many grade 3 nurses should work nightshift
         SEARCH_3 = self.getOverallSolution()
 
         # A feasible solution for grade 2
+        # Important note: Solution to this search only shows how many grade 2 nurses should work nightshift
         feasible_grade_2_solution_exists = False
         while not feasible_grade_2_solution_exists:
-            SEARCH_2 = self.getGradeTwoSolution(SEARCH_3.bestSolution)
+            prevSolution = SEARCH_3.bestSolution
+            SEARCH_2 = self.getGradeTwoSolution(prevSolution)
             solution = SEARCH_2.bestSolution
 
             # If no solution could be found, we backtrack to grade 3 tree, 
@@ -60,21 +66,24 @@ class KnapsackSolver:
             if solution.level == -1:
                 SEARCH_3.startSearch(True)
 
-                if SEARCH_3.bestSolution != -1:
-                    feasible_grade_2_solution_exists = True
+                # If we find a new solution
+                if SEARCH_3.bestSolution != prevSolution:
+                    #feasible_grade_2_solution_exists = True
+                    continue
+                # Otherwise add bank nurse and try again
                 else:
-                    # This should not be theoretically possible, 
-                    # since bank nurses are added in first step untill feasible
-                    raise Exception("ERROR: No feasible solution exists for grade 2")
+                    self.addBankNurse()
+                    SEARCH_3 = self.getOverallSolution()
             else:
                 feasible_grade_2_solution_exists = True
 
 
-        # A feasible solutino for grade 1
-        #SEARCH_1 = self.getGradeOneSolution(SEARCH_2.bestSolution)
+        # A feasible solutino for grade 2
+        # Important note: Solution to this search only shows how many grade 1 nurses should work nightshift
         feasible_grade_1_solution_exists = False
         while not feasible_grade_1_solution_exists:
-            SEARCH_1 = self.getGradeTwoSolution(SEARCH_2.bestSolution)
+            prevSolution = SEARCH_2.bestSolution
+            SEARCH_1 = self.getGradeOneSolution(prevSolution)
             solution = SEARCH_1.bestSolution
 
              # If no solution could be found, we backtrack to grade 2 tree, 
@@ -82,18 +91,24 @@ class KnapsackSolver:
             if solution.level == -1:
                 SEARCH_2.startSearch(True)
 
-                if SEARCH_2.bestSolution != -1:
-                    feasible_grade_1_solution_exists = True
+                # If we find a new solution
+                if SEARCH_2.bestSolution != prevSolution:
+                    #feasible_grade_2_solution_exists = True
+                    continue
+                # Otherwise add bank nurse and try again
+                # We add a bank nurse the the previous search's best solution
                 else:
-                    # This should not be theoretically possible, 
-                    # since bank nurses are added in first step untill feasible
-                    raise Exception("ERROR: No feasible solution exists for grade 1")
+                    bankNurseProfit = self.bankNurseContract.nights
+                    bankNurseWeight = self.bankNurseContract.days
+                    bankNurseItem = KnapsackItem(bankNurseProfit, bankNurseWeight, 2)
+                    prevSolution.items.append(bankNurseItem)
+                    self.addBankNurse()
+                    SEARCH_2 = self.getGradeTwoSolution(prevSolution)
+                    print("hej")
             else:
                 feasible_grade_1_solution_exists = True
 
-        # what now????
-
-        return SEARCH_1       
+        return SEARCH_1   
 
     def getOverallSolution(self):
         # Find a feasible solution for grade 3
@@ -134,16 +149,13 @@ class KnapsackSolver:
         return branchAndSearch
     
     def addBankNurse(self):
-        # paper doesn't mention contract of bank nurses...
-        bankContract = Contract(3, 2)
-        # paper doesn't mention grade of bank nurses...
-        bankGrade = Grade.ONE
+        bankContract = self.bankNurseContract
+        bankGrade = self.bankNurseGrade
         bankNurse = Nurse(1000, bankGrade, bankContract)
+        self.globalC += bankContract.days
         self.schedule.nurses.append(bankNurse)
-    
-    def getGradeTwoSolution(self, previousSolution):
-        lowerBound = previousSolution.Z
 
+    def getGradeTwoSolution(self, previousSolution):
         Q_3 = self.getTypesFromSolution(previousSolution)
         E_2 = self.requiredForGrade(Grade.TWO, True)
         D_2 = self.requiredForGrade(Grade.TWO, False)
@@ -155,6 +167,9 @@ class KnapsackSolver:
             self.contracts[1]: 0,
             self.contracts[2]: 0
         }
+
+        #lowerBound = previousSolution.Z
+        lowerBound = E_2
 
         # Defines upper bound for each contract type
         # Some crazy ass shit going on here
@@ -172,7 +187,9 @@ class KnapsackSolver:
             
             if Q_i < upperBounds[contract]:
                 upperBounds[contract] = Q_i
-        
+
+        #C_2 = self.costForBounds(upperBounds, D_2)
+
         # Represent the problem in bounded knapsack item groups
         items = []
         for contract in self.contracts:
@@ -183,7 +200,6 @@ class KnapsackSolver:
             itemGroup = ItemGroup(profit, weight, upperBound)
             items.append(itemGroup)
         
-        C_2 = self.costForBounds(upperBounds, D_2)
         # There is something wrong with upper bounds
         # It works if we're judt kinda ignoring the upper bound
         # TODO: figure it out
@@ -195,24 +211,19 @@ class KnapsackSolver:
         branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
 
         branchAndSearch.startSearch(True)
-        solution = branchAndSearch.bestSolution
-
-        # If solution.level is -1, then no feasible solution exists
-        # TODO: Rerun the tree at previous level
-        if solution.level == -1:
-            pass
 
         return branchAndSearch
     
     def getGradeOneSolution(self, previousSolution):
-        lowerBound = previousSolution.Z
-
         # Nurses of type i working contract, chosen from prev solution
         Q_2 = self.getTypesFromSolution(previousSolution)
         # Grade 1 shifts needing to be covered
         E_1 = self.requiredForGrade(Grade.ONE, True)
         # Grade 1 shifts needing to be covered
         D_1 = self.requiredForGrade(Grade.ONE, False)
+
+        #lowerBound = previousSolution.Z
+        lowerBound = E_1
 
         # Number of nurses of grade G working contract I
         N_I_G = self.getContractToGrade()
@@ -259,12 +270,6 @@ class KnapsackSolver:
         branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
 
         branchAndSearch.startSearch(True)
-        solution = branchAndSearch.bestSolution
-
-        # If solution.level is -1, then no feasible solution exists
-        # Rerun tree at previous level
-        if solution.level == -1:
-            pass
         
         return branchAndSearch
     
