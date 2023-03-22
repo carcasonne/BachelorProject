@@ -8,6 +8,19 @@ from Domain.Models.Enums.Grade import Grade
 class TabuSearch_SIMPLE:
     def __init__(self, initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria,
                  acceptableScoreThreshold, tabuTenure):
+        """
+        The next three variables is there to make sure that we hold the 3 tabu criteria:
+            1) A move involves the tabu nurse (i.e. the nurse moved last time) from tabuList.
+            2) A move results in a tabu configuration on the dayNightTabuList.
+            3) The dayNightCounter exceeds maxits and the move does not change the day night split.
+        """
+        # Tabu criteria 1: tabulist - Nurses involved in earlier moves - This is a fixed length of 1
+        self.tabuList = []
+        # Tabu criteria 2:dayNightTabuList - Nurses working days - list[set(nurse working days), ...] - Length 6 (binary representation)
+        self.dayNightTabuList = []
+        # Tabu criteria 3:
+        self.dayNightCounter = 0
+        self.maxits = 0
         self.currSolution = initialSolution
         self.bestSolution = initialSolution
         self.evaluate = solutionEvaluator
@@ -15,6 +28,13 @@ class TabuSearch_SIMPLE:
         self.neighborOperator = neighborOperator
         self.acceptableScoreThreshold = acceptableScoreThreshold
         self.tabuTenure = tabuTenure
+
+    def makeMove(self):
+        if None:  # TODO: Change this to: if the move changes the day night split
+            self.dayNightTabuList = None  # TODO: the dayNightTabuList is updated
+            self.dayNightCounter = 0
+            self.calculateLowerBound = None # TODO: Remove this and make method for lowerbound Eq.(6)
+
 
     def isTerminationCriteriaMet(self):
         # can add more termination criteria
