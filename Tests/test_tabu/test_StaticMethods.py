@@ -132,6 +132,11 @@ class Test_StaticMethods(unittest.TestCase):
         nurse.contract = Contract(2, 2)
         self.assertEqual(42, len(findFeasablePatterns(nurse)))
 
+    def test_find_feasible_patterns_with_contract_5_days_and_2_nights_returns_42_patterns(self):
+        nurse = self.schedule.nurses[0]
+        nurse.contract = Contract(5, 2)
+        self.assertEqual(42, len(findFeasablePatterns(nurse)))
+
     def test_find_feasible_patterns_returns_only_TabuShiftPatterns(self):
         for nurse in self.schedule.nurses:
             for p in findFeasablePatterns(nurse):
