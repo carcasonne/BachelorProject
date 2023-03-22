@@ -16,7 +16,7 @@ class StandardShiftPattern(ShiftPattern):
 class TabuShiftPattern(ShiftPattern):
     def __init__(self, day, night):
         super().__init__(night)
-        self.days = day
+        self.day = day
         self.merged = []
         counter = 0
         while counter < 7:
@@ -24,3 +24,14 @@ class TabuShiftPattern(ShiftPattern):
             self.merged.append(night[counter])
             counter += 1
 
+    def __eq__(self, other):
+        if not isinstance(other, TabuShiftPattern):
+            # don't attempt to compare against unrelated types
+            return False
+
+        if self.day == [0] * 7 and other.day == [0] * 7 and self.night != [0] * 7 and other.night != [0] * 7:
+            return True
+        elif self.night == [0] * 7 and other.night == [0] * 7 and self.day != [0] * 7 and other.day != [0] * 7:
+            return True
+        else:
+            return False

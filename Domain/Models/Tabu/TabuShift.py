@@ -2,34 +2,23 @@ from Domain.Models.Enums.Grade import Grade
 
 
 class TabuShift:
-    # TODO: This should properly just take at Shift and convert it.
     def __init__(self, coverRequirements, tabuShiftType, shiftDay):
+        # coverRequirements: R(k, r) = the minimum acceptable number of nurses of grade r or above for shift k
         self.coverRequirements = coverRequirements
-        self.assignedNurses = [set(), set(), set()]
-        self.tabuShiftType = tabuShiftType
+        self.assignedNurses = {Grade.ONE: set(), Grade.TWO: set(), Grade.THREE: set()}
+        self.shiftType = tabuShiftType
         self.shiftDay = shiftDay
 
-    def assignNurse(self, nurse):
-        if nurse in self.assignedNurses[2]: raise Exception("Nurse is already assigned to this shift")
-        value = nurse.grade.value - 1
-        for x in range(value, 3):
-            self.assignedNurses[x].add(nurse)
+    def addNurse(self, nurse):
+        for grade in self.assignedNurses.keys():
+            if nurse.grade.value <= grade.value:
+                if nurse.id in self.assignedNurses[grade]:
+                    raise Exception("Add Nurse Error: Nurse is already assigned to this shift")
+                self.assignedNurses[grade].add(nurse.id)
 
     def removeNurse(self, nurse):
-        if nurse not in self.assignedNurses[2]: raise Exception("Nurse does not exist")
-        value = nurse.grade.value - 1
-        for x in range(value, 3):
-            self.assignedNurses[x].remove(nurse)
-
-    def toBit(self):
-        # TODO: Remove this method since it is never used
-        bitShifts = (self.shiftDay - 1)
-        return int('1', 2) << bitShifts
-
-    def __str__(self):
-        finalString = "ST: " + str(self.tabuShiftType) + " CR: " + str(self.coverRequirements[Grade.ONE]) + ", " + \
-                      str(self.coverRequirements[Grade.TWO]) + ", " + \
-                      str(self.coverRequirements[Grade.THREE]) + " NURSES ASSIGNED: " + str(
-            len(self.assignedNurses[Grade.ONE.value - 1])) + ", " + str(
-            len(self.assignedNurses[Grade.TWO.value - 1])) + ", " + str(len(self.assignedNurses[Grade.THREE.value - 1]))
-        return finalString
+        for grade in self.assignedNurses.keys():
+            if nurse.grade.value <= grade.value:
+                if nurse.id not in self.assignedNurses[grade]:
+                    raise Exception("Remove Nurse Error: Nurse is not assigned to this shift")
+                self.assignedNurses[grade].remove(nurse.id)
