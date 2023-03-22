@@ -3,6 +3,7 @@ from Domain.Models.Enums.Grade import Grade
 
 class TabuShift:
     def __init__(self, coverRequirements, tabuShiftType, shiftDay):
+        # coverRequirements: R(k, r) = the minimum acceptable number of nurses of grade r or above for shift k
         self.coverRequirements = coverRequirements
         self.assignedNurses = {Grade.ONE: set(), Grade.TWO: set(), Grade.THREE: set()}
         self.shiftType = tabuShiftType
