@@ -39,12 +39,12 @@ def evaluatePC(schecule):
     raise NotImplemented
 
 
-# findFeasablePatterns: F(i) = return all feasible patterns for nurse i
-def findFeasablePatterns(nurse):
+# findFeasiblePatterns: F(i) = return all feasible patterns for nurse i
+def findFeasiblePatterns(nurse):
     fp = []
     counter = 0
-    for x in range(2):
-        if counter == x:
+    while counter != 2:
+        if counter == 0:
             combs = combinations(range(7), nurse.contract.days)
         else:
             combs = combinations(range(7),  nurse.contract.nights)
@@ -57,7 +57,8 @@ def findFeasablePatterns(nurse):
                 if len(comb) == nurse.contract.days:
                     fp.append(TabuShiftPattern(bitstring, [0] * 7))
             else:
-                if len(comb) == nurse.contract.days:
+                if len(comb) == nurse.contract.nights:
                     fp.append(TabuShiftPattern([0] * 7, bitstring))
+        counter += 1
     return fp
 
