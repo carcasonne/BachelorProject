@@ -61,7 +61,7 @@ def calculateDifferenceCC(schedule, nurse, pattern):
     :param pattern:
     :return integer difference:
     """
-    pass
+
 
 
 # TODO: Make implementation for evaluatePC

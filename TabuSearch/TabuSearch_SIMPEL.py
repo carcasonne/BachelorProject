@@ -97,7 +97,7 @@ class TabuSearch_SIMPLE:
                     if (nurse.worksNight and pattern.day == [0] * 7) or (not nurse.worksNight and pattern.day != [0] * 7):
                         neighbour = copy.deepcopy(schedule)
                         n_nurse = neighbour.nurses[nurse.id]
-                        n_nurse.assignShiftPattern(pattern)
+                        n_nurse._assignShiftPattern(pattern)
                         neighbour.CC = evaluateCC(neighbour)
                         neighbour.PC = evaluatePC(neighbour)
                         if neighbour.CC < schedule.CC: #and neighbour.PC <= schedule.PC:

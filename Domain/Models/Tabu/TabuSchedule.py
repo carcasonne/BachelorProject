@@ -34,13 +34,13 @@ class TabuSchedule:
     # TODO: Tests for this one
     def assignPatternToNurse(self, nurse, pattern):
         oldPattern = nurse.shiftPattern.merged
-        nurse.assignShiftPattern(pattern)
+        nurse._assignShiftPattern(pattern)
         newPattern = nurse.shiftPattern.merged
         for x in range(14):
             if oldPattern[x] != newPattern[x] and newPattern[x] == 1:
-                self.shifts[x].addNurse(nurse)
+                self.shifts[x]._addNurse(nurse)
             if oldPattern[x] != newPattern[x] and oldPattern[x] == 1:
-                self.shifts[x].removeNurse(nurse)
+                self.shifts[x]._removeNurse(nurse)
 
     # Checks if pattern covers shift - Returns: 1 or 0
     def __eq__(self, other):

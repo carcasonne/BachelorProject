@@ -29,17 +29,17 @@ class Test_TabuNurse(unittest.TestCase):
     # ----------------------------------- assignShiftPattern(self, pattern) -----------------------------------
     def test_assigning_pattern_changes_field_pattern(self):
         pattern = TabuShiftPattern([1, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0])
-        self.testnurse.assignShiftPattern(pattern)
+        self.testnurse._assignShiftPattern(pattern)
         self.assertEqual(pattern.merged, self.testnurse.shiftPattern.merged)
 
     def test_assigning_day_pattern_changes_worksNight_to_false(self):
         pattern = TabuShiftPattern([1, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0])
-        self.testnurse.assignShiftPattern(pattern)
+        self.testnurse._assignShiftPattern(pattern)
         self.assertEqual(False, self.testnurse.worksNight)
 
     def test_assigning_night_pattern_changes_worksNight_to_true(self):
         pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 0, 0])
-        self.testnurse.assignShiftPattern(pattern)
+        self.testnurse._assignShiftPattern(pattern)
         self.assertEqual(True, self.testnurse.worksNight)
 
     def test_nurse_eq_nurse_with_same_id_and_grade_returns_true(self):

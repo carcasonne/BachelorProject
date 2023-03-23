@@ -44,9 +44,9 @@ class Test_StaticMethods(unittest.TestCase):
         nurse = self.schedule.nurses[0]
         dp1 = TabuShiftPattern([1, 0, 0, 1, 0, 1, 0, 1], [0, 0, 0, 0, 0, 0, 0])
         np2 = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 1, 0, 1, 0, 1])
-        nurse.assignShiftPattern(dp1)
+        nurse._assignShiftPattern(dp1)
         self.assertEqual(1, nurseWorksPattern(nurse, dp1))
-        nurse.assignShiftPattern(np2)
+        nurse._assignShiftPattern(np2)
         self.assertEqual(1, nurseWorksPattern(nurse, np2))
 
     def test_nurse_does_not_work_pattern_returns_0(self):
@@ -55,10 +55,10 @@ class Test_StaticMethods(unittest.TestCase):
         dp2 = TabuShiftPattern([1, 1, 0, 1, 0, 1, 0, 1], [0, 0, 0, 0, 0, 0, 0])
         np1 = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 1, 0, 1, 0, 1])
         np2 = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 0, 1, 0, 1])
-        nurse.assignShiftPattern(dp1)
+        nurse._assignShiftPattern(dp1)
         self.assertEqual(0, nurseWorksPattern(nurse, np1))
         self.assertEqual(0, nurseWorksPattern(nurse, dp2))
-        nurse.assignShiftPattern(np1)
+        nurse._assignShiftPattern(np1)
         self.assertEqual(0, nurseWorksPattern(nurse, dp1))
         self.assertEqual(0, nurseWorksPattern(nurse, np2))
 
@@ -68,19 +68,19 @@ class Test_StaticMethods(unittest.TestCase):
         self.assertEqual(63, evaluateCC(self.schedule))
 
     def test_evaluate_CC_with_nurses_added_on_all_days_returns_21(self):
-        self.schedule.nurses[0].assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.nurses[1].assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.nurses[2].assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.nurses[3].assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.nurses[4].assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.nurses[5].assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[0]._assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[1]._assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[2]._assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[3]._assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[4]._assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[5]._assignShiftPattern(TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
 
         self.assertEqual(21, evaluateCC(self.schedule))
 
     def test_evaluate_CC_with_nurses_added_on_all_days_returns_42(self):
-        self.schedule.nurses[0].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
-        self.schedule.nurses[1].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
-        self.schedule.nurses[2].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.nurses[0]._assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.nurses[1]._assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.nurses[2]._assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
 
         self.assertEqual(42, evaluateCC(self.schedule))
 
@@ -88,22 +88,22 @@ class Test_StaticMethods(unittest.TestCase):
         for i in range(len(self.schedule.nurses) // 9):
             for x in range(9):
                 if x % 3 == 0:
-                    self.schedule.nurses[0 + i * 9 + x].assignShiftPattern(
+                    self.schedule.nurses[0 + i * 9 + x]._assignShiftPattern(
                         TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
                 else:
-                    self.schedule.nurses[0 + i * 9 + x].assignShiftPattern(
+                    self.schedule.nurses[0 + i * 9 + x]._assignShiftPattern(
                         TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
         self.assertEqual(0, evaluateCC(self.schedule))
 
     # TODO: This test currently fails, but based on the article it should fail... Make it different if Paloma say so.
     def test_evaluate_CC_over_assignment_of_a_shift_does_not_return_a_better_CC(self):
-        self.schedule.nurses[0].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.nurses[1].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.nurses[2].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[0]._assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[1]._assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[2]._assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
         notOverAssigned = evaluateCC(self.schedule)
 
-        self.schedule.nurses[3].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.nurses[4].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[3]._assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.nurses[4]._assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
         overAssigned = evaluateCC(self.schedule)
 
         self.assertFalse(notOverAssigned > overAssigned)
