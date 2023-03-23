@@ -49,4 +49,8 @@ class TabuSchedule:
         pass
 
     def __str__(self):
-        return f"Tabu Schedule"
+        string = f"TabuSchedule: \n"
+        for shift in self.shifts:
+            string += f"{str(shift)} \n"
+        string += f"Score: {self.CC}"
+        return string
