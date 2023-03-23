@@ -242,9 +242,9 @@ class TestKnapsackSolver(unittest.TestCase):
         grade_2_solution = grade_2_search.bestSolution
         self.assertTrue(grade_2_solution.level == -1)
 
-    # Not implemented yet
     # This DOES NOT test the solver. The solver backtracks in previous tree, and adds bank nurses
     # This methods tests that searching an infeasible tree gives no feasible solutions
+    # NOTE: This is depdendent on BankNurse contract being 3 days, 2 nights
     def test_infeasible_grade_1_search_finds_no_solution(self):
         infeasibleSchedule = self._get_grade_1_infeasible_schedule()
         solver = KnapsackSolver(infeasibleSchedule)
