@@ -89,14 +89,13 @@ class Test_StaticMethods(unittest.TestCase):
             for x in range(9):
                 if x % 3 == 0:
                     self.schedule.nurses[0 + i * 9 + x].assignShiftPattern(
-                        TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
+                        TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
                 else:
                     self.schedule.nurses[0 + i * 9 + x].assignShiftPattern(
                         TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
         self.assertEqual(0, evaluateCC(self.schedule))
 
     # TODO: This test currently fails, but based on the article it should fail... Make it different if Paloma say so.
-    @unittest.skip("We need to talk with Paloma about this first")
     def test_evaluate_CC_over_assignment_of_a_shift_does_not_return_a_better_CC(self):
         self.schedule.nurses[0].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))
         self.schedule.nurses[1].assignShiftPattern(TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0, 0]))

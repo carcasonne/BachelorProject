@@ -34,7 +34,7 @@ def nurseWorksPattern(nurse, pattern):
     return 0
 
 
-# TODO: THIS IS CURRENTLY ONLY BASED ON GRADE THREE. IMPLEMENTED CORRECTLY BUT DOES NOT MAKE SENSE.
+# TODO: THIS IS CURRENTLY ONLY BASED ON GRADE THREE. IMPLEMENTED DIFFERENT TO Eq(4).
 def evaluateCC(schedule):
     """
     evaluateCC: CC - Evaluates the covering cost of a schedule
@@ -47,8 +47,8 @@ def evaluateCC(schedule):
         for n in schedule.nurses:
             if n.shiftPattern is not None:
                 assigned += patternCoverShift(n.shiftPattern, s)
-        CC += s.coverRequirements[Grade.THREE] - assigned
-    return max(0, CC)
+        CC += max(0, s.coverRequirements[Grade.THREE] - assigned)  # TODO: Max in here instead of in the end
+    return CC
 
 
 # TODO: Make implementation for evaluatePC
@@ -58,7 +58,7 @@ def evaluatePC(schedule):
     :param schedule:
     :return PC:
     """
-    raise NotImplemented
+    pass
 
 
 # TODO: Make implementation for evaluateLB
@@ -68,7 +68,7 @@ def evaluateLB(schedule):
     :param schedule:
     :return LB:
     """
-    raise NotImplemented
+    pass
 
 
 def findFeasiblePatterns(nurse):
