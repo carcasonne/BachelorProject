@@ -30,7 +30,7 @@ class Test_TabuSearch(unittest.TestCase):
     # ----------------------------------- randomDecent(self, schedule) -----------------------------------
     def test_random_decent_returns_schedule_with_better_CC(self):
         oldCC = self.schedule.CC
-        newCC = self.ts.randomDecent(self.schedule).CC
+        newCC = self.ts.randomDecent(self.schedule)[0].CC
         self.assertTrue(oldCC > newCC)
 
     def test_random_decent_does_not_change_old_schedules_CC(self):
