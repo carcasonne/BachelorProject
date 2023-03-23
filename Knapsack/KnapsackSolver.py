@@ -38,6 +38,7 @@ class KnapsackSolver:
         # paper doesn't mention grade of bank nurses...
         self.bankNurseContract = contract3
         self.bankNurseGrade = Grade.ONE
+        self.bankNurseCount = 0
 
     # Strategy consists of 3 parts:
     # 1. Find the first feasible solution above lower bound E (feasible for all grades)
@@ -151,9 +152,10 @@ class KnapsackSolver:
     def addBankNurse(self):
         bankContract = self.bankNurseContract
         bankGrade = self.bankNurseGrade
-        bankNurse = Nurse(1000, bankGrade, bankContract)
+        bankNurse = Nurse(1000 + self.bankNurseCount, bankGrade, bankContract)
         self.globalC += bankContract.days
         self.schedule.nurses.append(bankNurse)
+        self.bankNurseCount += 1
 
     def getGradeTwoSolution(self, previousSolution):
         Q_3 = self.getTypesFromSolution(previousSolution)
