@@ -51,37 +51,9 @@ class TabuSearch_SIMPLE:
                or self.neighborOperator(self.currSolution) == 0
 
     def run(self):
-        tabuList = {}
+        # Phase 1:
+        while self.bestSolution.CC > 0:
 
-        while not self.isTerminationCriteriaMet():
-            # get all of the neighbors
-            neighbors = self.neighborOperator(self.currSolution)
-            # find all tabuSolutions other than those
-            # that fit the aspiration criteria
-            tabuSolutions = tabuList.keys()
-            # find all neighbors that are not part of the Tabu list
-            neighbors = filter(lambda n: self.aspirationCriteria(n), neighbors)
-            # pick the best neighbor solution
-            newSolution = sorted(neighbors, key=lambda n: self.evaluate(n))[0]
-            # get the cost between the two solutions
-            cost = self.evaluate(self.solution) - self.evaluate(newSolution)
-            # if the new solution is better,
-            # update the best solution with the new solution
-            if cost >= 0:
-                self.bestSolution = newSolution
-            # update the current solution with the new solution
-            self.currSolution = newSolution
-
-            # decrement the Tabu Tenure of all tabu list solutions
-            for sol in tabuList:
-                tabuList[sol] -= 1
-                if tabuList[sol] == 0:
-                    del tabuList[sol]
-            # add new solution to the Tabu list
-            tabuList[newSolution] = self.tabuTenure
-
-        # return best solution found
-        return self.bestSolution
 
 
     # Phase 1 Moves:
@@ -101,7 +73,7 @@ class TabuSearch_SIMPLE:
                     if (nurse.worksNight and pattern.day == [0] * 7) or (not nurse.worksNight and pattern.day != [0] * 7):
                         neighbour = copy.deepcopy(schedule)
                         n_nurse = neighbour.nurses[nurse.id]
-                        n_nurse._assignShiftPattern(pattern)
+                        neighbour.assignPatternToNurse(n_nurse, pattern)
                         neighbour.CC = evaluateCC(neighbour)
                         neighbour.PC = evaluatePC(neighbour)
                         if neighbour.CC < schedule.CC: #and neighbour.PC <= schedule.PC:
