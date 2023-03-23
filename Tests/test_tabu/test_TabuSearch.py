@@ -44,6 +44,17 @@ class Test_TabuSearch(unittest.TestCase):
         out = self.ts.randomDecent(self.schedule)
         self.assertEqual(None, out)
 
+    def test_ramdom_kick_changes_one_pattern_for_one_nurse(self):
+        oldSched = copy.deepcopy(self.schedule)
+        schedWasChanged = False
+        self.ts.randomKick(self.schedule)
+        for nurse in self.schedule.nurses:
+            if nurse.shiftPattern != oldSched.nurses[nurse.id].shiftPattern:
+                schedWasChanged = True
+                break
+        self.assertTrue(schedWasChanged)
+
+
 
 if __name__ == '__main__':
     unittest.main()

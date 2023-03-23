@@ -85,8 +85,6 @@ class TabuSearch_SIMPLE:
                         neighbour = copy.deepcopy(schedule)
                         n_nurse = neighbour.nurses[nurse.id]
                         neighbour.assignPatternToNurse(n_nurse, pattern)
-                        neighbour.CC = evaluateCC(neighbour)
-                        neighbour.PC = evaluatePC(neighbour)
                         if neighbour.CC < schedule.CC: #and neighbour.PC <= schedule.PC:
                             self.tabuList = []
                             self.tabuList.append(nurse.id)
@@ -135,8 +133,7 @@ class TabuSearch_SIMPLE:
         :return: move
         """
         print("Running Random Kick...")
-        validMove = False
-        while not validMove:
+        while True:
             nurse = schedule.nurses[random.randint(0, len(schedule.nurses))]
             nurseWorkedNight = copy.copy(nurse.worksNight)
             if nurse.id not in self.tabuList:
@@ -144,8 +141,6 @@ class TabuSearch_SIMPLE:
                 neighbour = copy.deepcopy(schedule)
                 n_nurse = neighbour.nurses[nurse.id]
                 neighbour.assignPatternToNurse(n_nurse, pattern)
-                evaluateCC(neighbour)
-                evaluatePC(neighbour)
                 self.tabuList = []
                 self.tabuList.append(nurse.id)
                 return neighbour, nurseWorkedNight != n_nurse.worksNight
