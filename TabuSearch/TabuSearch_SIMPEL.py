@@ -81,3 +81,11 @@ class TabuSearch_SIMPLE:
 
         # return best solution found
         return self.bestSolution
+
+    def randomDecent(self, schedule):
+        """
+        Step 1.1 (Random decent). Carry out random decent by accepting the first neighbourhood move that satisfies
+        non-tabu conditions 1 - 3 and improves CC and does not increase PC. Repeat until no satisfactory move exists.
+        :param schedule:
+        :return:
+        """
