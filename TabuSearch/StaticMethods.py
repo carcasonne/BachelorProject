@@ -44,21 +44,38 @@ def evaluateCC(schedule):
     """
     CC = 0
     for s in schedule.shifts:
-        # TODO: Same line under just with grade one
-
+        # TODO: Same line underneath just with grade one
+        # TODO: Same line as underneath just with grade two
         CC += max(0, s.coverRequirements[Grade.THREE] - len(s.assignedNurses[Grade.THREE])) # TODO: Max in here instead of in the end
     return CC
 
 
-# TODO: Make calculateDifferenceCC()
+# TODO: This only takes grade three into count - Make grade one and two
 def calculateDifferenceCC(schedule, nurse, pattern):
     """
     calculateDifferenceCC: Returns the difference in CC for the schedule if nurse is shifted to pattern
     :param schedule:
     :param nurse:
     :param pattern:
-    :return integer difference:
+    :return CC difference if move is chosen:
     """
+    diffCC = 0
+    for i in range(14):
+        newMergedPattern = pattern.merged
+        oldMergedPattern = nurse.shiftPattern.merged
+        if newMergedPattern[i] != oldMergedPattern[i]:
+            # TODO: Grade 1,2,3 add - for grade in self.schedule.shifts.keys() and change every place with Grade.Three to grade
+            currentShiftCoverage = schedule.shifts[i].coverRequirements[Grade.THREE] - len(schedule.shifts[i].assignedNurses[Grade.THREE])
+            if newMergedPattern[i] == 1:
+                # If covering requirement is higher than the assigned nurses it will decrease the CC to add nurse
+                if currentShiftCoverage > 0:
+                    diffCC -= 1
+            if oldMergedPattern[i] == 1:
+                # If covering requirement is higher than the assigned nurses it will increase in CC to remove nurse
+                if currentShiftCoverage < 0:
+                    diffCC += 1
+    return diffCC
+
 
 
 

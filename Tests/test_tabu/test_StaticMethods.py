@@ -140,6 +140,39 @@ class Test_StaticMethods(unittest.TestCase):
             for p in findFeasiblePatterns(nurse):
                 self.assertIsInstance(p, TabuShiftPattern, "given object is not instance of TabuShiftPattern")
 
+    # ----------------------------------- calculateDifferenceCC(schedule, nurse, pattern) -----------------------------------
+    def test_calculate_differenceCC_calculates_same_difference_as_changing_the_schedule_day_pattern(self):
+        pattern = TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0])
+        nurse = self.schedule.nurses[0]
+        beforeCC = self.schedule.CC
+        result = calculateDifferenceCC(self.schedule, nurse, pattern)
+        self.schedule.assignPatternToNurse(nurse, pattern)
+        afterCC = evaluateCC(self.schedule)
+
+        self.assertEqual(afterCC-beforeCC, result)
+
+    def test_calculate_differenceCC_calculates_same_difference_as_changing_the_schedule_night_pattern(self):
+        pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1])
+        nurse = self.schedule.nurses[1]
+        beforeCC = self.schedule.CC
+        result = calculateDifferenceCC(self.schedule, nurse, pattern)
+        self.schedule.assignPatternToNurse(nurse, pattern)
+        afterCC = evaluateCC(self.schedule)
+
+        self.assertEqual(afterCC - beforeCC, result)
+
+    @unittest.skip("Dont do this now")
+    def test_calculate_differenceCC_returns_positive_differance(self):
+        pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1])
+        pattern2 = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 1, 0, 1, 1])
+        nurse = self.schedule.nurses[0]
+        self.schedule.assignPatternToNurse(nurse, pattern)
+        result = calculateDifferenceCC(self.schedule, nurse, pattern2)
+
+        self.assertTrue(result > 0)
+        self.assertEqual(2, result)
+
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -41,6 +41,7 @@ class TabuSchedule:
                 self.shifts[x]._addNurse(nurse)
             if oldPattern[x] != newPattern[x] and oldPattern[x] == 1:
                 self.shifts[x]._removeNurse(nurse)
+        self.CC = evaluateCC(self)
 
     # Checks if pattern covers shift - Returns: 1 or 0
     def __eq__(self, other):
