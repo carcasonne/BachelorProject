@@ -92,7 +92,7 @@ class TabuSearch_SIMPLE:
         :return move:
         """
         for nurse in schedule.nurses:
-            if nurse not in self.tabuList:
+            if nurse.id not in self.tabuList:
                 for pattern in self.feasiblePatterns[nurse.id]:
                     if (nurse.worksNight and pattern(0) == [0] * 7) or (not nurse.worksNight and pattern(0) != [0] * 7):
                         neighbour = copy.deepcopy(schedule)
@@ -101,6 +101,7 @@ class TabuSearch_SIMPLE:
                         evaluateCC(neighbour)
                         evaluatePC(neighbour)
                         if neighbour.CC < schedule.CC and neighbour.PC <= schedule.PC:
+                            self.tabuList.append(nurse.id)
                             return neighbour
         return None
 
