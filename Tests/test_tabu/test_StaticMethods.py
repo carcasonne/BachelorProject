@@ -180,6 +180,7 @@ class Test_StaticMethods(unittest.TestCase):
 
         pattern = TabuShiftPattern([0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0])
         result = calculateDifferenceCC(self.schedule, self.schedule.nurses[0], pattern)
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0], pattern)
 
         self.assertTrue(CC > self.schedule.CC)
         self.assertEqual(-3, result)
