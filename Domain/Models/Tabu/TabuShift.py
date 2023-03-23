@@ -24,6 +24,6 @@ class TabuShift:
                 self.assignedNurses[grade].remove(nurse.id)
     
     def __str__(self):
-        return f"TabuShift - Day: {self.shiftDay.name} Type: {self.shiftType.name} " \
-               f"Requirement: ({self.coverRequirements[Grade.ONE]}, {self.coverRequirements[Grade.TWO]}, {self.coverRequirements[Grade.THREE]}) " \
+        return f"TabuShift - Weekday: {self.shiftDay.name} \t Type: {self.shiftType.name}  \t " \
+               f"Requirement: ({self.coverRequirements[Grade.ONE]}, {self.coverRequirements[Grade.TWO]}, {self.coverRequirements[Grade.THREE]})\t " \
                f"Assigned: ({len(self.assignedNurses[Grade.ONE])}, {len(self.assignedNurses[Grade.TWO])}, {len(self.assignedNurses[Grade.THREE])})"
