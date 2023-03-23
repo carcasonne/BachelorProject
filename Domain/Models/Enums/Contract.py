@@ -8,8 +8,7 @@ class Contract():
             # don't attempt to compare against unrelated types
             return False
 
-        return  (self.days == other.days and 
-                 self.nights == other.nights)
+        return (self.days == other.days and self.nights == other.nights)
 
     def __hash__(self):
         return hash(f"{self.days}, {self.nights}")

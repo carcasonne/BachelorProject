@@ -1,4 +1,5 @@
 from Domain.Models.Enums.Contract import Contract
+from Domain.Models.Enums.Days import Days
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Enums.ShiftType import ShiftType
 from Domain.Models.Nurse import Nurse
@@ -9,10 +10,10 @@ from Domain.Models.Shift import Shift
 class TestTabuData:
     def __init__(self):
         self.shifts = []
-        for x in range(7):
-            self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.EARLY, x))
-            self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.LATE, x))
-            self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.NIGHT, x))
+        for day in Days:
+            self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.EARLY, day))
+            self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.LATE, day))
+            self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.NIGHT, day))
 
         self.nurses = []
         for x in range(3):

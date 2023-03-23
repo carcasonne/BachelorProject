@@ -19,6 +19,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install flake8 pytest
+          pip install numpy
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Lint with flake8
         run: |
@@ -26,6 +27,9 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=20 --max-line-length=300 --statistics
+      - name: Run model tests
+        run: |
+          python3 -m unittest discover -s Tests/test_models  -p 'test_*.py'
       - name: Test the parser
         run: |
           python3 -m unittest discover -s Tests/test_parser  -p 'test_*.py'
@@ -34,4 +38,13 @@ jobs:
           python3 -m unittest discover -s Tests/test_knapsack  -p 'test_*.py'
       - name: Test the tabu search implementation
         run: |
-          echo "Tabu Search tests not implemented yet"
+          echo "Running tabu model tests"
+          python3 -m unittest discover -s Tests/test_tabu/test_tabu_model  -p 'test_*.py'
+          echo "Running tabu tests"
+          python3 -m unittest discover -s Tests/test_tabu  -p 'test_*.py'
+      - name: Test the network flow implementation
+        run: |
+          echo "Network Flow model tests not implemented yet"
+      - name: Run integration tests
+        run: |
+          echo "Network Flow model tests not implemented yet"
