@@ -34,4 +34,11 @@ jobs:
           python3 -m unittest discover -s Tests/test_knapsack  -p 'test_*.py'
       - name: Test the tabu search implementation
         run: |
-          echo "Tabu Search tests not implemented yet"
+          python3 -m unittest discover -s Tests/test_tabu/test_tabu_model  -p 'test_*.py'
+          python3 -m unittest discover -s Tests/test_tabu  -p 'test_*.py'
+      - name: Test the network flow implementation
+        run: |
+          echo "Network Flow model tests not implemented yet"
+      - name: Run integration tests
+        run: |
+          echo "Network Flow model tests not implemented yet"
