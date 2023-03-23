@@ -1,9 +1,10 @@
 """
 Tabu Search Class
 """
+import copy
+
 from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
-from copy import *
 
 # TODO: THIS SOLUTION IS ONLY BASED ON GRADE THREE
 
@@ -96,9 +97,9 @@ class TabuSearch_SIMPLE:
                     neighbour = copy.deepcopy(schedule)
                     n_nurse = neighbour.nurses[nurse.id]
                     n_nurse.assignShiftPattern(pattern)
-                    evaluateCC(neighbour)
-                    evaluatePC(neighbour)
-                    if neighbour.CC < schedule.CC and neighbour.PC <= schedule.PC:
+                    neighbour.CC = evaluateCC(neighbour)
+                    neighbour.PC = evaluatePC(neighbour)
+                    if neighbour.CC < schedule.CC:  # neighbour.PC <= schedule.PC
                         return neighbour
         return None
 
