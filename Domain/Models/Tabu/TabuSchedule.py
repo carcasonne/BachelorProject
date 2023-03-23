@@ -27,9 +27,9 @@ class TabuSchedule:
                 self.shifts.append(TabuShift(requirements, TabuShiftType.DAY, Schedule.shifts[x].shiftDay))
         if len(self.shifts) != 14:
             raise Exception("Must be exactly 14 shifts")
-        self.CC = evaluateCC(self)
-        self.PC = evaluatePC(self)
-        self.LB = evaluateLB(self)
+        self.CC = evaluateCC(self)  # The covering cost of the schedule - Eq(4)
+        self.PC = evaluatePC(self)  # The penalty cost of the schedule - Z / Eq(1)
+        self.LB = evaluateLB(self)  # The lower bound of the schedule - Eq(5)
 
     # Checks if pattern covers shift - Returns: 1 or 0
 

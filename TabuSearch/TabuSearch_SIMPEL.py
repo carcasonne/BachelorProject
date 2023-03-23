@@ -82,10 +82,18 @@ class TabuSearch_SIMPLE:
         # return best solution found
         return self.bestSolution
 
+    # TODO: Random decent after PC and LB
     def randomDecent(self, schedule):
         """
         Step 1.1 (Random decent). Carry out random decent by accepting the first neighbourhood move that satisfies
         non-tabu conditions 1 - 3 and improves CC and does not increase PC. Repeat until no satisfactory move exists.
+        :param schedule:
+        :return move:
+        """
+
+    def balanceRestoring(self, schedule):
+        """
+        Step 1.2 (Balance days and nights). Check for balance by lower bound (Eq(5)). if
         :param schedule:
         :return:
         """
