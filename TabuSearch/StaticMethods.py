@@ -35,6 +35,7 @@ def nurseWorksPattern(nurse, pattern):
 
 
 # TODO: THIS IS CURRENTLY ONLY BASED ON GRADE THREE. IMPLEMENTED DIFFERENT TO Eq(4).
+# TODO: Change this to uses assignednurses in TabuShift
 def evaluateCC(schedule):
     """
     evaluateCC: CC - Evaluates the covering cost of a schedule
@@ -49,6 +50,18 @@ def evaluateCC(schedule):
                 assigned += patternCoverShift(n.shiftPattern, s)
         CC += max(0, s.coverRequirements[Grade.THREE] - assigned)  # TODO: Max in here instead of in the end
     return CC
+
+
+# TODO: Make calculateDifferenceCC()
+def calculateDifferenceCC(schedule, nurse, pattern):
+    """
+    calculateDifferenceCC: Returns the difference in CC for the schedule if nurse is shifted to pattern
+    :param schedule:
+    :param nurse:
+    :param pattern:
+    :return integer difference:
+    """
+    pass
 
 
 # TODO: Make implementation for evaluatePC
