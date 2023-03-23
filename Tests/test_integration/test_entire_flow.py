@@ -29,6 +29,8 @@ class EntireFlow(unittest.TestCase):
 
         newSchedule = knapsackSolver.schedule
         search = TabuSearch_SIMPLE(TabuSchedule(newSchedule))
+        search.run()
+        print(str(search.bestSolution))
 
     # TODO: Add assert tests. But now we are happy if it doesn't crash
     def test_runs_entire_flow_with_bank_nurses(self):
@@ -46,6 +48,8 @@ class EntireFlow(unittest.TestCase):
         newSchedule = knapsackSolver.schedule
         
         search = TabuSearch_SIMPLE(TabuSchedule(newSchedule))
+        search.run()
+        print(str(search.bestSolution))
 
 if __name__ == '__main__':
     unittest.main()
