@@ -3,7 +3,7 @@ Tabu Search Class
 """
 from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
-from copy import copy
+from copy import *
 
 # TODO: THIS SOLUTION IS ONLY BASED ON GRADE THREE
 
