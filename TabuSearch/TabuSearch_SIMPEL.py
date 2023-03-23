@@ -83,6 +83,9 @@ class TabuSearch_SIMPLE:
         # return best solution found
         return self.bestSolution
 
+
+    # Phase 1 Moves:
+
     # TODO: Random decent after PC and LB
     def randomDecent(self, schedule):
         """
@@ -113,3 +116,35 @@ class TabuSearch_SIMPLE:
         :return:
         """
         print("Running Balance Restoration...")
+
+    def shiftChain(self, schedule):
+        """
+        Step 1.3 For each of the grades, attempt to find a chain of moves using Shift Chain Neighbourhood from s_now to s_final, so that CC is reduced and PC does not increase
+        :param schedule:
+        :return: move
+        """
+        print("Running Shift Chain...")
+
+    def nurseChain(self, schedule):
+        """
+        Step 1.4 For each of the grades, attempt to find a chain of moves from Nurse Chain Neighbourhood s_now to s_final, so that CC is reduced and PC does not increase
+        :param schedule:
+        :return: move
+        """
+        print("Running Nurse Chain...")
+
+    def underCovering(self, schedule):
+        """
+        Step 1.5 Select the best move according to CC that satisfies non-tabu conditions 1 and 2 that improve the cover for one shift (although makes other worse)
+        :param schedule:
+        :return: move
+        """
+        print("Running Under Covering...")
+
+    def randomKick(self, schedule):
+        """
+        Step 1.6 Randomly select a move satisfying non-tabu conditions 1-3.
+        :param schedule:
+        :return: move
+        """
+        print("Running Random Kick...")
