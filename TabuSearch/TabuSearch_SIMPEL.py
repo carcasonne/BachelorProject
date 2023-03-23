@@ -22,7 +22,7 @@ class TabuSearch_SIMPLE:
         self.dayNightTabuList = []
         # Tabu criteria 3:
         self.dayNightCounter = 0
-        self.maxits = 0
+        self.maxits = 50
         self.lowerBound = None  # TODO: Calculate Lower Bound
         # Feasible shift patterns for nurses is provided in this dict
         self.feasiblePatterns = dict()
@@ -91,6 +91,7 @@ class TabuSearch_SIMPLE:
         :param schedule:
         :return move:
         """
+        print("Running Random Descent...")
         for nurse in schedule.nurses:
             if nurse.id not in self.tabuList:
                 for pattern in self.feasiblePatterns[nurse.id]:
@@ -111,3 +112,4 @@ class TabuSearch_SIMPLE:
         :param schedule:
         :return:
         """
+        print("Running Balance Restoration...")
