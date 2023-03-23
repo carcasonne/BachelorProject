@@ -73,7 +73,7 @@ def calculateDifferenceCC(schedule, nurse, pattern):
                     diffCC -= 1
             if oldMergedPattern[i] == 1:
                 # If covering requirement is higher than the assigned nurses it will increase in CC to remove nurse
-                if currentShiftCoverage < 0:
+                if currentShiftCoverage >= 0:
                     diffCC += 1
     return diffCC
 
