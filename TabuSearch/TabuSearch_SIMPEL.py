@@ -94,16 +94,7 @@ class TabuSearch_SIMPLE:
         for nurse in schedule.nurses:
             if nurse.id not in self.tabuList:
                 for pattern in self.feasiblePatterns[nurse.id]:
-<<<<<<< HEAD
-                    neighbour = copy.deepcopy(schedule)
-                    n_nurse = neighbour.nurses[nurse.id]
-                    n_nurse.assignShiftPattern(pattern)
-                    neighbour.CC = evaluateCC(neighbour)
-                    neighbour.PC = evaluatePC(neighbour)
-                    if neighbour.CC < schedule.CC:  # neighbour.PC <= schedule.PC
-                        return neighbour
-=======
-                    if (nurse.worksNight and pattern(0) == [0] * 7) or (not nurse.worksNight and pattern(0) != [0] * 7):
+                    if (nurse.worksNight and pattern.day == [0] * 7) or (not nurse.worksNight and pattern.day != [0] * 7):
                         neighbour = copy.deepcopy(schedule)
                         n_nurse = neighbour.nurses[nurse.id]
                         n_nurse.assignShiftPattern(pattern)
@@ -112,7 +103,6 @@ class TabuSearch_SIMPLE:
                         if neighbour.CC < schedule.CC: #and neighbour.PC <= schedule.PC:
                             self.tabuList.append(nurse.id)
                             return neighbour
->>>>>>> 6e6c1eb21ad1a68c9e50ff2301a4c4242bae3cee
         return None
 
     def balanceRestoring(self, schedule):
