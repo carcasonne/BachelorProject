@@ -31,6 +31,16 @@ class TabuSchedule:
         self.PC = evaluatePC(self)  # The penalty cost of the schedule - Z / Eq(1)
         self.LB = evaluateLB(self)  # The lower bound of the schedule - Eq(5)
 
+    # TODO: Tests for this one
+    def assignPatternToNurse(self, nurse, pattern):
+        oldShiftPattern = nurse.assignedShiftPattern
+        nurse.assignShiftPattern(pattern)
+        for x in range(14):
+            if oldShiftPattern[x] != pattern[x] and pattern[x] == 1:
+                self.shifts[x].addNurse(nurse)
+            if oldShiftPattern[x] != pattern[x] and oldShiftPattern[x] == 1:
+                self.shifts[x].removeNurse(nurse)
+
     # Checks if pattern covers shift - Returns: 1 or 0
     def __eq__(self, other):
         pass
