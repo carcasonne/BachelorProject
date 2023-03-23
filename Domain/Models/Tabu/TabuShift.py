@@ -22,3 +22,6 @@ class TabuShift:
                 if nurse.id not in self.assignedNurses[grade]:
                     raise Exception("Remove Nurse Error: Nurse is not assigned to this shift")
                 self.assignedNurses[grade].remove(nurse.id)
+    
+    def __str__(self):
+        return f"Tabu Shift: {self.shiftDay}, {self.shiftType}"
