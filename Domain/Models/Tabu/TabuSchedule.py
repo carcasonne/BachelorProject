@@ -32,6 +32,8 @@ class TabuSchedule:
         self.LB = evaluateLB(self)  # The lower bound of the schedule - Eq(5)
 
     # Checks if pattern covers shift - Returns: 1 or 0
-
     def __eq__(self, other):
         pass
+
+    def __str__(self):
+        return f"Tabu Schedule"

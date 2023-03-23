@@ -30,3 +30,6 @@ class TabuNurse:
             return False
 
         return self.id == other.id and self.grade.value == other.grade.value
+    
+    def __str__(self):
+        return f"Tabu Nurse, id: {self.id}"
