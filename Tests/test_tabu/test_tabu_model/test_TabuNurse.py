@@ -16,6 +16,7 @@ class Test_TabuNurse(unittest.TestCase):
     def tearDown(self) -> None:
         self.testnurse = TabuNurse(Nurse(0, Grade.TWO, Contract(1, 1)))
 
+    # ----------------------------------- init(self, nurse) -----------------------------------
     def test_init_returns_tabu_nurse_with_same_fields_as_parameter_nurse(self):
         # Check if every field is converted correctly
         self.nurse = Nurse(0, Grade.ONE, Contract(5, 4))
@@ -25,6 +26,7 @@ class Test_TabuNurse(unittest.TestCase):
         self.assertEqual(self.nurse.contract, self.tabunurse.contract)
         self.assertEqual(self.nurse.grade, self.tabunurse.grade)
 
+    # ----------------------------------- assignShiftPattern(self, pattern) -----------------------------------
     def test_assigning_pattern_changes_field_pattern(self):
         pattern = TabuShiftPattern([1, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0])
         self.testnurse.assignShiftPattern(pattern)
@@ -44,6 +46,10 @@ class Test_TabuNurse(unittest.TestCase):
         n = TabuNurse(Nurse(0, Grade.TWO, Contract(1, 1)))
         self.assertEqual(True, n == self.testnurse)
 
+    # ----------------------------------- calculatePenalty(self) -----------------------------------
+    # TODO: Make test for calculate penalty
+
+    # ----------------------------------- __eq__(self, other) -----------------------------------
     def test_nurse_eq_nurse_with_different_id_and_same_grade_returns_false(self):
         n = TabuNurse(Nurse(1, Grade.TWO, Contract(1, 1)))
         self.assertEqual(False, n == self.testnurse)

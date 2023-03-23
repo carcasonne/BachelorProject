@@ -3,7 +3,6 @@ from itertools import combinations
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Enums.ShiftType import TabuShiftType
 
-
 # patternCoverShift: a_j_k = 1 if pattern j covers shift k
 from Domain.Models.ShiftPatterns.ShiftPattern import TabuShiftPattern
 
@@ -35,8 +34,14 @@ def evaluateCC(schedule):
     return max(0, CC)
 
 
-def evaluatePC(schecule):
+# TODO: Make implementation for evaluatePC
+def evaluatePC(schedule):
     raise NotImplemented
+
+
+# TODO: Make implementation for evaluateLB
+def evaluateLB(schedule):
+    pass
 
 
 # findFeasiblePatterns: F(i) = return all feasible patterns for nurse i
@@ -47,7 +52,7 @@ def findFeasiblePatterns(nurse):
         if counter == 0:
             combs = combinations(range(7), nurse.contract.days)
         else:
-            combs = combinations(range(7),  nurse.contract.nights)
+            combs = combinations(range(7), nurse.contract.nights)
 
         for comb in combs:
             bitstring = [0] * 7
@@ -61,4 +66,3 @@ def findFeasiblePatterns(nurse):
                     fp.append(TabuShiftPattern([0] * 7, bitstring))
         counter += 1
     return fp
-

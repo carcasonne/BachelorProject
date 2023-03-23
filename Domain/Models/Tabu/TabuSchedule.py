@@ -2,6 +2,9 @@ from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuShift import TabuShift
 from Domain.Models.Enums.ShiftType import TabuShiftType
+from TabuSearch.StaticMethods import evaluateCC
+from TabuSearch.StaticMethods import evaluatePC
+from TabuSearch.StaticMethods import evaluateLB
 
 
 class TabuSchedule:
@@ -24,6 +27,9 @@ class TabuSchedule:
                 self.shifts.append(TabuShift(requirements, TabuShiftType.DAY, Schedule.shifts[x].shiftDay))
         if len(self.shifts) != 14:
             raise Exception("Must be exactly 14 shifts")
+        self.CC = evaluateCC(self)
+        self.PC = evaluatePC(self)
+        self.LB = evaluateLB(self)
 
     # Checks if pattern covers shift - Returns: 1 or 0
 

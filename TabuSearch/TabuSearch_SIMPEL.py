@@ -2,6 +2,7 @@
 Tabu Search Class
 """
 from Domain.Models.Enums.Grade import Grade
+from TabuSearch.StaticMethods import *
 
 # TODO: THIS SOLUTION IS ONLY BASED ON GRADE THREE
 
@@ -21,6 +22,12 @@ class TabuSearch_SIMPLE:
         # Tabu criteria 3:
         self.dayNightCounter = 0
         self.maxits = 0
+        self.lowerBound = None  # TODO: Calculate Lower Bound
+        # Feasible shift patterns for nurses is provided in this dict
+        self.feasiblePatterns = dict()
+        for n in initialSolution.nurses:
+            self.feasiblePatterns[n.id] = findFeasiblePatterns(n)
+
         self.currSolution = initialSolution
         self.bestSolution = initialSolution
         self.evaluate = solutionEvaluator
@@ -29,12 +36,13 @@ class TabuSearch_SIMPLE:
         self.acceptableScoreThreshold = acceptableScoreThreshold
         self.tabuTenure = tabuTenure
 
-    def makeMove(self):
+    def makeMove(self, move):
         if None:  # TODO: Change this to: if the move changes the day night split
             self.dayNightTabuList = None  # TODO: the dayNightTabuList is updated
             self.dayNightCounter = 0
-            self.calculateLowerBound = None # TODO: Remove this and make method for lowerbound Eq.(6)
-
+            self.lowerBound = None  # TODO: Calculate lowerbound Eq.(6)
+        else:  # if move does not change the day night split
+            self.dayNightCounter += 1
 
     def isTerminationCriteriaMet(self):
         # can add more termination criteria
