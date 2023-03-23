@@ -161,7 +161,6 @@ class Test_StaticMethods(unittest.TestCase):
 
         self.assertEqual(afterCC - beforeCC, result)
 
-    @unittest.skip("Dont do this now")
     def test_calculate_differenceCC_returns_positive_differance(self):
         pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1])
         pattern2 = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 1, 0, 1, 1])
@@ -171,6 +170,32 @@ class Test_StaticMethods(unittest.TestCase):
 
         self.assertTrue(result > 0)
         self.assertEqual(2, result)
+
+    def test_calculate_differenceCC_for_over_covered_shift_returns_only_decrease_in_CC(self):
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[1], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[2], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[3], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        CC = self.schedule.CC
+
+        pattern = TabuShiftPattern([0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0])
+        result = calculateDifferenceCC(self.schedule, self.schedule.nurses[0], pattern)
+
+        self.assertTrue(CC > self.schedule.CC)
+        self.assertEqual(-3, result)
+
+    def test_calculate_differenceCC_for_semi_covered_shifts_returns_no_decrease_or_increase_in_CC(self):
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[1], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[2], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[3], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        CC = self.schedule.CC
+
+        pattern = TabuShiftPattern([0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0])
+        result = calculateDifferenceCC(self.schedule, self.schedule.nurses[0], pattern)
+
+        self.assertEqual(CC, self.schedule.CC)
+        self.assertEqual(0, result)
 
 
 
