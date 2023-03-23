@@ -39,6 +39,7 @@ class KnapsackSolver:
         self.bankNurseContract = contract3
         self.bankNurseGrade = Grade.ONE
         self.bankNurseCount = 0
+        self.originalNurses = len(schedule.nurses)
 
     # Strategy consists of 3 parts:
     # 1. Find the first feasible solution above lower bound E (feasible for all grades)
@@ -122,10 +123,15 @@ class KnapsackSolver:
             C_3 = self.costForBounds(upperBounds, self.D)
             lowerBound = self.E
 
-            # If the upper bound is smaller then lower bound, the problem is infeasible
-            # Therefor we add a bank nurse to the solution and try again
+            # If the upper bound is smaller than lower bound, the problem is infeasible
+            # Therefore we add a bank nurse to the solution and try again
+            # We define this as the difference between required nights shifts, and night shifts its possible to cover
+            # And divide this with how many nights each bank nurse could cover
             if(C_3 <= lowerBound):
-                self.addBankNurse()
+                n = lowerBound - C_3
+                n //= self.bankNurseContract.nights
+                for _ in range(n):
+                    self.addBankNurse()
                 continue
 
             self.globalC = C_3
@@ -152,7 +158,7 @@ class KnapsackSolver:
     def addBankNurse(self):
         bankContract = self.bankNurseContract
         bankGrade = self.bankNurseGrade
-        bankNurse = Nurse(1000 + self.bankNurseCount, bankGrade, bankContract)
+        bankNurse = Nurse(self.originalNurses + self.bankNurseCount, bankGrade, bankContract)
         self.globalC += bankContract.days
         self.schedule.nurses.append(bankNurse)
         self.bankNurseCount += 1
