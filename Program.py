@@ -7,11 +7,6 @@ import copy
 schedule = TabuSchedule(copy.deepcopy(TestTabuData().schedule))
 
 search = TabuSearch_SIMPLE(schedule)
-for s in search.bestSolution.shifts:
-    print(str(s))
-print("Score: " + str(search.bestSolution.CC))
+print(str(search.bestSolution))
 search.run()
-evaluateCC(search.bestSolution)
-for s in search.bestSolution.shifts:
-    print(str(s))
-print("Score: " + str(search.bestSolution.CC))
+print(str(search.bestSolution))

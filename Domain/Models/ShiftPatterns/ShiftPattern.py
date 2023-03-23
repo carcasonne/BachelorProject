@@ -24,6 +24,9 @@ class TabuShiftPattern(ShiftPattern):
             self.merged.append(night[counter])
             counter += 1
 
+    def __str__(self):
+        return f"TabuShiftPattern: ({self.day}, {self.night})"
+
     def __eq__(self, other):
         if not isinstance(other, TabuShiftPattern):
             # don't attempt to compare against unrelated types

@@ -43,7 +43,7 @@ class TabuSearch_SIMPLE:
 
     def makeMove(self, move):
         if move is None:
-            pass
+            return None
         else:
             if move[1]: # If move changes the day night split
                 dayNurses = []
@@ -58,6 +58,7 @@ class TabuSearch_SIMPLE:
             else:  # if move does not change the day night split
                 self.dayNightCounter += 1
             self.bestSolution = move[0]
+            return move[0]
 
     def run(self):
         # Phase 1:
@@ -94,7 +95,7 @@ class TabuSearch_SIMPLE:
                             return neighbour, False
         return None
 
-    def balanceRestoring(self, schedule:TabuSchedule):
+    def balanceRestoring(self, schedule):
         """
         Step 1.2 (Balance days and nights). Check for balance by lower bound (Eq(5)). if
         :param schedule:
