@@ -8,8 +8,7 @@ from copy import *
 # TODO: THIS SOLUTION IS ONLY BASED ON GRADE THREE
 
 class TabuSearch_SIMPLE:
-    def __init__(self, initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria,
-                 acceptableScoreThreshold, tabuTenure):
+    def __init__(self, initialSolution): # (initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure)
         """
         The next three variables is there to make sure that we hold the 3 tabu criteria:
             1) A move involves the tabu nurse (i.e. the nurse moved last time) from tabuList.
@@ -31,11 +30,11 @@ class TabuSearch_SIMPLE:
 
         self.currSolution = initialSolution
         self.bestSolution = initialSolution
-        self.evaluate = solutionEvaluator
-        self.aspirationCriteria = aspirationCriteria
-        self.neighborOperator = neighborOperator
-        self.acceptableScoreThreshold = acceptableScoreThreshold
-        self.tabuTenure = tabuTenure
+        self.evaluate = None
+        self.aspirationCriteria = None
+        self.neighborOperator = None
+        self.acceptableScoreThreshold = None
+        self.tabuTenure = None
 
     def makeMove(self, move):
         if None:  # TODO: Change this to: if the move changes the day night split
