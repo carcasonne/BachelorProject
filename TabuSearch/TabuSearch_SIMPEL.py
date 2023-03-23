@@ -3,6 +3,7 @@ Tabu Search Class
 """
 from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
+from copy import *
 
 # TODO: THIS SOLUTION IS ONLY BASED ON GRADE THREE
 
@@ -89,6 +90,17 @@ class TabuSearch_SIMPLE:
         :param schedule:
         :return move:
         """
+        for nurse in schedule.nurses:
+            if nurse not in self.tabuList:
+                for pattern in self.feasiblePatterns[nurse.id]:
+                    neighbour = copy.deepcopy(schedule)
+                    n_nurse = neighbour.nurses[nurse.id]
+                    n_nurse.assignShiftPattern(pattern)
+                    evaluateCC(neighbour)
+                    evaluatePC(neighbour)
+                    if neighbour.CC < schedule.CC and neighbour.PC <= schedule.PC:
+                        return neighbour
+        return None
 
     def balanceRestoring(self, schedule):
         """
