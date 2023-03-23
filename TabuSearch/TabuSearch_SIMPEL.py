@@ -99,7 +99,7 @@ class TabuSearch_SIMPLE:
                         n_nurse.assignShiftPattern(pattern)
                         neighbour.CC = evaluateCC(neighbour)
                         neighbour.PC = evaluatePC(neighbour)
-                        if neighbour.CC < schedule.CC and neighbour.PC <= schedule.PC:
+                        if neighbour.CC < schedule.CC: #and neighbour.PC <= schedule.PC:
                             self.tabuList.append(nurse.id)
                             return neighbour
         return None
