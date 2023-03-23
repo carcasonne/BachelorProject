@@ -44,11 +44,9 @@ def evaluateCC(schedule):
     """
     CC = 0
     for s in schedule.shifts:
-        assigned = 0
-        for n in schedule.nurses:
-            if n.shiftPattern is not None:
-                assigned += patternCoverShift(n.shiftPattern, s)
-        CC += max(0, s.coverRequirements[Grade.THREE] - assigned)  # TODO: Max in here instead of in the end
+        # TODO: Same line under just with grade one
+
+        CC += max(0, s.coverRequirements[Grade.THREE] - len(s.assignedNurses[Grade.THREE])) # TODO: Max in here instead of in the end
     return CC
 
 
