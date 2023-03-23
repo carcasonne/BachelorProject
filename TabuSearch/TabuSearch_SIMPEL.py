@@ -47,7 +47,7 @@ class TabuSearch_SIMPLE:
         else:
             if move[1]: # If move changes the day night split
                 dayNurses = []
-                for nurse in self.bestSolution: # Find all nurses that works during the day
+                for nurse in self.bestSolution.nurses: # Find all nurses that works during the day
                     if not nurse.worksNight:
                         dayNurses.append(nurse.id)
                 self.dayNightTabuList.append(dayNurses)
@@ -138,10 +138,10 @@ class TabuSearch_SIMPLE:
         """
         print("Running Random Kick...")
         while True:
-            nurse = schedule.nurses[random.randint(0, len(schedule.nurses))]
+            nurse = schedule.nurses[random.randint(0, len(schedule.nurses) - 1)]
             nurseWorkedNight = copy.copy(nurse.worksNight)
             if nurse.id not in self.tabuList:
-                pattern = self.feasiblePatterns[nurse.id][random.randint(0, len(self.feasiblePatterns[nurse.id]))]
+                pattern = self.feasiblePatterns[nurse.id][random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)]
                 neighbour = copy.deepcopy(schedule)
                 n_nurse = neighbour.nurses[nurse.id]
                 neighbour.assignPatternToNurse(n_nurse, pattern)
