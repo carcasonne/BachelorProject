@@ -4,6 +4,7 @@ Tabu Search Class
 import copy
 import random
 
+from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
 
@@ -37,6 +38,8 @@ class TabuSearch_SIMPLE:
         self.neighborOperator = None
         self.acceptableScoreThreshold = None
         self.tabuTenure = None
+
+        self.shiftRequirements = findShiftTypeRequirements(initialSolution)
 
     def makeMove(self, move):
         if move is None:
@@ -85,27 +88,26 @@ class TabuSearch_SIMPLE:
                         neighbour = copy.deepcopy(schedule)
                         n_nurse = neighbour.nurses[nurse.id]
                         neighbour.assignPatternToNurse(n_nurse, pattern)
-                        neighbour.CC = evaluateCC(neighbour)
-                        neighbour.PC = evaluatePC(neighbour)
                         if neighbour.CC < schedule.CC: #and neighbour.PC <= schedule.PC:
                             self.tabuList = []
                             self.tabuList.append(nurse.id)
                             return neighbour, False
         return None
 
-    def balanceRestoring(self, schedule):
+    def balanceRestoring(self, schedule:TabuSchedule):
         """
         Step 1.2 (Balance days and nights). Check for balance by lower bound (Eq(5)). if
         :param schedule:
-        :return:
+        :return: move, changed day/night:
         """
         print("Running Balance Restoration...")
+        return None
 
     def shiftChain(self, schedule):
         """
         Step 1.3 For each of the grades, attempt to find a chain of moves using Shift Chain Neighbourhood from s_now to s_final, so that CC is reduced and PC does not increase
         :param schedule:
-        :return: move
+        :return: move, changed day/night:
         """
         print("Running Shift Chain...")
         return None
@@ -114,7 +116,7 @@ class TabuSearch_SIMPLE:
         """
         Step 1.4 For each of the grades, attempt to find a chain of moves from Nurse Chain Neighbourhood s_now to s_final, so that CC is reduced and PC does not increase
         :param schedule:
-        :return: move
+        :return: move, changed day/night:
         """
         print("Running Nurse Chain...")
         return None
@@ -123,7 +125,7 @@ class TabuSearch_SIMPLE:
         """
         Step 1.5 Select the best move according to CC that satisfies non-tabu conditions 1 and 2 that improve the cover for one shift (although makes other worse)
         :param schedule:
-        :return: move
+        :return: move, changed day/night:
         """
         print("Running Under Covering...")
         return None
@@ -132,11 +134,10 @@ class TabuSearch_SIMPLE:
         """
         Step 1.6 Randomly select a move satisfying non-tabu conditions 1-3.
         :param schedule:
-        :return: move
+        :return: move, changed day/night:
         """
         print("Running Random Kick...")
-        validMove = False
-        while not validMove:
+        while True:
             nurse = schedule.nurses[random.randint(0, len(schedule.nurses))]
             nurseWorkedNight = copy.copy(nurse.worksNight)
             if nurse.id not in self.tabuList:
@@ -144,8 +145,46 @@ class TabuSearch_SIMPLE:
                 neighbour = copy.deepcopy(schedule)
                 n_nurse = neighbour.nurses[nurse.id]
                 neighbour.assignPatternToNurse(n_nurse, pattern)
-                evaluateCC(neighbour)
-                evaluatePC(neighbour)
                 self.tabuList = []
                 self.tabuList.append(nurse.id)
                 return neighbour, nurseWorkedNight != n_nurse.worksNight
+        pass
+        
+    
+    def findBalanceRestoringCandidateList(self, schedule:TabuSchedule):
+        types = [TabuShiftType.DAY, TabuShiftType.NIGHT]
+        # Find out if solution is unbalanced for any grade for any type
+
+        for type in types:
+                # Get all nurses working this type of pattern
+                typeNurses = [nurse for nurse in schedule.nurses if nurse.worksNights]
+                # Find number of shifts worked by all nurses of this grade and this type
+                shifts = 0
+                for nurse in typeNurses:
+                    pattern = nurse.shiftPattern.day if type == TabuShiftType.DAY else nurse.shiftPattern.night
+                    shifts += sum(pattern)
+
+                # Fewer shifts worked than is required?
+                if shifts < self.shiftRequirements[type][Grade.THREE]:
+                    
+                    pass
+
+        # This is for considering all grades
+        # for grade in Grade:
+        #     # Get all nurses of this grade. This can technically be done in a single for-loop, possible optimization
+        #     gradeNurses = [nurse for nurse in schedule.nurses if nurse.grade == grade]
+        #     for type in types:
+        #         # Get all nurses working this type of pattern
+        #         typeNurses = [nurse for nurse in gradeNurses if nurse.worksNights]
+        #         # Find number of shifts worked by all nurses of this grade and this type
+        #         shifts = 0
+        #         for nurse in typeNurses:
+        #             pattern = nurse.shiftPattern.day if type == TabuShiftType.DAY else nurse.shiftPattern.night
+        #             shifts += sum(pattern)
+
+        #         # Fewer shifts worked than is required?
+        #         if shifts < self.shiftRequirements[type][grade]:
+                    
+        #             pass
+
+
