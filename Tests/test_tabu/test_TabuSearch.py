@@ -1,6 +1,7 @@
 import copy
 import unittest
 
+from Domain.Models.ShiftPatterns.ShiftPattern import TabuShiftPattern
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from TabuSearch.StaticMethods import evaluateCC
 from Tests.test_tabu.TestTabuData import TestTabuData
@@ -40,7 +41,16 @@ class Test_TabuSearch(unittest.TestCase):
         self.assertEqual(oldCC, newCC)
 
     def test_random_decent_if_no_move_is_found_returns_none(self):
-        self.schedule.CC = 0
+        for i in range(len(self.schedule.nurses) // 9):
+            for x in range(9):
+                if x % 3 == 0:
+                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x],
+                                                       TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1],
+                                                                        [0, 0, 0, 0, 0, 0, 0]))
+                else:
+                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x],
+                                                       TabuShiftPattern([0, 0, 0, 0, 0, 0, 0],
+                                                                        [1, 1, 1, 1, 1, 1, 1, 1]))
         out = self.ts.randomDecent(self.schedule)
         self.assertEqual(None, out)
 
