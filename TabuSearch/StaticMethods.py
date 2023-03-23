@@ -1,5 +1,6 @@
 from itertools import combinations
 
+from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Enums.ShiftType import TabuShiftType
 
@@ -97,3 +98,22 @@ def findFeasiblePatterns(nurse):
                     fp.append(TabuShiftPattern([0] * 7, bitstring))
         counter += 1
     return fp
+
+# Returns the number of shifts needed to be covered for each grade
+# NOTE: Right now, this only sets for grade 3
+def findShiftTypeRequirements(schedule: TabuSchedule, Grade, night):
+    Q_t_r = {} 
+    types = [TabuShiftType.DAY, TabuShiftType.NIGHT]
+
+    for type in types:
+        Q_t_r[type] = {
+            Grade.ONE: 0,
+            Grade.TWO: 0,
+            Grade.THREE: 0
+        }
+    
+    for type in types:
+        grade_3_requirements = sum(shift.coverRequirements[Grade] for shift in schedule.shifts if shift.shiftType == type)
+        Q_t_r[type][Grade.THREE] = grade_3_requirements
+    
+    return Q_t_r

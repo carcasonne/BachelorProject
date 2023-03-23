@@ -1,6 +1,7 @@
 """
 Tabu Search Class
 """
+from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
 from copy import *
@@ -35,6 +36,8 @@ class TabuSearch_SIMPLE:
         self.neighborOperator = None
         self.acceptableScoreThreshold = None
         self.tabuTenure = None
+
+        self.shiftRequirements = findShiftTypeRequirements(initialSolution)
 
     def makeMove(self, move):
         if None:  # TODO: Change this to: if the move changes the day night split
@@ -104,9 +107,49 @@ class TabuSearch_SIMPLE:
                             return neighbour
         return None
 
-    def balanceRestoring(self, schedule):
+    def balanceRestoring(self, schedule:TabuSchedule):
         """
         Step 1.2 (Balance days and nights). Check for balance by lower bound (Eq(5)). if
         :param schedule:
         :return:
         """
+        pass
+        
+    
+    def findBalanceRestoringCandidateList(self, schedule:TabuSchedule):
+        types = [TabuShiftType.DAY, TabuShiftType.NIGHT]
+        # Find out if solution is unbalanced for any grade for any type
+
+        for type in types:
+                # Get all nurses working this type of pattern
+                typeNurses = [nurse for nurse in schedule.nurses if nurse.worksNights]
+                # Find number of shifts worked by all nurses of this grade and this type
+                shifts = 0
+                for nurse in typeNurses:
+                    pattern = nurse.shiftPattern.day if type == TabuShiftType.DAY else nurse.shiftPattern.night
+                    shifts += sum(pattern)
+
+                # Fewer shifts worked than is required?
+                if shifts < self.shiftRequirements[type][Grade.THREE]:
+                    
+                    pass
+
+        # This is for considering all grades
+        # for grade in Grade:
+        #     # Get all nurses of this grade. This can technically be done in a single for-loop, possible optimization
+        #     gradeNurses = [nurse for nurse in schedule.nurses if nurse.grade == grade]
+        #     for type in types:
+        #         # Get all nurses working this type of pattern
+        #         typeNurses = [nurse for nurse in gradeNurses if nurse.worksNights]
+        #         # Find number of shifts worked by all nurses of this grade and this type
+        #         shifts = 0
+        #         for nurse in typeNurses:
+        #             pattern = nurse.shiftPattern.day if type == TabuShiftType.DAY else nurse.shiftPattern.night
+        #             shifts += sum(pattern)
+
+        #         # Fewer shifts worked than is required?
+        #         if shifts < self.shiftRequirements[type][grade]:
+                    
+        #             pass
+
+
