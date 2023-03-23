@@ -2,6 +2,7 @@
 Tabu Search Class
 """
 import copy
+import random
 
 from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
@@ -38,22 +39,32 @@ class TabuSearch_SIMPLE:
         self.tabuTenure = None
 
     def makeMove(self, move):
-        if None:  # TODO: Change this to: if the move changes the day night split
-            self.dayNightTabuList = None  # TODO: the dayNightTabuList is updated
-            self.dayNightCounter = 0
-            self.lowerBound = None  # TODO: Calculate lowerbound Eq.(6)
-        else:  # if move does not change the day night split
-            self.dayNightCounter += 1
-
-    def isTerminationCriteriaMet(self):
-        # can add more termination criteria
-        return self.evaluate(self.bestSolution) < self.acceptableScoreThreshold \
-               or self.neighborOperator(self.currSolution) == 0
+        if move is None:
+            pass
+        else:
+            if move[1]: # If move changes the day night split
+                dayNurses = []
+                for nurse in self.bestSolution: # Find all nurses that works during the day
+                    if not nurse.worksNight:
+                        dayNurses.append(nurse.id)
+                self.dayNightTabuList.append(dayNurses)
+                if len(self.dayNightTabuList) == 7:
+                    self.dayNightTabuList.pop(6)
+                self.dayNightCounter = 0
+                self.lowerBound = None  # TODO: Calculate lowerbound Eq.(6)
+            else:  # if move does not change the day night split
+                self.dayNightCounter += 1
+            self.bestSolution = move[0]
 
     def run(self):
         # Phase 1:
         while self.bestSolution.CC > 0:
-
+            if self.makeMove(self.randomDecent(self.bestSolution)) is None:
+                if self.makeMove(self.balanceRestoring(self.bestSolution)) is None:
+                    if self.makeMove(self.shiftChain(self.bestSolution)) is None:
+                        if self.makeMove(self.nurseChain(self.bestSolution)) is None:
+                            if self.makeMove(self.underCovering(self.bestSolution)) is None:
+                                self.makeMove(self.randomKick(self.bestSolution))
 
 
     # Phase 1 Moves:
@@ -64,7 +75,7 @@ class TabuSearch_SIMPLE:
         Step 1.1 (Random decent). Carry out random decent by accepting the first neighbourhood move that satisfies
         non-tabu conditions 1 - 3 and improves CC and does not increase PC. Repeat until no satisfactory move exists.
         :param schedule:
-        :return move:
+        :return move, changed day/night:
         """
         print("Running Random Descent...")
         for nurse in schedule.nurses:
@@ -77,8 +88,9 @@ class TabuSearch_SIMPLE:
                         neighbour.CC = evaluateCC(neighbour)
                         neighbour.PC = evaluatePC(neighbour)
                         if neighbour.CC < schedule.CC: #and neighbour.PC <= schedule.PC:
+                            self.tabuList = []
                             self.tabuList.append(nurse.id)
-                            return neighbour
+                            return neighbour, False
         return None
 
     def balanceRestoring(self, schedule):
@@ -96,6 +108,7 @@ class TabuSearch_SIMPLE:
         :return: move
         """
         print("Running Shift Chain...")
+        return None
 
     def nurseChain(self, schedule):
         """
@@ -104,6 +117,7 @@ class TabuSearch_SIMPLE:
         :return: move
         """
         print("Running Nurse Chain...")
+        return None
 
     def underCovering(self, schedule):
         """
@@ -112,6 +126,7 @@ class TabuSearch_SIMPLE:
         :return: move
         """
         print("Running Under Covering...")
+        return None
 
     def randomKick(self, schedule):
         """
@@ -120,3 +135,17 @@ class TabuSearch_SIMPLE:
         :return: move
         """
         print("Running Random Kick...")
+        validMove = False
+        while not validMove:
+            nurse = schedule.nurses[random.randint(0, len(schedule.nurses))]
+            nurseWorkedNight = copy.copy(nurse.worksNight)
+            if nurse.id not in self.tabuList:
+                pattern = self.feasiblePatterns[nurse.id][random.randint(0, len(self.feasiblePatterns[nurse.id]))]
+                neighbour = copy.deepcopy(schedule)
+                n_nurse = neighbour.nurses[nurse.id]
+                neighbour.assignPatternToNurse(n_nurse, pattern)
+                evaluateCC(neighbour)
+                evaluatePC(neighbour)
+                self.tabuList = []
+                self.tabuList.append(nurse.id)
+                return neighbour, nurseWorkedNight != n_nurse.worksNight
