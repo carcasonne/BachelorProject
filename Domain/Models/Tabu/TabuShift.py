@@ -9,14 +9,14 @@ class TabuShift:
         self.shiftType = tabuShiftType
         self.shiftDay = shiftDay
 
-    def addNurse(self, nurse):
+    def _addNurse(self, nurse):
         for grade in self.assignedNurses.keys():
             if nurse.grade.value <= grade.value:
                 if nurse.id in self.assignedNurses[grade]:
                     raise Exception("Add Nurse Error: Nurse is already assigned to this shift")
                 self.assignedNurses[grade].add(nurse.id)
 
-    def removeNurse(self, nurse):
+    def _removeNurse(self, nurse):
         for grade in self.assignedNurses.keys():
             if nurse.grade.value <= grade.value:
                 if nurse.id not in self.assignedNurses[grade]:
