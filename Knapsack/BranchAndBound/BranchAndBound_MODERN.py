@@ -33,6 +33,7 @@ class BranchAndBound_MODERN:
         self.PQ.insert(self.v, self.items, self.C, self.N)
 
         self.bestSolution = self.v
+        self.boundSolution = self.v
         self.lowerBound = lowerBound
 
     def resetSearch(self):
@@ -51,7 +52,13 @@ class BranchAndBound_MODERN:
 
             # Ignore node if upper bound falls too low
             # Branches by making 2 solutions: 1 where we insert the item, 1 where we do not
-            if v.U > self.bestSolution.Z: 
+            inspectNode = False
+            if earlyExit is not None:
+                inspectNode = v.U > self.boundSolution.Z
+            else:
+                inspectNode =  v.U > self.bestSolution.Z
+                
+            if inspectNode: 
                 # Make new node in tree
                 newLevel = v.level + 1
 
@@ -83,12 +90,21 @@ class BranchAndBound_MODERN:
                         if includeItemSolution.Z >= self.lowerBound:
                             if includeItemSolution.Z > self.bestSolution.Z:
                                 self.bestSolution = includeItemSolution
+                                self.boundSolution = includeItemSolution
                                 exit = earlyExit
+
+                        elif includeItemSolution.Z > self.boundSolution.Z:
+                            self.boundSolution = includeItemSolution
+                    
                     elif includeItemSolution.Z > self.bestSolution.Z:
                         self.bestSolution = includeItemSolution
+                        self.boundSolution = includeItemSolution
 
                 # If the new solution could potentiall be better, add it to PQ
-                if includeItemSolution.U > self.bestSolution.Z:
+                if self.lowerBound is not None:
+                    if includeItemSolution.U > self.boundSolution.Z:
+                        self.PQ.insert(includeItemSolution, self.items, self.C, self.N)
+                elif includeItemSolution.U > self.bestSolution.Z:
                     self.PQ.insert(includeItemSolution, self.items, self.C, self.N)
 
                 # Generate another solution corresponding to not inserting the item
@@ -98,8 +114,11 @@ class BranchAndBound_MODERN:
                 excludeItemSolution.items = v.items.copy()
                 excludeItemSolution.U = BranchAndBound_MODERN.get_bound(excludeItemSolution, self.items, self.C, self.N)
 
-                # If potential to be better than best solution, even without adding the item, then add to PQ
-                if excludeItemSolution.U > self.bestSolution.Z:
+                # If potential to be better than best solution, even without adding the item, then add to PQ                
+                if self.lowerBound is not None:
+                    if excludeItemSolution.U > self.boundSolution.Z:
+                        self.PQ.insert(excludeItemSolution, self.items, self.C, self.N)
+                elif excludeItemSolution.U > self.bestSolution.Z:
                     self.PQ.insert(excludeItemSolution, self.items, self.C, self.N)
                 
                 if exit: 
