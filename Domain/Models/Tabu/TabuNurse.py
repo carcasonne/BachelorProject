@@ -11,12 +11,12 @@ class TabuNurse:
         self.shiftPattern = TabuShiftPattern([0] * 7, [0] * 7)  # The shift pattern that this nurse is currently working
         self.worksNight = None  # True = Nurse works only night shifts, False = Nurse works only day shifts
         self.penalty = 0  # The penalty of the current shift pattern: from 0 (good pattern) to 10 (infeasible pattern)
-                          # TODO: Change this description since 0 - 10 does not make a lot of sense anymore.
+        # TODO: Change this description since 0 - 10 does not make a lot of sense anymore.
 
         # Soft constraints:
         self.consecutiveWorkingDays = nurse.consecutiveWorkingDays
         self.consecutiveDaysOff = nurse.consecutiveDaysOff
-        self.undesiredShifts = nurse.undesiredShifts
+        self.undesiredShifts = TabuShiftPattern(nurse.undesiredShifts[0], nurse.undesiredShifts[1])
         self.completeWeekend = nurse.completeWeekend
         self.undesiredWeekend = nurse.undesiredWeekend
 
@@ -30,29 +30,40 @@ class TabuNurse:
 
     # TODO: Find out some constrains and calculate the penalty based on that. This should be a number from 1 to 10
     def calculatePenalty(self, shiftpattern):
-        newPen = 0 # New penalty score
+        newPen = 0  # New penalty score
         # Calculating which schedule we should be looking at:
         if shiftpattern.day != [0] * 7:
             pattern = shiftpattern.day
-            undesired = self.undesiredShifts[0]
+            undesired = self.undesiredShifts.day
         else:
             pattern = shiftpattern.night
-            undesired = self.undesiredShifts[1]
+            undesired = self.undesiredShifts.night
 
         workList = []
         freeList = []
         work = 0
         free = 0
         # Computation over how many days the nurses work consecutively, and how many days they are free:
+        count = 0
         for e in pattern:
             if e == 1:
-                freeList.append(free)
-                free = 0
+                if free != 0:
+                    freeList.append(free)
+                    free = 0
                 work += 1
-            else:
-                workList.append(work)
-                work = 0
+            if e == 0:
+                if work != 0:
+                    workList.append(work)
+                    work = 0
                 free += 1
+            if count == 6:
+                if e == 0:
+                    freeList.append(free)
+                if e == 1:
+                    workList.append(work)
+            count += 1
+
+
         # Calculation of penalty score for working more/less than the desired consecutive days:
         for e in workList:
             if e > self.consecutiveWorkingDays[1]:
