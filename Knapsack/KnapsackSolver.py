@@ -182,23 +182,21 @@ class KnapsackSolver:
             if Q_i < upperBounds[contract]:
                 upperBounds[contract] = Q_i
 
-        #C_2 = self.costForBounds(upperBounds, D_2)
+        # C_2 = self.costForBounds(upperBounds, D_2)
+        # while C_2 <= lowerBound:
+        #     n = lowerBound - C_2
+        #     #n //= self.bankNurseContract.nights 
+        #     if C_2 == lowerBound:
+        #         n += 1     
+        #     for _ in range(n):
+        #         self.addBankNurse()
+        #         upperBounds[self.bankNurseContract] += 1
+
+        #     C_2 = self.costForBounds(upperBounds, D_2)
 
         # Represent the problem in bounded knapsack item groups
-        items = []
-        for contract in self.contracts:
-            profit = contract.nights
-            weight = contract.days
-            upperBound = upperBounds[contract]
-
-            itemGroup = ItemGroup(profit, weight, upperBound)
-            items.append(itemGroup)
+        items = self.createBoundedItemGroups(upperBounds)
         
-        # There is something wrong with upper bounds
-        # It works if we're judt kinda ignoring the upper bound
-        # TODO: figure it out
-        #C_2 = 20
-
         # Find a feasible solution for grade 2
         boundedKnapsack = BoundedKnapsack(items, self.globalC)
         zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
@@ -242,15 +240,20 @@ class KnapsackSolver:
             if Q_i < upperBounds[contract]:
                 upperBounds[contract] = Q_i
         
-        # Represent the problem in bounded knapsack item groups
-        items = []
-        for contract in self.contracts:
-            profit = contract.nights
-            weight = contract.days
-            upperBound = upperBounds[contract]
+        # C_1 = C_1 = self.costForBounds(upperBounds, D_1)
+        # while C_1 <= lowerBound:
+        #     n = lowerBound - C_1
+        #     #n //= self.bankNurseContract.nights 
+        #     if C_1 == lowerBound:
+        #         n += 1     
+        #     for _ in range(n):
+        #         self.addBankNurse()
+        #         upperBounds[self.bankNurseContract] += 1
 
-            itemGroup = ItemGroup(profit, weight, upperBound)
-            items.append(itemGroup)
+        #     C_1 = self.costForBounds(upperBounds, D_1)
+
+        # Represent the problem in bounded knapsack item groups
+        items = self.createBoundedItemGroups(upperBounds)
         
         # TODO: figure out the stuff with upper bound
         #C_1 = self.costForBounds(upperBounds, D_1)
