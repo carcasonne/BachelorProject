@@ -65,7 +65,6 @@ def calculateDifferenceCC(schedule, nurse, pattern):
         newMergedPattern = pattern.merged
         oldMergedPattern = nurse.shiftPattern.merged
         if newMergedPattern[i] != oldMergedPattern[i]:
-            # TODO: Grade 1,2,3 add - for grade in self.schedule.shifts.keys() and change every place with Grade.Three to grade
             for grade in schedule.shifts[0].assignedNurses.keys():
                 if nurse.grade.value <= grade.value:
                     currentShiftCoverage = schedule.shifts[i].coverRequirements[grade] - len(
@@ -90,8 +89,19 @@ def evaluatePC(schedule):
     :param schedule:
     :return PC:
     """
-    pass
+    PC = 0
+    for n in schedule.nurses:
+        PC += n.penalty
+    return PC
 
+def calculateDifferencePC(nurse, pattern):
+    """
+    calculateDifferenceCC: Returns the difference in PC for the nurse if nurse is shifted to pattern
+    :param nurse:
+    :param pattern:
+    :return PC difference if move is chosen:
+    """
+    return nurse.calculatePenalty(pattern) - nurse.penalty
 
 # TODO: Make implementation for evaluateLB
 def evaluateLB(schedule):

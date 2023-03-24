@@ -52,5 +52,6 @@ class TabuSchedule:
         string = f"TabuSchedule: \n"
         for shift in self.shifts:
             string += f"{str(shift)} \n"
-        string += f"Score: {self.CC}"
+        string += f"CC Score: {self.CC}"
+        string += f"PC Score: {self.PC}"
         return string

@@ -8,6 +8,15 @@ class Nurse:
         self.contract = contract
         self.assignedShiftPattern = None
 
+        # Soft constraints:
+        self.consecutiveWorkingDays = (0, 7)
+        self.consecutiveDaysOff = (0, 7)
+        self.undesiredShifts = ([0] * 7, [0] * 7)
+        self.completeWeekend = False
+        self.undesiredWeekend = False
+
+
+
     def assignShiftPattern(self, shiftPattern):  # A bit representation of ether (day, night) or (early, late, night)
         self.assignedShiftPattern = shiftPattern
 

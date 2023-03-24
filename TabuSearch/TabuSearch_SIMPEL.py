@@ -86,7 +86,7 @@ class TabuSearch_SIMPLE:
             if nurse.id not in self.tabuList:
                 for pattern in self.feasiblePatterns[nurse.id]:
                     if (nurse.worksNight and pattern.day == [0] * 7) or (not nurse.worksNight and pattern.day != [0] * 7):
-                        if calculateDifferenceCC(schedule, nurse, pattern) < 0: #and neighbour.PC <= schedule.PC:
+                        if calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse, pattern) <= 0:
                             neighbour = copy.deepcopy(schedule)
                             n_nurse = neighbour.nurses[nurse.id]
                             neighbour.assignPatternToNurse(n_nurse, pattern)
