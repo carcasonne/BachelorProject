@@ -185,6 +185,27 @@ class TestKnapsackSolver(unittest.TestCase):
         self.assertTrue(feasibleSolution.level != -1)
         self.assertTrue(feasibleSolution.Z > 0)
 
+    def test_schedule_with_no_nurses_gets_bank_nurse_solution(self):
+        nurselessSchedule = self._get_schedule_with_no_nurses()
+        solver = KnapsackSolver(nurselessSchedule)
+
+        # Make sure no nurses are in schedule
+        self.assertEqual(0, len(nurselessSchedule.nurses))
+
+        grade_3_search = solver.getOverallSolution()
+        grade_3_solution = grade_3_search.bestSolution
+        grade_2_search = solver.getGradeTwoSolution(grade_3_solution)
+        grade_2_solution = grade_2_search.bestSolution
+        grade_1_search = solver.getGradeOneSolution(grade_2_solution)
+        grade_1_solution = grade_1_search.bestSolution
+
+        nurses = solver.schedule.nurses
+
+        # A feasible solution should have been generated
+        self.assertTrue(len(nurses) > 0)
+        self.assertTrue(grade_1_solution.level != -1)
+        self.assertTrue(grade_1_solution.Z > 0)
+
     # Grade 3 will always return a feasible schedule, as it implicitly adds bank nurses
     def test_infeasible_grade_3_assigned_bank_nurses(self):
         infeasibleSchedule = self._get_grade_3_infeasible_schedule()
@@ -203,6 +224,42 @@ class TestKnapsackSolver(unittest.TestCase):
         self.assertTrue(newNurses > 0)
         self.assertTrue(grade_3_solution.level != -1)
         self.assertTrue(grade_3_solution.Z > 0)
+
+    # Not implemented yet
+    # This DOES NOT test the solver. The solver backtracks in previous tree, and adds bank nurses
+    # This methods tests that searching an infeasible tree gives no feasible solutions
+    def test_infeasible_grade_2_search_finds_no_solution(self):
+        infeasibleSchedule = self._get_grade_2_infeasible_schedule()
+        solver = KnapsackSolver(infeasibleSchedule)
+        
+        # Grade 3 solution should exist
+        grade_3_search = solver.getOverallSolution()
+        grade_3_solution = grade_3_search.bestSolution
+        self.assertTrue(grade_3_solution.level != -1)
+        
+        # Grade 2 solution should not exist
+        grade_2_search = solver.getGradeTwoSolution(grade_3_solution)
+        grade_2_solution = grade_2_search.bestSolution
+        self.assertTrue(grade_2_solution.level == -1)
+
+    # This DOES NOT test the solver. The solver backtracks in previous tree, and adds bank nurses
+    # This methods tests that searching an infeasible tree gives no feasible solutions
+    # NOTE: This is depdendent on BankNurse contract being 3 days, 2 nights
+    def test_infeasible_grade_1_search_finds_no_solution(self):
+        infeasibleSchedule = self._get_grade_1_infeasible_schedule()
+        solver = KnapsackSolver(infeasibleSchedule)
+
+        # Grade 3 solution should exist
+        grade_3_search = solver.getOverallSolution()
+        grade_3_solution = grade_3_search.bestSolution
+        self.assertTrue(grade_3_solution.level != -1)
+
+        # Grade 1 solution should not exist
+        # It would probably fail already at grade 2, so we go directly to grade 1 to ensure test
+        grade_1_search = solver.getGradeOneSolution(grade_3_solution)
+        grade_1_solution = grade_1_search.bestSolution
+
+        self.assertTrue(grade_1_solution.level == -1)
 
     # Tests if the solver's .requiredForGrade() functions as expected
     def test_solver_gets_correct_shiftRequirements_for_grade(self):
