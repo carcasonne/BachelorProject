@@ -1,5 +1,5 @@
 from itertools import combinations
-
+import random
 
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Enums.ShiftType import TabuShiftType
@@ -65,7 +65,6 @@ def calculateDifferenceCC(schedule, nurse, pattern):
         newMergedPattern = pattern.merged
         oldMergedPattern = nurse.shiftPattern.merged
         if newMergedPattern[i] != oldMergedPattern[i]:
-            # TODO: Grade 1,2,3 add - for grade in self.schedule.shifts.keys() and change every place with Grade.Three to grade
             for grade in schedule.shifts[0].assignedNurses.keys():
                 if nurse.grade.value <= grade.value:
                     currentShiftCoverage = schedule.shifts[i].coverRequirements[grade] - len(
@@ -90,8 +89,113 @@ def evaluatePC(schedule):
     :param schedule:
     :return PC:
     """
-    pass
+    PC = 0
+    for n in schedule.nurses:
+        PC += n.penalty
+    return PC
 
+def calculateDifferencePC(nurse, pattern):
+    """
+    calculateDifferenceCC: Returns the difference in PC for the nurse if nurse is shifted to pattern
+    :param nurse:
+    :param pattern:
+    :return PC difference if move is chosen:
+    """
+    return nurse.calculatePenalty(pattern) - nurse.penalty
+
+def randomizeConstraints(nurse):
+    # Setting random variables for if nurse has any specific preferences, for more variation and "realistic" consistency in constraints:
+    hatesNight = False
+    if random.randint(1, 4) == 1:
+        hatesNight = True
+    hatesWeekend = False
+    if random.randint(1, 3) == 1:
+        hatesWeekend = True
+    prefersNight = False
+    if random.randint(1, 5) == 1 and not hatesNight:
+        prefersNight = True
+    prefersWeekend = False
+    if random.randint(1, 4) == 1 and not hatesWeekend:
+        prefersWeekend = True
+
+
+    # Calculating minimum for consecutive working days:
+    rand = random.randint(1, 7)
+    if rand <= 4:
+        nurse.consecutiveWorkingDays = 1, nurse.consecutiveWorkingDays[1]
+    elif rand <= 6:
+        nurse.consecutiveWorkingDays = 2, nurse.consecutiveWorkingDays[1]
+    else:
+        nurse.consecutiveWorkingDays = 3, nurse.consecutiveWorkingDays[1]
+
+    # Calculating maximum for consecutive working days:
+    rand = random.randint(1, 10)
+    nurse.consecutiveWorkingDays = nurse.consecutiveWorkingDays[0], 5
+    if rand <= 5:
+        pass
+    elif rand <= 8:
+        nurse.consecutiveWorkingDays = nurse.consecutiveWorkingDays[0], 4
+    elif rand <= 9:
+        nurse.consecutiveWorkingDays = nurse.consecutiveWorkingDays[0], 3
+    elif rand == 10 and nurse.consecutiveWorkingDays[0] != 3:
+        nurse.consecutiveWorkingDays = nurse.consecutiveWorkingDays[0], 2
+
+
+    # Calculating minimum for consecutive free days:
+    rand = random.randint(1, 7)
+    if rand <= 5:
+        nurse.consecutiveDaysOff = 1, nurse.consecutiveDaysOff[1]
+    else:
+        nurse.consecutiveDaysOff = 2, nurse.consecutiveDaysOff[1]
+
+    # Calculating maximum for consecutive free days:
+    rand = random.randint(1, 10)
+    nurse.consecutiveDaysOff = nurse.consecutiveDaysOff[0], 2
+    if rand <= 2 and nurse.consecutiveDaysOff[0] != 2:
+        nurse.consecutiveDaysOff = nurse.consecutiveDaysOff[0], 1
+    elif rand <= 8:
+        pass
+    else:
+        nurse.consecutiveDaysOff = nurse.consecutiveDaysOff[0], 3
+
+
+    # Randomly calculating random days that the nurse does not want to work:
+    for x in range(14):
+        rand = random.randint(1, 10)
+        if x <= 6 and rand == 1:
+            nurse.undesiredShifts.day[x] = 1
+        elif x >= 7 and rand == 1:
+            nurse.undesiredShifts.night[x - 7] = 1
+
+
+    # Randomly calculating weekends constraints:
+    if random.randint(1, 5) == 1:
+        nurse.completeWeekend = True
+    if random.randint(1, 5) == 1:
+        nurse.undesiredWeekend = True
+
+
+    # Setting preferences calculated in the beginning:
+    if hatesNight:
+        nurse.undesiredShifts.night = [1] * 7
+    if hatesWeekend:
+        nurse.undesiredShifts.day[5] = 1
+        nurse.undesiredShifts.day[6] = 1
+        nurse.undesiredShifts.night[5] = 1
+        nurse.undesiredShifts.night[6] = 1
+        nurse.undesiredWeekend = True
+        nurse.consecutiveDaysOff = 2, nurse.consecutiveDaysOff[1]
+        if nurse.consecutiveDaysOff[1] < 2:
+            nurse.consecutiveDaysOff = nurse.consecutiveDaysOff[0], 2
+    if prefersNight:
+        nurse.undesiredShifts.day = [1] * 7
+    if prefersWeekend:
+        nurse.undesiredShifts.day[5] = 0
+        nurse.undesiredShifts.day[6] = 0
+        nurse.undesiredShifts.night[5] = 0
+        nurse.undesiredShifts.night[6] = 0
+        nurse.undesiredWeekend = False
+        nurse.completeWeekend = True
 
 # TODO: Make implementation for evaluateLB
 def evaluateLB(schedule):
