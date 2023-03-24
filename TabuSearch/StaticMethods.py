@@ -47,7 +47,8 @@ def evaluateCC(schedule):
     for s in schedule.shifts:
         CC += max(0, s.coverRequirements[Grade.ONE] - len(s.assignedNurses[Grade.ONE]))
         CC += max(0, s.coverRequirements[Grade.TWO] - len(s.assignedNurses[Grade.TWO]))
-        CC += max(0, s.coverRequirements[Grade.THREE] - len(s.assignedNurses[Grade.THREE])) # TODO: Max in here instead of in the end
+        CC += max(0, s.coverRequirements[Grade.THREE] - len(
+            s.assignedNurses[Grade.THREE]))  # TODO: Max in here instead of in the end
     return CC
 
 
@@ -80,8 +81,6 @@ def calculateDifferenceCC(schedule, nurse, pattern):
     return diffCC
 
 
-
-
 # TODO: Make implementation for evaluatePC
 def evaluatePC(schedule):
     """
@@ -94,6 +93,7 @@ def evaluatePC(schedule):
         PC += n.penalty
     return PC
 
+
 def calculateDifferencePC(nurse, pattern):
     """
     calculateDifferenceCC: Returns the difference in PC for the nurse if nurse is shifted to pattern
@@ -102,6 +102,7 @@ def calculateDifferencePC(nurse, pattern):
     :return PC difference if move is chosen:
     """
     return nurse.calculatePenalty(pattern) - nurse.penalty
+
 
 def randomizeConstraints(nurse):
     # Setting random variables for if nurse has any specific preferences, for more variation and "realistic" consistency in constraints:
@@ -117,7 +118,6 @@ def randomizeConstraints(nurse):
     prefersWeekend = False
     if random.randint(1, 4) == 1 and not hatesWeekend:
         prefersWeekend = True
-
 
     # Calculating minimum for consecutive working days:
     rand = random.randint(1, 7)
@@ -140,7 +140,6 @@ def randomizeConstraints(nurse):
     elif rand == 10 and nurse.consecutiveWorkingDays[0] != 3:
         nurse.consecutiveWorkingDays = nurse.consecutiveWorkingDays[0], 2
 
-
     # Calculating minimum for consecutive free days:
     rand = random.randint(1, 7)
     if rand <= 5:
@@ -158,7 +157,6 @@ def randomizeConstraints(nurse):
     else:
         nurse.consecutiveDaysOff = nurse.consecutiveDaysOff[0], 3
 
-
     # Randomly calculating random days that the nurse does not want to work:
     for x in range(14):
         rand = random.randint(1, 10)
@@ -167,13 +165,11 @@ def randomizeConstraints(nurse):
         elif x >= 7 and rand == 1:
             nurse.undesiredShifts.night[x - 7] = 1
 
-
     # Randomly calculating weekends constraints:
     if random.randint(1, 5) == 1:
         nurse.completeWeekend = True
     if random.randint(1, 5) == 1:
         nurse.undesiredWeekend = True
-
 
     # Setting preferences calculated in the beginning:
     if hatesNight:
@@ -197,14 +193,27 @@ def randomizeConstraints(nurse):
         nurse.undesiredWeekend = False
         nurse.completeWeekend = True
 
+
 # TODO: Make implementation for evaluateLB
 def evaluateLB(schedule):
     """
-    evaluateLB: LB - The sum of the minimal penalty cost for all nurses in the schedule (Both day and night patter)
+    evaluateLB: LB - The sum of the minimal penalty cost for all nurses in the schedule (Both day and night pattern)
     :param schedule:
     :return LB:
     """
-    pass
+
+
+def checkBalance(self, schedule):  # This balance check is based on Eq (5) in the article
+    balancedDays = True
+    balancedNights = True
+    for shift in self.schedule.shifts:
+        for grade in shift.assignedNurses.keys:
+            if (len(shift.assignedNurses[grade]) - shift.coverRequirements[grade]) > 0:
+                if shift.shiftType == TabuShiftType.DAY:
+                    balancedDays = False
+                if shift.shiftType == TabuShiftType.NIGHT:
+                    balancedNights = False
+    return balancedDays, balancedNights
 
 
 def findFeasiblePatterns(nurse):
@@ -234,10 +243,11 @@ def findFeasiblePatterns(nurse):
         counter += 1
     return fp
 
+
 # Returns the number of shifts needed to be covered for each grade
 # NOTE: Right now, this only sets for grade 3
 def findShiftTypeRequirements(schedule):
-    Q_t_r = {} 
+    Q_t_r = {}
     types = [TabuShiftType.DAY, TabuShiftType.NIGHT]
 
     for type in types:
@@ -246,9 +256,10 @@ def findShiftTypeRequirements(schedule):
             Grade.TWO: 0,
             Grade.THREE: 0
         }
-    
+
     for type in types:
-        grade_3_requirements = sum(shift.coverRequirements[Grade.THREE] for shift in schedule.shifts if shift.shiftType == type)
+        grade_3_requirements = sum(
+            shift.coverRequirements[Grade.THREE] for shift in schedule.shifts if shift.shiftType == type)
         Q_t_r[type][Grade.THREE] = grade_3_requirements
-    
+
     return Q_t_r

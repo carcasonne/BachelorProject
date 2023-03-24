@@ -106,12 +106,15 @@ class TabuSearch_SIMPLE:
 
     def balanceRestoring(self, schedule):
         """
-        Step 1.2 (Balance days and nights). Check for balance by lower bound (Eq(5)). if
+        Step 1.2 (Balance days and nights). Check for balance by using checkBalance (Eq(5)) and return None if nether days and nights is satisfied. if
         :param schedule:
         :return: move, changed day/night:
         """
         print("Running Balance Restoration...")
-        return None
+        if checkBalance(self.bestSolution) == (False, False):
+            return None
+
+
 
     def shiftChain(self, schedule):
         """
@@ -197,5 +200,4 @@ class TabuSearch_SIMPLE:
         #         if shifts < self.shiftRequirements[type][grade]:
                     
         #             pass
-
 

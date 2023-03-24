@@ -219,8 +219,19 @@ class Test_StaticMethods(unittest.TestCase):
 
         self.assertEqual(oldPC-60, newPC)
 
+    # ----------------------------------- checkBalance(schedule) -----------------------------------
+    # TODO: checkBalance() Tests...
+    def test_check_with_satisfied_balance_returns_true_true(self):
+        pass
 
+    def test_check_with_unsatisfied_day_balance_returns_false_true(self):
+        pass
 
+    def test_check_with_unsatisfied_night_balance_returns_true_false(self):
+        pass
+
+    def test_check_with_unsatisfied_day_and_night_balance_returns_false_false(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
