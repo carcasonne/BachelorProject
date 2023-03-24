@@ -251,6 +251,17 @@ class Test_TabuNurse(unittest.TestCase):
         pattern = TabuShiftPattern([1, 1, 0, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0], )
         self.assertEqual(0, n.calculatePenalty(pattern))
 
+    # Multiple penalties:
+    def test_calculate_penalty_multiple_penalties_returns_(self):
+        n = TabuNurse(Nurse(0, Grade.TWO, Contract(1, 1)))
+        n.undesiredWeekend = True
+        n.consecutiveDaysOff = (1, 2)
+        n.consecutiveWorkingDays = (1, 2)
+
+        n.undesiredShifts = TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [1, 0, 0, 0, 0, 1, 1])
+        pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 1, 1, 1])
+        self.assertEqual(120, n.calculatePenalty(pattern))
+
     # ----------------------------------- __eq__(self, other) -----------------------------------
     def test_nurse_eq_nurse_with_different_id_and_same_grade_returns_false(self):
         n = TabuNurse(Nurse(1, Grade.TWO, Contract(1, 1)))
