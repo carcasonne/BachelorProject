@@ -52,6 +52,11 @@ class TabuSchedule:
         string = f"TabuSchedule: \n"
         for shift in self.shifts:
             string += f"{str(shift)} \n"
-        string += f"CC Score: {self.CC}"
+        string += f"CC Score: {self.CC} \n"
+        string += f"PC Score: {self.PC}"
+        return string
+
+    def scores(self):
+        string = f"CC Score: {self.CC} \n"
         string += f"PC Score: {self.PC}"
         return string
