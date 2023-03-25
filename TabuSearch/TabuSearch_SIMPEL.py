@@ -109,6 +109,7 @@ class TabuSearch_SIMPLE:
                             return neighbour, False
         return None
 
+    # TODO: Test this balanceRestoring()
     def balanceRestoring(self, schedule):
         """
         Step 1.2 (Balance days and nights). Check for balance by using checkBalance (Eq(5)) and return None if nether
