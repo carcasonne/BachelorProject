@@ -203,17 +203,27 @@ def evaluateLB(schedule):
     """
 
 
-# TODO: This maybe wrong due to Eq(5) properly checks is assigned nurses in total is eq or more that required. This does not do that.
+# TODO: There is properly a smarter way to do this
 def checkBalance(schedule):  # This balance check is based on Eq (5) in the article
     balancedDays = True
     balancedNights = True
+    totalDaysAssigned = [0, 0, 0]
+    totalDaysRequired = [0, 0, 0]
+    totalNightsAssigned = [0, 0, 0]
+    totalNightsRequired = [0, 0, 0]
     for shift in schedule.shifts:
         for grade in shift.coverRequirements.keys():
-            if (len(shift.assignedNurses[grade]) - shift.coverRequirements[grade]) < 0:
-                if shift.shiftType == TabuShiftType.DAY:
-                    balancedDays = False
-                if shift.shiftType == TabuShiftType.NIGHT:
-                    balancedNights = False
+            if shift.shiftType == TabuShiftType.DAY:
+                totalDaysAssigned[grade.value-1] += len(shift.assignedNurses[grade])
+                totalDaysRequired[grade.value-1] += shift.coverRequirements[grade]
+            if shift.shiftType == TabuShiftType.NIGHT:
+                totalNightsAssigned[grade.value-1] += len(shift.assignedNurses[grade])
+                totalNightsRequired[grade.value-1] += shift.coverRequirements[grade]
+    for x in range(3):
+        if totalDaysAssigned[x] - totalDaysRequired[x] < 0:
+            balancedDays = False
+        if totalNightsAssigned[x] - totalNightsRequired[x] < 0:
+            balancedNights = False
     return balancedDays, balancedNights
 
 

@@ -121,9 +121,17 @@ class Test_TabuSearch(unittest.TestCase):
         self.assertEqual(oldWorksDay - 1, newWorksDay)
         self.assertEqual(oldWorksNight + 1, newWorksNight)
 
+    def test_balance_restoring_with_covered_nights_and_days_returns_none(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses)//2:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+            else:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
 
+        self.assertEqual(None, self.ts.balanceRestoring(self.schedule))
 
-
+    def test_balance_restoring_with_undercovered_nights_and_days_returns_none(self):
+        self.assertEqual(None, self.ts.balanceRestoring(self.schedule))
 
 
 if __name__ == '__main__':
