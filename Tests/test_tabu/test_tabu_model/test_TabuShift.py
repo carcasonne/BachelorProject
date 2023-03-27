@@ -13,7 +13,7 @@ from Domain.Models.Tabu.TabuShift import TabuShift
 class Test_TabuShiftTests(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.shiftDay = TabuShift({Grade.ONE.name: 1, Grade.TWO: 2, Grade.THREE: 3}, TabuShiftType.DAY, Days.MONDAY)
+        self.shiftDay = TabuShift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, TabuShiftType.DAY, Days.MONDAY)
         self.shiftNight = TabuShift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, TabuShiftType.DAY, Days.MONDAY)
         self.n1 = TabuNurse(Nurse(0, Grade.ONE, Contract(5, 4)))
         self.n2 = TabuNurse(Nurse(1, Grade.TWO, Contract(3, 2)))

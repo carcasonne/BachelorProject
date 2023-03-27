@@ -84,7 +84,7 @@ class TabuSearch_SIMPLE:
 
     # Phase 1 Moves:
     # TODO: Random decent after PC and LB
-    # TODO: Is Tabu criteria 2 taken in to count here?
+    # TODO: Is Tabu criteria 2 taken into count here?
     def randomDecent(self, schedule):
         """
         Step 1.1 (Random decent). Carry out random decent by accepting the first neighbourhood move that satisfies
@@ -128,31 +128,31 @@ class TabuSearch_SIMPLE:
         match balance:
             case (False, False):  # There are not enough nurses on days or nights
                 return None
+            case (True, True):  # There are enough nurses on days and nights
+                return None
             case (False, True):  # There are not enough nurses on days
                 for nurse in schedule.nurses:
-                    if nurse.id not in self.tabuList and nurse.worksNight == False:
+                    if nurse.id not in self.tabuList and nurse.worksNight is True:
                         for pattern in self.feasiblePatterns[nurse.id]:
                             diffCC = calculateDifferenceCC(schedule, nurse, pattern)
-                            if diffCC < 0 and pattern.night != [0] * 7:
+                            if diffCC < 0 and pattern.night == [0] * 7:
                                 # TODO: We need to take tabu criteria 2 into count here
                                 moveList.append((diffCC, (nurse, pattern)))
             case (True, False):  # There are not enough nurses on nights
                 for nurse in schedule.nurses:
-                    if nurse.id not in self.tabuList and nurse.worksNight == True:
+                    if nurse.id not in self.tabuList and nurse.worksNight is False:
                         for pattern in self.feasiblePatterns[nurse.id]:
                             diffCC = calculateDifferenceCC(schedule, nurse, pattern)
-                            if diffCC < 0 and pattern.day != [0] * 7:
+                            if diffCC < 0 and pattern.day == [0] * 7:
                                 # TODO: We need to take tabu criteria 2 into count here
                                 moveList.append((diffCC, (nurse, pattern)))
-            case (True, True):  # There are enough nurses on days and nights
-                pass
 
         if len(moveList) != 0:
             move = (None, None)
             bestCC = 0
             for m in moveList:
                 if bestCC > m[0]:
-                    move = m
+                    move = m[1]
 
             neighbour = copy.deepcopy(schedule)
             n_nurse = neighbour.nurses[move[0].id]

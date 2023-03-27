@@ -16,7 +16,7 @@ class TestTabuData:
             self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.NIGHT, day))
 
         self.nurses = []
-        for x in range(3):
+        for x in range(2):
             self.nurses.append(Nurse(0 + (x * 12), Grade.ONE, Contract(5, 4)))
             self.nurses.append(Nurse(1 + (x * 12), Grade.ONE, Contract(3, 2)))
             self.nurses.append(Nurse(2 + (x * 12), Grade.ONE, Contract(4, 3)))

@@ -222,16 +222,46 @@ class Test_StaticMethods(unittest.TestCase):
     # ----------------------------------- checkBalance(schedule) -----------------------------------
     # TODO: checkBalance() Tests...
     def test_check_with_satisfied_balance_returns_true_true(self):
-        pass
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses)//2:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0]*7, [1, 1, 1, 1, 1, 1, 1]))
+            else:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+
+        self.assertEqual((True, True), checkBalance(self.schedule))
 
     def test_check_with_unsatisfied_day_balance_returns_false_true(self):
-        pass
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses):
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0]*7, [1, 1, 1, 1, 1, 1, 1]))
+
+        self.assertEqual((False, True), checkBalance(self.schedule))
 
     def test_check_with_unsatisfied_night_balance_returns_true_false(self):
-        pass
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses):
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+
+        self.assertEqual((True, False), checkBalance(self.schedule))
 
     def test_check_with_unsatisfied_day_and_night_balance_returns_false_false(self):
-        pass
+        self.assertEqual((False, False), checkBalance(self.schedule))
+
+    def test_check_balance_with_one_unsatisfied_day_returns_false_true(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses) // 2:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+            else:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 0, 1, 1, 1], [0] * 7))
+        self.assertEqual((False, True), checkBalance(self.schedule))
+
+    def test_check_balance_with_one_unsatisfied_night_returns_false_true(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses) // 2:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 0, 1]))
+            else:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.assertEqual((True, False), checkBalance(self.schedule))
 
 if __name__ == '__main__':
     unittest.main()

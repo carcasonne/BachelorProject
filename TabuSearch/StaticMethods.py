@@ -203,12 +203,13 @@ def evaluateLB(schedule):
     """
 
 
-def checkBalance(self, schedule):  # This balance check is based on Eq (5) in the article
+# TODO: This maybe wrong due to Eq(5) properly checks is assigned nurses in total is eq or more that required. This does not do that.
+def checkBalance(schedule):  # This balance check is based on Eq (5) in the article
     balancedDays = True
     balancedNights = True
-    for shift in self.schedule.shifts:
-        for grade in shift.assignedNurses.keys:
-            if (len(shift.assignedNurses[grade]) - shift.coverRequirements[grade]) > 0:
+    for shift in schedule.shifts:
+        for grade in shift.coverRequirements.keys():
+            if (len(shift.assignedNurses[grade]) - shift.coverRequirements[grade]) < 0:
                 if shift.shiftType == TabuShiftType.DAY:
                     balancedDays = False
                 if shift.shiftType == TabuShiftType.NIGHT:

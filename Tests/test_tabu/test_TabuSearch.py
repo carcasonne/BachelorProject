@@ -54,15 +54,75 @@ class Test_TabuSearch(unittest.TestCase):
         out = self.ts.randomDecent(self.schedule)
         self.assertEqual(None, out)
 
-    def test_ramdom_kick_changes_one_pattern_for_one_nurse(self):
-        oldSched = copy.deepcopy(self.schedule)
-        schedWasChanged = False
-        self.ts.randomKick(self.schedule)
+    def test_random_kick_changes_one_pattern_for_one_nurse(self):
+        oldSchedule = copy.deepcopy(self.schedule)
+        scheduleWasChanged = False
+        self.schedule = self.ts.randomKick(self.schedule)[0]
         for nurse in self.schedule.nurses:
-            if nurse.shiftPattern != oldSched.nurses[nurse.id].shiftPattern:
-                schedWasChanged = True
+            if nurse.shiftPattern != oldSchedule.nurses[nurse.id].shiftPattern:
+                scheduleWasChanged = True
                 break
-        self.assertTrue(schedWasChanged)
+        self.assertTrue(scheduleWasChanged)
+
+    # ----------------------------------- balanceRestoring(self, schedule) -----------------------------------
+    def test_balance_restoring_with_undercovered_days_returns_move_with_more_day_nurses(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses):
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+
+        oldSchedule = copy.deepcopy(self.schedule)
+        oldWorksNight = 0
+        oldWorksDay = 0
+        for nurse in oldSchedule.nurses:
+            if nurse.worksNight is True:
+                oldWorksNight += 1
+            else:
+                oldWorksDay += 1
+
+        newSchedule = self.ts.balanceRestoring(self.schedule)[0]
+        newWorksNight = 0
+        newWorksDay = 0
+        for nurse in newSchedule.nurses:
+            if nurse.worksNight is True:
+                newWorksNight += 1
+            else:
+                newWorksDay += 1
+        self.assertTrue(oldWorksDay < newWorksDay, "New schedule does not have more day nurses")
+        self.assertTrue(oldWorksNight > newWorksNight, "New schedule does not have more night nurses")
+        self.assertTrue(oldSchedule.CC > newSchedule.CC, "CC was not better")
+        self.assertEqual(oldWorksDay+1, newWorksDay)
+        self.assertEqual(oldWorksNight-1, newWorksNight)
+
+    def test_balance_restoring_with_undercovered_nights_returns_move_with_more_night_nurses(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses):
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+
+        oldSchedule = copy.deepcopy(self.schedule)
+        oldWorksNight = 0
+        oldWorksDay = 0
+        for nurse in oldSchedule.nurses:
+            if nurse.worksNight is True:
+                oldWorksNight += 1
+            else:
+                oldWorksDay += 1
+
+        newSchedule = self.ts.balanceRestoring(self.schedule)[0]
+        newWorksNight = 0
+        newWorksDay = 0
+        for nurse in newSchedule.nurses:
+            if nurse.worksNight is True:
+                newWorksNight += 1
+            else:
+                newWorksDay += 1
+        self.assertTrue(oldWorksDay > newWorksDay, "New schedule does not have more day nurses")
+        self.assertTrue(oldWorksNight < newWorksNight, "New schedule does not have more night nurses")
+        self.assertTrue(oldSchedule.CC > newSchedule.CC, "CC was not better")
+        self.assertEqual(oldWorksDay - 1, newWorksDay)
+        self.assertEqual(oldWorksNight + 1, newWorksNight)
+
+
+
 
 
 
