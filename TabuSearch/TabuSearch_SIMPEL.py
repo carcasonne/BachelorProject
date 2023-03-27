@@ -124,7 +124,7 @@ class TabuSearch_SIMPLE:
         """
         print("Running Balance Restoration...")
         balance = checkBalance(schedule)
-        moveList = []
+        ccAndMove = 0, None
         match balance:
             case (False, False):  # There are not enough nurses on days or nights
                 return None
@@ -135,25 +135,20 @@ class TabuSearch_SIMPLE:
                     if nurse.id not in self.tabuList and nurse.worksNight is True:
                         for pattern in self.feasiblePatterns[nurse.id]:
                             diffCC = calculateDifferenceCC(schedule, nurse, pattern)
-                            if diffCC < 0 and pattern.night == [0] * 7:
+                            if diffCC < ccAndMove[0] and pattern.night == [0] * 7:
                                 # TODO: We need to take tabu criteria 2 into count here
-                                moveList.append((diffCC, (nurse, pattern)))
+                                ccAndMove = diffCC, (nurse, pattern)
             case (True, False):  # There are not enough nurses on nights
                 for nurse in schedule.nurses:
                     if nurse.id not in self.tabuList and nurse.worksNight is False:
                         for pattern in self.feasiblePatterns[nurse.id]:
                             diffCC = calculateDifferenceCC(schedule, nurse, pattern)
-                            if diffCC < 0 and pattern.day == [0] * 7:
+                            if diffCC < ccAndMove[0] and pattern.day == [0] * 7:
                                 # TODO: We need to take tabu criteria 2 into count here
-                                moveList.append((diffCC, (nurse, pattern)))
+                                ccAndMove = diffCC, (nurse, pattern)
 
-        if len(moveList) != 0:
-            move = (None, None)
-            bestCC = 0
-            for m in moveList:
-                if bestCC > m[0]:
-                    move = m[1]
-
+        if ccAndMove[0] != 0:
+            move = ccAndMove[1]
             neighbour = copy.deepcopy(schedule)
             n_nurse = neighbour.nurses[move[0].id]
             neighbour.assignPatternToNurse(n_nurse, move[1])
