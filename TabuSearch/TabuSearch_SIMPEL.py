@@ -22,8 +22,15 @@ class TabuSearch_SIMPLE:
         """
         # Tabu criteria 1: tabulist - Nurses involved in earlier moves - This is a fixed length of 1
         self.tabuList = []
+
         # Tabu criteria 2:dayNightTabuList - Nurses working days - list[set(nurse working days), ...] - Length 6 (binary representation)
         self.dayNightTabuList = []  # TODO: Maybe this should be an array of sets for makeing easy and quick comparisons
+        firstTabuSet = {}
+        for n in initialSolution.nurses:
+            if n.worksNight is False:
+                firstTabuSet.add(n.id)
+        self.dayNightTabuList.append(firstTabuSet)
+
         # Tabu criteria 3:
         self.dayNightCounter = 0
         self.maxits = 50
@@ -51,16 +58,17 @@ class TabuSearch_SIMPLE:
             self.bestSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][
                 random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)])
 
+    # TODO: There was a mistake here. We need tests for this also.
     def makeMove(self, move):
         if move is None:
             return None
         else:
             if move[1]:  # If move changes the day night split
-                dayNurses = []
-                for nurse in self.bestSolution.nurses:  # Find all nurses that works during the day
+                dayNurses = set()
+                for nurse in move[0].nurses:  # Find all nurses that works during the day
                     if not nurse.worksNight:
-                        dayNurses.append(nurse.id)
-                self.dayNightTabuList.append(dayNurses)
+                        dayNurses.add(nurse.id)
+                self.dayNightTabuList.insert(0, dayNurses)
                 if len(self.dayNightTabuList) == 7:
                     self.dayNightTabuList.pop(6)
                 self.dayNightCounter = 0
@@ -133,19 +141,31 @@ class TabuSearch_SIMPLE:
             case (False, True):  # There are not enough nurses on days
                 for nurse in schedule.nurses:
                     if nurse.id not in self.tabuList and nurse.worksNight is True:
-                        for pattern in self.feasiblePatterns[nurse.id]:
-                            diffCC = calculateDifferenceCC(schedule, nurse, pattern)
-                            if diffCC < ccAndMove[0] and pattern.night == [0] * 7:
-                                # TODO: We need to take tabu criteria 2 into count here
-                                ccAndMove = diffCC, (nurse, pattern)
+                        tabuCon = False
+                        tabuCheck = copy.copy(self.dayNightTabuList[0])
+                        tabuCheck.add(nurse.id)
+                        if tabuCheck in self.dayNightTabuList:  # Calculate if the move is making a tabu configuration on the dayNightTabulist
+                            tabuCon = True
+
+                        if tabuCon is False:
+                            for pattern in self.feasiblePatterns[nurse.id]:
+                                diffCC = calculateDifferenceCC(schedule, nurse, pattern)
+                                if diffCC < ccAndMove[0] and pattern.night == [0] * 7:
+                                    ccAndMove = diffCC, (nurse, pattern)
             case (True, False):  # There are not enough nurses on nights
                 for nurse in schedule.nurses:
                     if nurse.id not in self.tabuList and nurse.worksNight is False:
-                        for pattern in self.feasiblePatterns[nurse.id]:
-                            diffCC = calculateDifferenceCC(schedule, nurse, pattern)
-                            if diffCC < ccAndMove[0] and pattern.day == [0] * 7:
-                                # TODO: We need to take tabu criteria 2 into count here
-                                ccAndMove = diffCC, (nurse, pattern)
+                        tabuCon = False
+                        tabuCheck = copy.copy(self.dayNightTabuList[0])
+                        tabuCheck.add(nurse.id)
+                        if tabuCheck in self.dayNightTabuList:  # Calculate if the move is making a tabu configuration on the dayNightTabulist
+                            tabuCon = True
+
+                        if tabuCon is False:
+                            for pattern in self.feasiblePatterns[nurse.id]:
+                                diffCC = calculateDifferenceCC(schedule, nurse, pattern)
+                                if diffCC < ccAndMove[0] and pattern.day == [0] * 7:
+                                    ccAndMove = diffCC, (nurse, pattern)
 
         if ccAndMove[0] != 0:
             move = ccAndMove[1]

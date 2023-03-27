@@ -133,6 +133,29 @@ class Test_TabuSearch(unittest.TestCase):
     def test_balance_restoring_with_undercovered_nights_and_days_returns_none(self):
         self.assertEqual(None, self.ts.balanceRestoring(self.schedule))
 
+    def test_balance_restoring_does_not_make_a_tabu_configuration_that_exists(self):
+        tabuset = set()
+        counter = True
+        for n in self.schedule.nurses:
+            if n.id < len(self.schedule.nurses) // 2:
+                self.schedule.assignPatternToNurse(n, TabuShiftPattern([1, 0, 0, 0, 0, 0, 0], [0] * 7))
+                tabuset.add(n.id)
+            else:
+                if counter:
+                    tabuset.add(n.id)
+                    counter = False
+                self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+
+        self.ts.dayNightTabuList.append(tabuset)
+        self.ts.makeMove((self.schedule, True))
+        self.ts.makeMove(self.ts.balanceRestoring(self.schedule))
+        self.assertNotEqual(tabuset, self.ts.dayNightTabuList[0], "Tabuset should not be able to be chossen")
+        counter = 0
+        for s in self.ts.dayNightTabuList:
+            if s == tabuset:
+                counter += 1
+        self.assertEqual(1, counter)
+
 
 if __name__ == '__main__':
     unittest.main()
