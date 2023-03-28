@@ -208,19 +208,14 @@ class TestKnapsackSolver(unittest.TestCase):
         # Make sure no nurses are in schedule
         self.assertEqual(0, len(nurselessSchedule.nurses))
 
-        grade_3_search = solver.getOverallSolution()
-        grade_3_solution = grade_3_search.bestSolution
-        grade_2_search = solver.getGradeTwoSolution(grade_3_solution)
-        grade_2_solution = grade_2_search.bestSolution
-        grade_1_search = solver.getGradeOneSolution(grade_2_solution)
-        grade_1_solution = grade_1_search.bestSolution
-
+        search = solver.solve()
+        solution = search.bestSolution
         nurses = solver.schedule.nurses
 
         # A feasible solution should have been generated
         self.assertTrue(len(nurses) > 0)
-        self.assertTrue(grade_1_solution.level != -1)
-        self.assertTrue(grade_1_solution.Z > 0)
+        self.assertTrue(solution.level != -1)
+        self.assertTrue(solution.Z > 0)
 
     # Grade 3 will always return a feasible schedule, as it implicitly adds bank nurses
     def test_infeasible_grade_3_assigned_bank_nurses(self):
@@ -385,9 +380,9 @@ class TestKnapsackSolver(unittest.TestCase):
 
         # I miss c# linq :(
         nightShift = next((shift for shift in feasibleSchedule.shifts if shift.shiftType == ShiftType.NIGHT), None)
-        # By adding 1 Grade3 nurse to the night shift requirements, 
+        # By adding 3 Grade3 nurse to the night shift requirements, 
         # the schedule will no longer have a feasible solution for Grade3
-        nightShift.coverRequirements[Grade.THREE] += 1
+        nightShift.coverRequirements[Grade.THREE] += 3
 
         return feasibleSchedule
     

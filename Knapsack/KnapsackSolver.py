@@ -24,7 +24,7 @@ class KnapsackSolver:
         self.E = self.requiredForGrade(Grade.THREE, True) # sum(shift.coverRequirements[Grade.THREE] for shift in self.schedule.shifts if shift.shiftType == ShiftType.NIGHT)
         self.D = self.requiredForGrade(Grade.THREE, False) # sum(shift.coverRequirements[Grade.THREE] for shift in self.schedule.shifts if shift.shiftType != ShiftType.NIGHT)
         self.globalC = 0
-        self.bankNurseContract = Contract(3, 2)
+        self.bankNurseContract = Contract(1, 1)
         self.contracts = self.extractContracts(self.schedule.nurses)
         self.bankNurseGrade = Grade.ONE
         self.bankNurseCount = 0
@@ -40,9 +40,14 @@ class KnapsackSolver:
     def solve(self):
         # TODO: VERY IMPORTANT! MAKE SOLUTION 2 AND 1 FINDERS ABLE TO ADD BANK NURSES AS NEEDED
 
+        print("Starting knapsack search")
+
         # A feasible solution for grade 3
         # Important note: Solution to this search only shows how many grade 3 nurses should work nightshift
         SEARCH_3 = self.getOverallSolution()
+
+        print("Found grade 3 solution with items: ")
+        print(SEARCH_3.bestSolution.items)
 
         # A feasible solution for grade 2
         # Important note: Solution to this search only shows how many grade 2 nurses should work nightshift
@@ -63,11 +68,13 @@ class KnapsackSolver:
                     continue
                 # Otherwise add bank nurse and try again
                 else:
-                    self.addBankNurse()
+                    self.addBankNurse(Grade.TWO)
                     SEARCH_3 = self.getOverallSolution()
             else:
                 feasible_grade_2_solution_exists = True
 
+        print("Found grade 2 solution with items: ")
+        print(SEARCH_2.bestSolution.items)
 
         # A feasible solutino for grade 2
         # Important note: Solution to this search only shows how many grade 1 nurses should work nightshift
@@ -94,10 +101,13 @@ class KnapsackSolver:
                     index = self.contracts.index(self.bankNurseContract)
                     bankNurseItem = KnapsackItem(bankNurseProfit, bankNurseWeight, index)
                     prevSolution.items.append(bankNurseItem)
-                    self.addBankNurse()
+                    self.addBankNurse(Grade.ONE)
                     SEARCH_2 = self.getGradeTwoSolution(prevSolution)
             else:
                 feasible_grade_1_solution_exists = True
+
+        print("Found grade 1 solution with items: ")
+        print(SEARCH_1.bestSolution.items)
 
         return SEARCH_1   
 
@@ -109,23 +119,24 @@ class KnapsackSolver:
         while not grade_three_solution_exists:
             upperBounds = self.getOverallUpperBounds()
             boundedItemGroups = self.createBoundedItemGroups(upperBounds)
-            C_3 = self.costForBounds(upperBounds, self.D)
+            cost = self.costForBounds(upperBounds, self.D)
             lowerBound = self.E
 
             # If the upper bound is smaller than lower bound, the problem is infeasible
-            # Therefore we add a bank nurse to the solution and try again
-            # We define this as the difference between required nights shifts, and night shifts its possible to cover
-            # And divide this with how many nights each bank nurse could cover
-            if(C_3 < lowerBound):
-                n = lowerBound - C_3
-                n //= self.bankNurseContract.nights             
+            if(cost < lowerBound):
+                print("-------------")
+                print("There are insufficent grade 3 nurses to cover all requirements")
+                n = lowerBound - cost + 1
+                #n //= self.bankNurseContract.nights       
+                print(f"Adding {n} nurses")      
                 for _ in range(n):
-                    self.addBankNurse()
+                    self.addBankNurse(Grade.THREE)
+                print("-------------")
                 continue
 
-            self.globalC = C_3
+            self.globalC = cost
 
-            boundedKnapsack = BoundedKnapsack(boundedItemGroups, C_3)
+            boundedKnapsack = BoundedKnapsack(boundedItemGroups, cost)
             zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
             branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
 
@@ -135,70 +146,66 @@ class KnapsackSolver:
             # If solution.level is -1, then no feasible solution exists
             # Else we have found a solution and exit the while loop
             if solution.level == -1:
-                # Add nurses equivelant to difference between lower and upper bound
-                bankN = C_3 - lowerBound
+                # Add nurses equivelant to difference between lower and global upper bound
+                bankN = cost - lowerBound
                 for _ in range(bankN):
-                    self.addBankNurse()
+                    self.addBankNurse(Grade.THREE)
+                continue
             else:
                 grade_three_solution_exists = True
         
         return branchAndSearch
-    
-    def addBankNurse(self):
-        bankContract = self.bankNurseContract
-        bankGrade = self.bankNurseGrade
-        bankNurse = Nurse(self.originalNurses + self.bankNurseCount, bankGrade, bankContract)
-        self.globalC += bankContract.days
-        self.schedule.nurses.append(bankNurse)
-        self.bankNurseCount += 1
 
     def getGradeTwoSolution(self, previousSolution):
         Q_3 = self.getTypesFromSolution(previousSolution)
         E_2 = self.requiredForGrade(Grade.TWO, True)
         D_2 = self.requiredForGrade(Grade.TWO, False)
 
-        N_I_G = self.getContractToGrade()
-
         upperBounds = {}
+        typeToCount = {}
         for contract in self.contracts:
             upperBounds[contract] = 0
+            typeToCount[contract] = 0
 
-        #lowerBound = previousSolution.Z
         lowerBound = E_2
+        isFeasible = False
+        while not isFeasible:
+            N_I_G = self.getContractToGrade()
+            for contract in self.contracts:
+                Q_i = Q_3[contract]
+                N_I_3 = N_I_G[contract][Grade.THREE]
+                N_I_2 = N_I_G[contract][Grade.TWO]
+                N_I_1 = N_I_G[contract][Grade.ONE]
+                typeToCount[contract] = N_I_1 + N_I_2
 
-        # Defines upper bound for each contract type
-        # Some crazy ass shit going on here
-        for contract in self.contracts:
-            Q_i = Q_3[contract]
-            N_I_3 = N_I_G[contract][Grade.THREE]
-
-            if Q_i <= N_I_3:
-                upperBounds[contract] = N_I_G[contract][Grade.ONE] + N_I_G[contract][Grade.TWO]
-            else:
-                sub = Q_i - N_I_G[contract][Grade.THREE]
-                upperBounds[contract] = N_I_G[contract][Grade.ONE] + N_I_G[contract][Grade.TWO] - sub
-                lowerBound = E_2 - sub
+                if Q_i <= N_I_3:
+                    upperBounds[contract] = N_I_1 + N_I_2
+                else:
+                    sub = Q_i - N_I_3
+                    upperBounds[contract] = N_I_1 + N_I_2 - sub
+                    lowerBound = E_2 - sub
+                
+                if Q_i < upperBounds[contract]:
+                    upperBounds[contract] = Q_i
             
-            if Q_i < upperBounds[contract]:
-                upperBounds[contract] = Q_i
+            cost = self.costForBounds(typeToCount, D_2)
 
-        # C_2 = self.costForBounds(upperBounds, D_2)
-        # while C_2 <= lowerBound:
-        #     n = lowerBound - C_2
-        #     #n //= self.bankNurseContract.nights 
-        #     if C_2 == lowerBound:
-        #         n += 1     
-        #     for _ in range(n):
-        #         self.addBankNurse()
-        #         upperBounds[self.bankNurseContract] += 1
-
-        #     C_2 = self.costForBounds(upperBounds, D_2)
+            if cost < lowerBound:
+                print("-------------")
+                print("There are insufficent grade 2 nurses to cover all requirements")
+                nursesNeeded = lowerBound - cost
+                print(f"Adding {nursesNeeded} nurses") 
+                for _ in range(nursesNeeded):
+                    self.addBankNurse(Grade.TWO)
+                continue
+            else:
+                isFeasible = True
 
         # Represent the problem in bounded knapsack item groups
-        items = self.createBoundedItemGroups(upperBounds)
+        items = self.createBoundedItemGroups(typeToCount)
         
         # Find a feasible solution for grade 2
-        boundedKnapsack = BoundedKnapsack(items, self.globalC)
+        boundedKnapsack = BoundedKnapsack(items, cost)
         zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
         branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
 
@@ -221,51 +228,61 @@ class KnapsackSolver:
         N_I_G = self.getContractToGrade()
 
         upperBounds = {}
+        typeToCount = {}
         for contract in self.contracts:
             upperBounds[contract] = 0
+            typeToCount[contract] = 0
 
-        # Defines upper bound for each contract type
-        # Some crazy ass shit going on here
-        for contract in self.contracts:
-            Q_i = Q_2[contract]
-            N_I_2 = N_I_G[contract][Grade.TWO]
+        isFeasible = False
+        while not isFeasible:
+            N_I_G = self.getContractToGrade()
+            for contract in self.contracts:
+                Q_i = Q_2[contract]
+                N_I_2 = N_I_G[contract][Grade.TWO]
+                typeToCount[contract] = N_I_G[contract][Grade.ONE]
 
-            if Q_i <= N_I_2:
-                upperBounds[contract] = N_I_G[contract][Grade.ONE]
+                if Q_i <= N_I_2:
+                    upperBounds[contract] = N_I_G[contract][Grade.ONE]
+                else:
+                    sub = Q_i - N_I_G[contract][Grade.TWO]
+                    upperBounds[contract] = N_I_G[contract][Grade.ONE] - sub 
+                    lowerBound = E_1 - sub
+                
+                if Q_i < upperBounds[contract]:
+                    upperBounds[contract] = Q_i
+
+            cost = self.costForBounds(typeToCount, D_1)
+
+            if cost < lowerBound:
+                print("-------------")
+                print("There are insufficent grade 1 nurses to cover all requirements")
+                nursesNeeded = lowerBound - cost
+                print(f"Adding {nursesNeeded} nurses") 
+                for _ in range(nursesNeeded):
+                    self.addBankNurse(Grade.ONE)
+                continue
             else:
-                sub = Q_i - N_I_G[contract][Grade.TWO]
-                upperBounds[contract] = N_I_G[contract][Grade.ONE] - sub 
-                lowerBound = E_1 - sub
-            
-            if Q_i < upperBounds[contract]:
-                upperBounds[contract] = Q_i
-        
-        # C_1 = C_1 = self.costForBounds(upperBounds, D_1)
-        # while C_1 <= lowerBound:
-        #     n = lowerBound - C_1
-        #     #n //= self.bankNurseContract.nights 
-        #     if C_1 == lowerBound:
-        #         n += 1     
-        #     for _ in range(n):
-        #         self.addBankNurse()
-        #         upperBounds[self.bankNurseContract] += 1
-
-        #     C_1 = self.costForBounds(upperBounds, D_1)
+                isFeasible = True
 
         # Represent the problem in bounded knapsack item groups
-        items = self.createBoundedItemGroups(upperBounds)
-        
-        # TODO: figure out the stuff with upper bound
-        #C_1 = self.costForBounds(upperBounds, D_1)
+        items = self.createBoundedItemGroups(typeToCount)
 
         # Find a feasible solution for grade 2
-        boundedKnapsack = BoundedKnapsack(items, self.globalC)
+        boundedKnapsack = BoundedKnapsack(items, cost)
         zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
         branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
 
         branchAndSearch.startSearch(True)
         
         return branchAndSearch
+    
+    def addBankNurse(self, grade:Grade):
+        bankContract = self.bankNurseContract
+        bankGrade = grade
+        bankNurse = Nurse(self.originalNurses + self.bankNurseCount, bankGrade, bankContract)
+        self.globalC += bankContract.days
+        self.schedule.nurses.append(bankNurse)
+        self.bankNurseCount += 1
     
     # Returns a (dictionary of (contract to (dictionary of grade to (number of nurses working this contract with this grade))))
     # TODO: this is constant, make it into a self.property 
