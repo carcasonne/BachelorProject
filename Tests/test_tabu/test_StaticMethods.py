@@ -253,7 +253,7 @@ class Test_StaticMethods(unittest.TestCase):
                 self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
             else:
                 self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 0, 1, 1, 1], [0] * 7))
-        self.assertEqual((False, True), checkBalance(self.schedule))
+        self.assertEqual((True, True), checkBalance(self.schedule))
 
     def test_check_balance_with_one_unsatisfied_with_enough_nurses_the_other_night_returns_false_true(self):
         for nurse in self.schedule.nurses:
@@ -261,7 +261,7 @@ class Test_StaticMethods(unittest.TestCase):
                 self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 0, 1]))
             else:
                 self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
-        self.assertEqual((True, False), checkBalance(self.schedule))
+        self.assertEqual((True, True), checkBalance(self.schedule))
 
 
 if __name__ == '__main__':

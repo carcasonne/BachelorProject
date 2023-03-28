@@ -35,8 +35,6 @@ def nurseWorksPattern(nurse, pattern):
     return 0
 
 
-# TODO: THIS IS CURRENTLY ONLY BASED ON GRADE THREE. IMPLEMENTED DIFFERENT TO Eq(4).
-# TODO: Change this to uses assignednurses in TabuShift
 def evaluateCC(schedule):
     """
     evaluateCC: CC - Evaluates the covering cost of a schedule
@@ -52,7 +50,6 @@ def evaluateCC(schedule):
     return CC
 
 
-# TODO: This only takes grade three into count - Make grade one and two
 def calculateDifferenceCC(schedule, nurse, pattern):
     """
     calculateDifferenceCC: Returns the difference in CC for the schedule if nurse is shifted to pattern
@@ -81,7 +78,6 @@ def calculateDifferenceCC(schedule, nurse, pattern):
     return diffCC
 
 
-# TODO: Make implementation for evaluatePC
 def evaluatePC(schedule):
     """
     evaluatePC: Z - Evaluates the penalty cost of a schedule
@@ -195,9 +191,10 @@ def randomizeConstraints(nurse):
 
 
 # TODO: Make implementation for evaluateLB
-def evaluateLB(schedule):
+# TODO: This method is very hard to understand
+def evaluateLB(patterns, schedule):
     """
-    evaluateLB: LB - The sum of the minimal penalty cost for all nurses in the schedule (Both day and night pattern)
+    evaluateLB: LB - The sum of the minimal penalty cost for all nurses in the schedule.
     :param schedule:
     :return LB:
     """
@@ -254,23 +251,3 @@ def findFeasiblePatterns(nurse):
         counter += 1
     return fp
 
-
-# Returns the number of shifts needed to be covered for each grade
-# NOTE: Right now, this only sets for grade 3
-def findShiftTypeRequirements(schedule):
-    Q_t_r = {}
-    types = [TabuShiftType.DAY, TabuShiftType.NIGHT]
-
-    for type in types:
-        Q_t_r[type] = {
-            Grade.ONE: 0,
-            Grade.TWO: 0,
-            Grade.THREE: 0
-        }
-
-    for type in types:
-        grade_3_requirements = sum(
-            shift.coverRequirements[Grade.THREE] for shift in schedule.shifts if shift.shiftType == type)
-        Q_t_r[type][Grade.THREE] = grade_3_requirements
-
-    return Q_t_r

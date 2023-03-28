@@ -28,7 +28,7 @@ class TabuNurse:
         self.shiftPattern = pattern
         self.penalty = self.calculatePenalty(pattern)
 
-    # TODO: Find out some constrains and calculate the penalty based on that. This should be a number from 1 to 10
+    # TODO: We need documentation for this function
     def calculatePenalty(self, shiftpattern):
         newPen = 0  # New penalty score
         # Calculating which schedule we should be looking at:

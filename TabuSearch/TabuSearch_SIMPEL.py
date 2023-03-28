@@ -25,7 +25,7 @@ class TabuSearch_SIMPLE:
 
         # Tabu criteria 2:dayNightTabuList - Nurses working days - list[set(nurse working days), ...] - Length 6 (binary representation)
         self.dayNightTabuList = []  # TODO: Maybe this should be an array of sets for makeing easy and quick comparisons
-        firstTabuSet = {}
+        firstTabuSet = set()
         for n in initialSolution.nurses:
             if n.worksNight is False:
                 firstTabuSet.add(n.id)
@@ -47,8 +47,6 @@ class TabuSearch_SIMPLE:
         self.neighborOperator = None
         self.acceptableScoreThreshold = None
         self.tabuTenure = None
-
-        self.shiftRequirements = findShiftTypeRequirements(initialSolution)
 
     def initSchedule(
             self):  # Just assigning the first pattern to every nurse for testing purposes, instead of randomized, since it solves it too fast with a randomized initial solution.
@@ -120,7 +118,7 @@ class TabuSearch_SIMPLE:
     # TODO: Test this balanceRestoring()
     def balanceRestoring(self, schedule):
         """
-        Step 1.2 (Balance days and nights). Check for balance by using checkBalance (Eq(5)) and return None if nether
+        Step 1.2.1 (Balance days and nights). Check for balance by using checkBalance (Eq(5)) and return None if nether
         days and nights is satisfied. Attempt to correct the balance by selection the best move satisfying non-tabu
         conditions 1 and 2 using a candidate list given by:
             1. moves that reduce the shortfall on nights without increasing that on days if night are short.
@@ -135,7 +133,7 @@ class TabuSearch_SIMPLE:
         ccAndMove = 0, None
         match balance:
             case (False, False):  # There are not enough nurses on days or nights
-                return None
+                return None  # TODO: Maybe we need swap move here
             case (True, True):  # There are enough nurses on days and nights
                 return None
             case (False, True):  # There are not enough nurses on days
@@ -180,11 +178,20 @@ class TabuSearch_SIMPLE:
             # TODO: Make method balanceSwap(): swap nurses to allow for balance restoring.
             return None
 
+    def balanceSwap(self, schedule):
+        """
+        Step 1.2.2 (Balance Swap). Allow a night and a day nurse to swap types subjects to improve the shortfall in one
+        type without increasing the other.
+        :param schedule:
+        :return move, with two swapped nurses:
+        """
+        pass
+
     def shiftChain(self, schedule):
         """
         Step 1.3 For each of the grades, attempt to find a chain of moves using Shift Chain Neighbourhood from s_now to s_final, so that CC is reduced and PC does not increase
         :param schedule:
-        :return: move, changed day/night:
+        :return move, changed day/night:
         """
         print("Running Shift Chain...")
         return None
