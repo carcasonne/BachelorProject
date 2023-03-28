@@ -41,6 +41,12 @@ class TabuSearch_SIMPLE:
 
         self.shiftRequirements = findShiftTypeRequirements(initialSolution)
 
+    def initSchedule(self): # Just assigning the first pattern to every nurse for testing purposes, instead of randomized, since it solves it too fast with a randomized initial solution.
+        for nurse in self.bestSolution.nurses:
+            randomizeConstraints(nurse)
+            # self.bestSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][0])
+            self.bestSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)])
+
     def makeMove(self, move):
         if move is None:
             return None
@@ -61,6 +67,8 @@ class TabuSearch_SIMPLE:
             return move[0]
 
     def run(self):
+        # Phase 0:
+        # self.initSchedule()
         # Phase 1:
         while self.bestSolution.CC > 0:
             if self.makeMove(self.randomDecent(self.bestSolution)) is None:
@@ -86,12 +94,13 @@ class TabuSearch_SIMPLE:
             if nurse.id not in self.tabuList:
                 for pattern in self.feasiblePatterns[nurse.id]:
                     if (nurse.worksNight and pattern.day == [0] * 7) or (not nurse.worksNight and pattern.day != [0] * 7):
-                        if calculateDifferenceCC(schedule, nurse, pattern) < 0: #and neighbour.PC <= schedule.PC:
+                        if calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse, pattern) <= 0:
                             neighbour = copy.deepcopy(schedule)
                             n_nurse = neighbour.nurses[nurse.id]
                             neighbour.assignPatternToNurse(n_nurse, pattern)
                             self.tabuList = []
                             self.tabuList.append(nurse.id)
+                            print(neighbour.scores())
                             return neighbour, False
         return None
 
@@ -148,6 +157,7 @@ class TabuSearch_SIMPLE:
                 neighbour.assignPatternToNurse(n_nurse, pattern)
                 self.tabuList = []
                 self.tabuList.append(nurse.id)
+                print(neighbour.scores())
                 return neighbour, nurseWorkedNight != n_nurse.worksNight
         pass
         
