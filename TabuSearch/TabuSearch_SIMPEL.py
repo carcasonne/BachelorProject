@@ -82,7 +82,7 @@ class TabuSearch_SIMPLE:
         # Phase 1:
         while self.bestSolution.CC > 0:
             if self.makeMove(self.randomDecent(self.bestSolution)) is None:
-                if self.makeMove(self.balanceRestoring(self.bestSolution)) is None:
+                if self.makeMove(self.balanceRestoring(self.bestSolution, False)) is None:
                     if self.makeMove(self.shiftChain(self.bestSolution)) is None:
                         if self.makeMove(self.nurseChain(self.bestSolution)) is None:
                             if self.makeMove(self.underCovering(self.bestSolution)) is None:
@@ -116,7 +116,7 @@ class TabuSearch_SIMPLE:
         return None
 
     # TODO: Test this balanceRestoring()
-    def balanceRestoring(self, schedule):
+    def balanceRestoring(self, schedule, relaxed):
         """
         Step 1.2.1 (Balance days and nights). Check for balance by using checkBalance (Eq(5)) and return None if nether
         days and nights is satisfied. Attempt to correct the balance by selection the best move satisfying non-tabu
@@ -126,40 +126,42 @@ class TabuSearch_SIMPLE:
         If no such move exists extend neighbourhood to allow a night and day nurse to swap types subject to improving
         the shortfall of one type without increasing the other. If still not successful relax tabu status and repeat.
         :param schedule:
+        :param relaxed:
         :return: move, changed day/night:
         """
         print("Running Balance Restoration...")
         balance = checkBalance(schedule)
         ccAndMove = 0, None
-        match balance:
-            case (False, False):  # There are not enough nurses on days or nights
-                return None  # TODO: Maybe we need swap move here
-            case (True, True):  # There are enough nurses on days and nights
-                return None
-            case (False, True):  # There are not enough nurses on days
-                for nurse in schedule.nurses:
-                    if nurse.id not in self.tabuList and nurse.worksNight is True:
+        if balance == (False, False):  # There are not enough nurses on days or nights
+            return None  # TODO: Maybe we need swap move here
+        elif balance == (True, True):  # There are enough nurses on days and nights
+            return None
+        elif balance == (False, True):  # There are not enough nurses on days
+            for nurse in schedule.nurses:
+                if nurse.worksNight is True:
+                    if nurse.id not in self.tabuList or relaxed:
                         tabuCon = False
                         tabuCheck = copy.copy(self.dayNightTabuList[0])
                         tabuCheck.add(nurse.id)
                         if tabuCheck in self.dayNightTabuList:  # Calculate if the move is making a tabu configuration on the dayNightTabulist
                             tabuCon = True
 
-                        if tabuCon is False:
+                        if tabuCon is False or relaxed:
                             for pattern in self.feasiblePatterns[nurse.id]:
                                 diffCC = calculateDifferenceCC(schedule, nurse, pattern)
                                 if diffCC < ccAndMove[0] and pattern.night == [0] * 7:
                                     ccAndMove = diffCC, (nurse, pattern)
-            case (True, False):  # There are not enough nurses on nights
-                for nurse in schedule.nurses:
-                    if nurse.id not in self.tabuList and nurse.worksNight is False:
+        elif balance == (True, False):  # There are not enough nurses on nights
+            for nurse in schedule.nurses:
+                if nurse.worksNight is False:
+                    if nurse.id not in self.tabuList or relaxed:
                         tabuCon = False
                         tabuCheck = copy.copy(self.dayNightTabuList[0])
                         tabuCheck.add(nurse.id)
                         if tabuCheck in self.dayNightTabuList:  # Calculate if the move is making a tabu configuration on the dayNightTabulist
                             tabuCon = True
 
-                        if tabuCon is False:
+                        if tabuCon is False or relaxed:
                             for pattern in self.feasiblePatterns[nurse.id]:
                                 diffCC = calculateDifferenceCC(schedule, nurse, pattern)
                                 if diffCC < ccAndMove[0] and pattern.day == [0] * 7:
@@ -175,17 +177,55 @@ class TabuSearch_SIMPLE:
             print(neighbour.scores())
             return neighbour, True
         else:
-            # TODO: Make method balanceSwap(): swap nurses to allow for balance restoring.
-            return None
+            return self.balanceSwap(schedule, relaxed)
 
-    def balanceSwap(self, schedule):
+    def balanceSwap(self, schedule, relaxed):
         """
         Step 1.2.2 (Balance Swap). Allow a night and a day nurse to swap types subjects to improve the shortfall in one
         type without increasing the other.
         :param schedule:
+        :param relaxed:
         :return move, with two swapped nurses:
         """
-        pass
+        print("Running Balance Swap...")
+        ccAndMove = 0, None
+        for nurse1 in schedule.nurses:
+            if nurse1.worksNight and (nurse1 not in self.tabuList or relaxed):
+                for nurse2 in schedule.nurses:
+                    if not nurse2.worksNight and (nurse2 not in self.tabuList or relaxed):
+                        tabuCon = False
+                        tabuCheck = copy.copy(self.dayNightTabuList[0])
+                        tabuCheck.add(nurse1.id)
+                        tabuCheck.remove(nurse2.id)
+                        if tabuCheck in self.dayNightTabuList:  # Calculate if the move is making a tabu configuration on the dayNightTabulist
+                            tabuCon = True
+                        if tabuCon is False or relaxed:
+                            for pattern1 in self.feasiblePatterns[nurse1.id]:
+                                if pattern1.night == [0] * 7:
+                                    for pattern2 in self.feasiblePatterns[nurse2.id]:
+                                        if pattern2.day == [0] * 7:
+                                            ccval = calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1, pattern2)
+                                            if ccval > ccAndMove[0]:
+                                                ccAndMove = ccval, (nurse1, nurse2, pattern1, pattern2)
+
+        if ccAndMove[0] != 0:
+            moves = ccAndMove[1]
+            neighbour = copy.deepcopy(schedule)
+            n_nurse1 = neighbour.nurses[moves[0].id]
+            n_nurse2 = neighbour.nurses[moves[1].id]
+            neighbour.assignPatternToNurse(n_nurse1, moves[2])
+            neighbour.assignPatternToNurse(n_nurse2, moves[3])
+            self.tabuList = []
+            self.tabuList.append(n_nurse1.id)
+            self.tabuList.append(n_nurse2.id)
+            print(neighbour.scores())
+            return neighbour, True
+        else:
+            if not relaxed:
+                self.balanceRestoring(schedule, True)
+            else:
+                return None
+
 
     def shiftChain(self, schedule):
         """
