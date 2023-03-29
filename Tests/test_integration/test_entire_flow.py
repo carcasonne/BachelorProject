@@ -36,20 +36,20 @@ class EntireFlow(unittest.TestCase):
     def test_runs_entire_flow_with_bank_nurses(self):
         scenario = "n030w4"
 
-        # parser = NurseParser()
-        # schedule = parser.parseScenario(scenario)
+        parser = NurseParser()
+        schedule = parser.parseScenario(scenario)
 
-        # # We delete all nurses
-        # schedule.nurses = []
-        # # Knapsack should decide how many bank nurses are necesarry
-        # knapsackSolver = KnapsackSolver(schedule)
-        # search = knapsackSolver.solve()
+        # We delete all nurses
+        schedule.nurses = []
+        # Knapsack should decide how many bank nurses are necesarry
+        knapsackSolver = KnapsackSolver(schedule)
+        search = knapsackSolver.solve()
 
-        # newSchedule = knapsackSolver.schedule
+        newSchedule = knapsackSolver.schedule
         
-        # search = TabuSearch_SIMPLE(TabuSchedule(newSchedule))
-        # search.run()
-        # print(str(search.bestSolution))
+        search = TabuSearch_SIMPLE(TabuSchedule(newSchedule))
+        search.run()
+        print(str(search.bestSolution))
 
 if __name__ == '__main__':
     unittest.main()

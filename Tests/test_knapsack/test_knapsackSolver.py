@@ -62,6 +62,8 @@ class TestKnapsackSolver(unittest.TestCase):
         schedule = self._get_grade_1_feasible_schedule()
         solver = KnapsackSolver(schedule)
 
+        expectedNurses = len(schedule.nurses)
+
         grade_3_search = solver.getOverallSolution()
         grade_3_solution = grade_3_search.bestSolution
         grade_2_search = solver.getGradeTwoSolution(grade_3_solution)
@@ -69,9 +71,13 @@ class TestKnapsackSolver(unittest.TestCase):
         grade_1_search = solver.getGradeOneSolution(grade_2_solution)
         grade_1_solution = grade_1_search.bestSolution
 
-        # TODO: THIS HAS BEEN CHANGED. I AM NOT SURE IF IT SHOULD FIND A SOLUTION ANYMORE TODO:
-        #self.assertTrue(grade_1_solution.level != -1)
-        #self.assertTrue(grade_1_solution.Z > 0)
+        actualNurese = len(solver.schedule.nurses)
+
+        self.assertTrue(grade_1_solution.level != -1)
+        self.assertTrue(grade_1_solution.Z > 0)
+
+        # No bank nurses necesarry, shouldn't have been added
+        self.assertEqual(expectedNurses, actualNurese)
     
     def test_finds_feasible_grade_3_solution_for_feasible_grade_2_schedule(self):
         schedule = self._get_grade_2_feasible_schedule()
