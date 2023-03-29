@@ -163,7 +163,7 @@ class Test_TabuSearch(unittest.TestCase):
         nurse = self.schedule.nurses[0]
         patternBefore = nurse.shiftPattern
         ccBefore = evaluateCC(self.schedule)
-        self.ts.dayNightTabuList.append(set().add(nurse.id))
+        self.ts.tabuList.append(nurse.id)
         schedule = self.ts.balanceRestoring(self.schedule, True)
         patternAfter = nurse.shiftPattern
         ccAfter = evaluateCC(schedule)
