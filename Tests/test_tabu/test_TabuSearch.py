@@ -173,7 +173,9 @@ class Test_TabuSearch(unittest.TestCase):
         self.assertTrue(ccBefore > ccAfter)
 
     # ----------------------------------- balanceSwap(self, schedule) -----------------------------------
-    #def test_balance_swap_swaps_two_nurses
+    @unittest.skip("Not Implemented")
+    def test_balance_swap_swaps_two_nurses(self):
+        pass
 
 
 if __name__ == '__main__':
