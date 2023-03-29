@@ -157,6 +157,9 @@ class Test_TabuSearch(unittest.TestCase):
         self.assertEqual(1, counter)
 
     def test_balance_restoring_relaxed_takes_nurse0_even_though_it_is_in_the_tabu_list(self):
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+
         nurse = self.schedule.nurses[0]
         patternBefore = nurse.shiftPattern
         ccBefore = evaluateCC(self.schedule)
