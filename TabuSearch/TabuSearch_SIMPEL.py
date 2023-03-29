@@ -274,38 +274,3 @@ class TabuSearch_SIMPLE:
                 print(neighbour.scores())
                 return neighbour, nurseWorkedNight != n_nurse.worksNight
         pass
-
-    def findBalanceRestoringCandidateList(self, schedule: TabuSchedule):
-        types = [TabuShiftType.DAY, TabuShiftType.NIGHT]
-        # Find out if solution is unbalanced for any grade for any type
-
-        for type in types:
-            # Get all nurses working this type of pattern
-            typeNurses = [nurse for nurse in schedule.nurses if nurse.worksNights]
-            # Find number of shifts worked by all nurses of this grade and this type
-            shifts = 0
-            for nurse in typeNurses:
-                pattern = nurse.shiftPattern.day if type == TabuShiftType.DAY else nurse.shiftPattern.night
-                shifts += sum(pattern)
-
-            # Fewer shifts worked than is required?
-            if shifts < self.shiftRequirements[type][Grade.THREE]:
-                pass
-
-        # This is for considering all grades
-        # for grade in Grade:
-        #     # Get all nurses of this grade. This can technically be done in a single for-loop, possible optimization
-        #     gradeNurses = [nurse for nurse in schedule.nurses if nurse.grade == grade]
-        #     for type in types:
-        #         # Get all nurses working this type of pattern
-        #         typeNurses = [nurse for nurse in gradeNurses if nurse.worksNights]
-        #         # Find number of shifts worked by all nurses of this grade and this type
-        #         shifts = 0
-        #         for nurse in typeNurses:
-        #             pattern = nurse.shiftPattern.day if type == TabuShiftType.DAY else nurse.shiftPattern.night
-        #             shifts += sum(pattern)
-
-        #         # Fewer shifts worked than is required?
-        #         if shifts < self.shiftRequirements[type][grade]:
-
-        #             pass
