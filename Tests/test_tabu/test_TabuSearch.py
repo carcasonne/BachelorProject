@@ -156,6 +156,9 @@ class Test_TabuSearch(unittest.TestCase):
                 counter += 1
         self.assertEqual(1, counter)
 
+    # ----------------------------------- balanceSwap(self, schedule) -----------------------------------
+    def test_balance_swap_swaps_two_nurses
+
 
 if __name__ == '__main__':
     unittest.main()
