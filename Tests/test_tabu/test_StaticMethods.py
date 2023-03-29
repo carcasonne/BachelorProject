@@ -151,6 +151,13 @@ class Test_StaticMethods(unittest.TestCase):
 
         self.assertEqual(afterCC-beforeCC, result)
 
+    def test_calculate_differenceCC_same_pattern_is_moved_to_night_returns_0(self):
+        pattern = TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0])
+        nurse = self.schedule.nurses[0]
+        self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        result = calculateDifferenceCC(self.schedule, nurse, pattern)
+        self.assertEqual(0, result)
+
     def test_calculate_differenceCC_calculates_same_difference_as_changing_the_schedule_night_pattern(self):
         pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1])
         nurse = self.schedule.nurses[1]
@@ -281,9 +288,11 @@ class Test_StaticMethods(unittest.TestCase):
     def test_calculate_difference_duo_cc_swap_nurses_with_only_overlapping_shifts_returns_0(self):
         nurse1 = self.schedule.nurses[0]
         nurse2 = self.schedule.nurses[1]
-        self.schedule.assignPatternToNurse(nurse1, TabuShiftPattern([0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.assignPatternToNurse(nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 1, 1, 1, 0]))
-        self.assertEqual(0, calculateDifferenceDuoCC(self.schedule, nurse1, nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 1, 1, 1, 0]), TabuShiftPattern([0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0])))
+        pattern1 = TabuShiftPattern([0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0])
+        pattern2 = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 0])
+        self.schedule.assignPatternToNurse(nurse1, pattern1)
+        self.schedule.assignPatternToNurse(nurse2, pattern2)
+        self.assertEqual(0, calculateDifferenceDuoCC(self.schedule, nurse1, nurse2, pattern2, pattern1))
 
 
 if __name__ == '__main__':

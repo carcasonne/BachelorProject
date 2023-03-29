@@ -95,7 +95,6 @@ def calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1, pattern2):
         oldMergedPattern1 = nurse1.shiftPattern.merged
         newMergedPattern2 = pattern2.merged
         oldMergedPattern2 = nurse2.shiftPattern.merged
-
         for grade in schedule.shifts[0].assignedNurses.keys():
             changeForN1 = newMergedPattern1[i] != oldMergedPattern1[i]
             changeForN2 = newMergedPattern2[i] != oldMergedPattern2[i]
@@ -119,15 +118,17 @@ def calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1, pattern2):
                         diffCC += oldMergedPattern2[i]
                 case (True, True):
                     # If covering requirement is higher than the assigned nurses it will decrease the CC to add nurse
-                    if currentShiftCoverage - newMergedPattern2[1] > 0:
+                    if currentShiftCoverage - newMergedPattern2[i] >= 0:
                         diffCC -= newMergedPattern1[i]
-                    if currentShiftCoverage + oldMergedPattern2[1] >= 0:
+                    if currentShiftCoverage + oldMergedPattern2[i] >= 0:
                         diffCC += oldMergedPattern1[i]
-                    if currentShiftCoverage - newMergedPattern1[i] > 0:
+                    if currentShiftCoverage - newMergedPattern1[i] >= 0:
                         diffCC -= newMergedPattern2[i]
                     if currentShiftCoverage + oldMergedPattern1[i] >= 0:
                         diffCC += oldMergedPattern2[i]
+
             print(str(diffCC))
+
     return diffCC
 
 
