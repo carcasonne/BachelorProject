@@ -133,7 +133,7 @@ class TabuSearch_SIMPLE:
         balance = checkBalance(schedule)
         ccAndMove = 0, None
         if balance == (False, False):  # There are not enough nurses on days or nights
-            return None  # TODO: Maybe we need swap move here
+            return None
         elif balance == (True, True):  # There are enough nurses on days and nights
             return None
         elif balance == (False, True):  # There are not enough nurses on days
@@ -205,7 +205,7 @@ class TabuSearch_SIMPLE:
                                     for pattern2 in self.feasiblePatterns[nurse2.id]:
                                         if pattern2.day == [0] * 7:
                                             ccval = calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1, pattern2)
-                                            if ccval > ccAndMove[0]:
+                                            if ccval < ccAndMove[0]:
                                                 ccAndMove = ccval, (nurse1, nurse2, pattern1, pattern2)
 
         if ccAndMove[0] != 0:
