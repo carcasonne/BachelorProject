@@ -164,11 +164,27 @@ class Test_TabuSearch(unittest.TestCase):
         patternBefore = nurse.shiftPattern
         ccBefore = evaluateCC(self.schedule)
         self.ts.tabuList.append(nurse.id)
-        schedule = self.ts.balanceRestoring(self.schedule, True)
-        patternAfter = nurse.shiftPattern
+        schedule = self.ts.balanceRestoring(self.schedule, True)[0]
+        patternAfter = self.schedule.nurses[0]
         ccAfter = evaluateCC(schedule)
 
-        self.assertEqual(schedule is not None)
+        self.assertTrue(schedule is not None)
+        self.assertNotEqual(patternBefore, patternAfter, "Did not update pattern for nurse 0")
+        self.assertTrue(ccBefore > ccAfter)
+
+    def test_balance_restoring_relaxed_takes_nurse0_even_though_it_is_in_the_day_night_list(self):
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+
+        nurse = self.schedule.nurses[0]
+        patternBefore = nurse.shiftPattern
+        ccBefore = evaluateCC(self.schedule)
+        self.ts.dayNightTabuList.append(set().add(nurse.id))
+        schedule = self.ts.balanceRestoring(self.schedule, True)[0]
+        patternAfter = self.schedule.nurses[0]
+        ccAfter = evaluateCC(schedule)
+
+        self.assertTrue(schedule is not None)
         self.assertNotEqual(patternBefore, patternAfter, "Did not update pattern for nurse 0")
         self.assertTrue(ccBefore > ccAfter)
 
