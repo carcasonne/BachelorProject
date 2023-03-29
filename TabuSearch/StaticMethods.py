@@ -105,29 +105,16 @@ def calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1, pattern2):
 
             currentShiftCoverage = schedule.shifts[i].coverRequirements[grade] - len(
                 schedule.shifts[i].assignedNurses[grade])
-            match changeForN1, changeForN2:
-                case (True, False):
-                    if currentShiftCoverage > 0:
-                        diffCC -= newMergedPattern1[i]
-                    if currentShiftCoverage >= 0:
-                        diffCC += oldMergedPattern1[i]
-                case (False, True):
-                    if currentShiftCoverage > 0:
-                        diffCC -= newMergedPattern2[i]
-                    if currentShiftCoverage >= 0:
-                        diffCC += oldMergedPattern2[i]
-                case (True, True):
-                    # If covering requirement is higher than the assigned nurses it will decrease the CC to add nurse
-                    if currentShiftCoverage - newMergedPattern2[i] >= 0:
-                        diffCC -= newMergedPattern1[i]
-                    if currentShiftCoverage + oldMergedPattern2[i] >= 0:
-                        diffCC += oldMergedPattern1[i]
-                    if currentShiftCoverage - newMergedPattern1[i] >= 0:
-                        diffCC -= newMergedPattern2[i]
-                    if currentShiftCoverage + oldMergedPattern1[i] >= 0:
-                        diffCC += oldMergedPattern2[i]
-
-            print(str(diffCC))
+            if changeForN1 is True and changeForN2 is False:
+                if currentShiftCoverage > 0:
+                    diffCC -= newMergedPattern1[i]
+                if currentShiftCoverage >= 0:
+                    diffCC += oldMergedPattern1[i]
+            elif changeForN1 is False and changeForN2 is True:
+                if currentShiftCoverage > 0:
+                    diffCC -= newMergedPattern2[i]
+                if currentShiftCoverage >= 0:
+                    diffCC += oldMergedPattern2[i]
 
     return diffCC
 
