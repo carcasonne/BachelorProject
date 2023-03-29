@@ -196,7 +196,8 @@ class TabuSearch_SIMPLE:
                         tabuCon = False
                         tabuCheck = copy.copy(self.dayNightTabuList[0])
                         tabuCheck.add(nurse1.id)
-                        tabuCheck.remove(nurse2.id)
+                        if nurse2.id in tabuCheck:
+                            tabuCheck.remove(nurse2.id)
                         if tabuCheck in self.dayNightTabuList:  # Calculate if the move is making a tabu configuration on the dayNightTabulist
                             tabuCon = True
                         if tabuCon is False or relaxed:
@@ -222,6 +223,7 @@ class TabuSearch_SIMPLE:
             return neighbour, True
         else:
             if not relaxed:
+                print("Relaxing Balance Restoration...")
                 self.balanceRestoring(schedule, True)
             else:
                 return None
