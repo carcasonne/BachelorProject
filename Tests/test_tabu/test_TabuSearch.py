@@ -79,7 +79,7 @@ class Test_TabuSearch(unittest.TestCase):
             else:
                 oldWorksDay += 1
 
-        newSchedule = self.ts.balanceRestoring(self.schedule)[0]
+        newSchedule = self.ts.balanceRestoring(self.schedule, False)[0]
         newWorksNight = 0
         newWorksDay = 0
         for nurse in newSchedule.nurses:
@@ -107,7 +107,7 @@ class Test_TabuSearch(unittest.TestCase):
             else:
                 oldWorksDay += 1
 
-        newSchedule = self.ts.balanceRestoring(self.schedule)[0]
+        newSchedule = self.ts.balanceRestoring(self.schedule, False)[0]
         newWorksNight = 0
         newWorksDay = 0
         for nurse in newSchedule.nurses:
@@ -128,10 +128,10 @@ class Test_TabuSearch(unittest.TestCase):
             else:
                 self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
 
-        self.assertEqual(None, self.ts.balanceRestoring(self.schedule))
+        self.assertEqual(None, self.ts.balanceRestoring(self.schedule, False))
 
     def test_balance_restoring_with_undercovered_nights_and_days_returns_none(self):
-        self.assertEqual(None, self.ts.balanceRestoring(self.schedule))
+        self.assertEqual(None, self.ts.balanceRestoring(self.schedule, False))
 
     def test_balance_restoring_does_not_make_a_tabu_configuration_that_exists(self):
         tabuset = set()
@@ -148,7 +148,7 @@ class Test_TabuSearch(unittest.TestCase):
 
         self.ts.dayNightTabuList.append(tabuset)
         self.ts.makeMove((self.schedule, True))
-        self.ts.makeMove(self.ts.balanceRestoring(self.schedule))
+        self.ts.makeMove(self.ts.balanceRestoring(self.schedule, False))
         self.assertNotEqual(tabuset, self.ts.dayNightTabuList[0], "Tabuset should not be able to be chossen")
         counter = 0
         for s in self.ts.dayNightTabuList:
@@ -156,8 +156,21 @@ class Test_TabuSearch(unittest.TestCase):
                 counter += 1
         self.assertEqual(1, counter)
 
+    def test_balance_restoring_relaxed_takes_nurse0_even_though_it_is_in_the_tabu_list(self):
+        nurse = self.schedule.nurses[0]
+        patternBefore = nurse.shiftPattern
+        ccBefore = evaluateCC(self.schedule)
+        self.ts.dayNightTabuList.append(set().add(nurse.id))
+        schedule = self.ts.balanceRestoring(self.schedule, True)
+        patternAfter = nurse.shiftPattern
+        ccAfter = evaluateCC(schedule)
+
+        self.assertEqual(schedule is not None)
+        self.assertNotEqual(patternBefore, patternAfter, "Did not update pattern for nurse 0")
+        self.assertTrue(ccBefore > ccAfter)
+
     # ----------------------------------- balanceSwap(self, schedule) -----------------------------------
-    def test_balance_swap_swaps_two_nurses
+    #def test_balance_swap_swaps_two_nurses
 
 
 if __name__ == '__main__':
