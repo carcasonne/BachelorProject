@@ -78,6 +78,59 @@ def calculateDifferenceCC(schedule, nurse, pattern):
     return diffCC
 
 
+def calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1, pattern2):
+    """
+    calculateDifferenceDuoCC: Returns the difference in CC for the schedule if nurse1 and nurse2 is shifted to pattern1
+    and pattern2
+    :param schedule:
+    :param nurse1:
+    :param nurse2:
+    :param pattern1:
+    :param pattern2:
+    :return CC difference:
+    """
+    diffCC = 0
+    for i in range(14):
+        newMergedPattern1 = pattern1.merged
+        oldMergedPattern1 = nurse1.shiftPattern.merged
+        newMergedPattern2 = pattern2.merged
+        oldMergedPattern2 = nurse2.shiftPattern.merged
+
+        for grade in schedule.shifts[0].assignedNurses.keys():
+            changeForN1 = newMergedPattern1[i] != oldMergedPattern1[i]
+            changeForN2 = newMergedPattern2[i] != oldMergedPattern2[i]
+            if nurse1.grade.value > grade.value:
+                changeForN1 = False
+            if nurse2.grade.value > grade.value:
+                changeForN2 = False
+
+            currentShiftCoverage = schedule.shifts[i].coverRequirements[grade] - len(
+                schedule.shifts[i].assignedNurses[grade])
+            match changeForN1, changeForN2:
+                case (True, False):
+                    if currentShiftCoverage > 0:
+                        diffCC -= newMergedPattern1[i]
+                    if currentShiftCoverage >= 0:
+                        diffCC += oldMergedPattern1[i]
+                case (False, True):
+                    if currentShiftCoverage > 0:
+                        diffCC -= newMergedPattern2[i]
+                    if currentShiftCoverage >= 0:
+                        diffCC += oldMergedPattern2[i]
+                case (True, True):
+                    # If covering requirement is higher than the assigned nurses it will decrease the CC to add nurse
+                    if currentShiftCoverage - newMergedPattern2[1] > 0:
+                        diffCC -= newMergedPattern1[i]
+                    if currentShiftCoverage + oldMergedPattern2[1] >= 0:
+                        diffCC += oldMergedPattern1[i]
+                    if currentShiftCoverage - newMergedPattern1[i] > 0:
+                        diffCC -= newMergedPattern2[i]
+                    if currentShiftCoverage + oldMergedPattern1[i] >= 0:
+                        diffCC += oldMergedPattern2[i]
+            print(str(diffCC))
+    return diffCC
+
+
 def evaluatePC(schedule):
     """
     evaluatePC: Z - Evaluates the penalty cost of a schedule
@@ -192,12 +245,13 @@ def randomizeConstraints(nurse):
 
 # TODO: Make implementation for evaluateLB
 # TODO: This method is very hard to understand
-def evaluateLB(patterns, schedule):
+def evaluateLB(schedule):
     """
     evaluateLB: LB - The sum of the minimal penalty cost for all nurses in the schedule.
     :param schedule:
     :return LB:
     """
+    pass
 
 
 # TODO: There is properly a smarter way to do this
@@ -211,11 +265,11 @@ def checkBalance(schedule):  # This balance check is based on Eq (5) in the arti
     for shift in schedule.shifts:
         for grade in shift.coverRequirements.keys():
             if shift.shiftType == TabuShiftType.DAY:
-                totalDaysAssigned[grade.value-1] += len(shift.assignedNurses[grade])
-                totalDaysRequired[grade.value-1] += shift.coverRequirements[grade]
+                totalDaysAssigned[grade.value - 1] += len(shift.assignedNurses[grade])
+                totalDaysRequired[grade.value - 1] += shift.coverRequirements[grade]
             if shift.shiftType == TabuShiftType.NIGHT:
-                totalNightsAssigned[grade.value-1] += len(shift.assignedNurses[grade])
-                totalNightsRequired[grade.value-1] += shift.coverRequirements[grade]
+                totalNightsAssigned[grade.value - 1] += len(shift.assignedNurses[grade])
+                totalNightsRequired[grade.value - 1] += shift.coverRequirements[grade]
     for x in range(3):
         if totalDaysAssigned[x] - totalDaysRequired[x] < 0:
             balancedDays = False
@@ -250,4 +304,3 @@ def findFeasiblePatterns(nurse):
                     fp.append(TabuShiftPattern([0] * 7, bitstring))
         counter += 1
     return fp
-

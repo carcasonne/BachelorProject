@@ -263,6 +263,28 @@ class Test_StaticMethods(unittest.TestCase):
                 self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
         self.assertEqual((True, True), checkBalance(self.schedule))
 
+    # ----------------------------------- calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1, pattern2) -----------------------------------
+    def test_calculate_difference_duo_cc_only_two_nurses_assigned_in_schedule_swap_returns_negative_21(self):
+        nurse1 = self.schedule.nurses[0]
+        nurse2 = self.schedule.nurses[1]
+        self.schedule.assignPatternToNurse(nurse1, TabuShiftPattern([1, 0, 0, 1, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 0, 0, 1]))
+        self.assertEqual(-21, calculateDifferenceDuoCC(self.schedule, nurse1, nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]), TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0])))
+
+    def test_calculate_difference_duo_cc_swap_nurses_with_no_overlapping_shifts_returns_negative_18(self):
+        nurse1 = self.schedule.nurses[0]
+        nurse2 = self.schedule.nurses[1]
+        self.schedule.assignPatternToNurse(nurse1, TabuShiftPattern([1, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1]))
+        self.assertEqual(-18, calculateDifferenceDuoCC(self.schedule, nurse1, nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 1, 1, 1, 0]), TabuShiftPattern([0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0])))
+
+    def test_calculate_difference_duo_cc_swap_nurses_with_only_overlapping_shifts_returns_0(self):
+        nurse1 = self.schedule.nurses[0]
+        nurse2 = self.schedule.nurses[1]
+        self.schedule.assignPatternToNurse(nurse1, TabuShiftPattern([0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 1, 1, 1, 0]))
+        self.assertEqual(0, calculateDifferenceDuoCC(self.schedule, nurse1, nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 1, 1, 1, 0]), TabuShiftPattern([0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0])))
+
 
 if __name__ == '__main__':
     unittest.main()
