@@ -32,7 +32,7 @@ class EntireFlow(unittest.TestCase):
         search.run()
         print(str(search.bestSolution))
 
-    # TODO: Add assert tests. But now we are happy if it doesn't crash
+    # TODO: This doesn't work because the branch and bound is too simple. And our priority queue is too shit
     def test_runs_entire_flow_with_bank_nurses(self):
         scenario = "n030w4"
 
