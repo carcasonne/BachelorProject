@@ -4,9 +4,6 @@ Tabu Search Class
 import copy
 import random
 
-import networkx as nx
-import matplotlib.pyplot as plt
-
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
@@ -243,7 +240,7 @@ class TabuSearch_SIMPLE:
         return None
         overCovered = []
         underCovered = []
-        Gday = nx.MultiDiGraph()
+        # Gday = nx.MultiDiGraph()
         for shift in schedule.shifts:
             if shift.coverRequirements[Grade.ONE] - len(shift.assignedNurses[Grade.ONE]) < 0:
                 overCovered.append(shift)
@@ -262,11 +259,11 @@ class TabuSearch_SIMPLE:
                                 patternDay = copy.copy(nurse.shiftPattern.day)
                                 patternDay[i] = 0
                                 patternDay[j] = 1
-                                Gday.add_edge(i, j, weight=calculateDifferencePC(nurse, TabuShiftPattern(patternDay, [0]*7)))
-        print(str(Gday))
-        nx.draw(Gday)
-        plt.show()
-        print(list(nx.dfs_edges(Gday, 0, 5)))
+                                #Gday.add_edge(i, j, weight=calculateDifferencePC(nurse, TabuShiftPattern(patternDay, [0]*7)))
+        #print(str(Gday))
+        #nx.draw(Gday)
+        #plt.show()
+        #print(list(nx.dfs_edges(Gday, 0, 5)))
 
 
     def nurseChain(self, schedule):
