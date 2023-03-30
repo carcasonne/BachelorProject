@@ -262,7 +262,7 @@ class TabuSearch_SIMPLE:
             if utilities is not None:
                 (overCovered, underCovered, dayGraph, nightGraph) = utilities
 
-                for oShift in overCovered[0] + overCovered[1]:
+                for oShift in (overCovered[0] + overCovered[1]):
                     if oShift.shiftType == TabuShiftType.DAY:
                         for uShift in underCovered[0]:
                             if uShift.shiftType == TabuShiftType.DAY:
@@ -281,7 +281,6 @@ class TabuSearch_SIMPLE:
                                 else:
                                     return None
                                 return neighbour, False
-
                     else:
                         for uShift in underCovered[1]:
                             if uShift.shiftType == TabuShiftType.NIGHT:
@@ -310,15 +309,16 @@ class TabuSearch_SIMPLE:
 
         for shift in schedule.shifts:
             if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
-                if shift.shiftType.DAY == TabuShiftType.DAY:
+                if shift.shiftType == TabuShiftType.DAY:
                     overCovered[0].append(shift)
                 else:
                     overCovered[1].append(shift)
             elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
-                if shift.shiftType.DAY == TabuShiftType.DAY:
+                if shift.shiftType == TabuShiftType.DAY:
                     underCovered[0].append(shift)
                 else:
                     underCovered[1].append(shift)
+
             if shift.shiftType == TabuShiftType.NIGHT:
                 nightGraph.addNode(shift.shiftDay.value - 1)
             else:
