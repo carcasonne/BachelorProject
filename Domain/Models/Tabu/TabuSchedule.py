@@ -73,7 +73,13 @@ class TabuSchedule:
             for key, value in shift.coverRequirements.items():
                 coverString += f"{str(key)}:    {str(value)}\n"
             for key, value in shift.assignedNurses.items():
-                color = Fore.GREEN if len(value) == shift.coverRequirements[key] else Fore.RED
+                color = None
+                if len(value) > shift.coverRequirements[key]:
+                    color = Fore.YELLOW
+                elif len(value) == shift.coverRequirements[key]:
+                    color = Fore.GREEN
+                else:
+                    color = Fore.RED
                 assignedString += f"{str(key)}:     {color + str(len(value)) + basicColor}\n"
             item = [shift.shiftDay, shift.shiftType, coverString, assignedString]
             shifts.append(item)
