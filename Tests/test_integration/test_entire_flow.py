@@ -27,8 +27,10 @@ class EntireFlow(unittest.TestCase):
         knapsackSolver = KnapsackSolver(schedule)
         search = knapsackSolver.solve()
 
-        newSchedule = knapsackSolver.schedule
-        search = TabuSearch_SIMPLE(TabuSchedule(newSchedule))
+        tabuSchedule = TabuSchedule(knapsackSolver.schedule)
+        print(str(tabuSchedule))
+
+        search = TabuSearch_SIMPLE(tabuSchedule)
         search.run()
         print(str(search.bestSolution))
 
