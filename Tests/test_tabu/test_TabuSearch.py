@@ -298,6 +298,15 @@ class Test_TabuSearch(unittest.TestCase):
         self.assertTrue(newSchedule.CC < self.schedule.CC)
         self.assertTrue(newSchedule.PC < self.schedule.PC)
 
+    def test_shift_chain_on_an_only_day_schedule_updates_tabu_list(self):
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([1, 1, 0, 1, 1, 1, 1], [0] * 7))
+        self.ts.balanceRestoring(self.schedule, False)
+        oldTabuList = copy.deepcopy(self.ts.tabuList)
+        self.ts.shiftChain(self.schedule)
+        self.assertNotEqual(oldTabuList, self.ts.tabuList)
+        self.assertEqual(len(oldTabuList)+1, len(self.ts.tabuList))
+
 
 
 
