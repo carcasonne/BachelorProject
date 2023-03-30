@@ -95,6 +95,7 @@ class DirectedGraph:
             else:
                 edges.append(self._findEdge(node, path[next]))
                 next += 1
+        return []
 
 
     def __str__(self):

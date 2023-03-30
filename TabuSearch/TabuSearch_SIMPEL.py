@@ -242,48 +242,48 @@ class TabuSearch_SIMPLE:
 
         for grade in [Grade.ONE, Grade.TWO, Grade.THREE]:
 
-            (overCovered, underCovered, dayGraph, nightGraph) = self._shiftChainUtil(schedule, grade)
+            utilities = self._shiftChainUtil(schedule, grade)
+            if utilities is not None:
+                (overCovered, underCovered, dayGraph, nightGraph) = utilities
 
-            for oShift in overCovered:
-                if oShift.shiftType == TabuShiftType.DAY:
-                    for uShift in underCovered:
-                        if uShift.shiftType == TabuShiftType.DAY:
-                            neighbour = copy.deepcopy(schedule)
-                            edges = dayGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)
-                            if len(edges) > 0:
-                                print("Performing chain operation on day...")
-                                self.tabuList = []
-                                for edge in edges:
-                                    nurse = neighbour.nurses[edge.nurseId]
-                                    patternDay = copy.copy(nurse.shiftPattern.day)
-                                    patternDay[edge.fromNode] = 0
-                                    patternDay[edge.toNode] = 1
-                                    neighbour.assignPatternToNurse(nurse, TabuShiftPattern(patternDay, [0] * 7))
-                                    self.tabuList.append(nurse.id)
-                            else:
-                                return None
-                            print(str(neighbour))
-                            return neighbour, False
+                for oShift in overCovered:
+                    if oShift.shiftType == TabuShiftType.DAY:
+                        for uShift in underCovered:
+                            if uShift.shiftType == TabuShiftType.DAY:
+                                neighbour = copy.deepcopy(schedule)
+                                edges = dayGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)
+                                if len(edges) > 0:
+                                    print("Performing chain operation on day...")
+                                    self.tabuList = []
+                                    for edge in edges:
+                                        nurse = neighbour.nurses[edge.nurseId]
+                                        patternDay = copy.copy(nurse.shiftPattern.day)
+                                        patternDay[edge.fromNode] = 0
+                                        patternDay[edge.toNode] = 1
+                                        neighbour.assignPatternToNurse(nurse, TabuShiftPattern(patternDay, [0] * 7))
+                                        self.tabuList.append(nurse.id)
+                                else:
+                                    return None
+                                return neighbour, False
 
-                else:
-                    for uShift in underCovered:
-                        if uShift.shiftType == TabuShiftType.NIGHT:
-                            neighbour = copy.deepcopy(schedule)
-                            edges = nightGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)
-                            if len(edges) > 0:
-                                print("Performing chain operation on night...")
-                                self.tabuList = []
-                                for edge in edges:
-                                    nurse = neighbour.nurses[edge.nurseId]
-                                    patternNight = copy.copy(nurse.shiftPattern.night)
-                                    patternNight[edge.fromNode] = 0
-                                    patternNight[edge.toNode] = 1
-                                    neighbour.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, patternNight))
-                                    self.tabuList.append(nurse.id)
-                            else:
-                                return None
-                            print(str(neighbour))
-                            return neighbour, False
+                    else:
+                        for uShift in underCovered:
+                            if uShift.shiftType == TabuShiftType.NIGHT:
+                                neighbour = copy.deepcopy(schedule)
+                                edges = nightGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)
+                                if len(edges) > 0:
+                                    print("Performing chain operation on night...")
+                                    self.tabuList = []
+                                    for edge in edges:
+                                        nurse = neighbour.nurses[edge.nurseId]
+                                        patternNight = copy.copy(nurse.shiftPattern.night)
+                                        patternNight[edge.fromNode] = 0
+                                        patternNight[edge.toNode] = 1
+                                        neighbour.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, patternNight))
+                                        self.tabuList.append(nurse.id)
+                                else:
+                                    return None
+                                return neighbour, False
 
 
 
