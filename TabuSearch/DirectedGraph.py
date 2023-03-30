@@ -59,14 +59,6 @@ class DirectedGraph:
         return neighbours
 
 
-    def _findFirstValidSolution(self, goal):
-        for path in self.solutions:
-            if len(path) <= 5:
-                calculatedWeight = self._calcPathWeight(path, goal)
-                if calculatedWeight <= 0:
-                    return path
-        return None
-
     def _findBestValidSolution(self, goal):
         bestSolution = [], 1
         for path in self.solutions:
