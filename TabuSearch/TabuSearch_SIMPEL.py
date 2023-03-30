@@ -120,10 +120,8 @@ class TabuSearch_SIMPLE:
         for nurse in schedule.nurses:
             if nurse.id not in self.tabuList:
                 for pattern in self.feasiblePatterns[nurse.id]:
-                    if (nurse.worksNight and pattern.day == [0] * 7) or (
-                            not nurse.worksNight and pattern.day != [0] * 7):
-                        if calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse,
-                                                                                                         pattern) <= 0:
+                    if (nurse.worksNight and pattern.day == [0] * 7) or (not nurse.worksNight and pattern.day != [0] * 7):
+                        if calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse, pattern) <= 0:
                             neighbour = copy.deepcopy(schedule)
                             n_nurse = neighbour.nurses[nurse.id]
                             neighbour.assignPatternToNurse(n_nurse, pattern)
@@ -175,7 +173,8 @@ class TabuSearch_SIMPLE:
                     if nurse.id not in self.tabuList or relaxed:
                         tabuCon = False
                         tabuCheck = copy.copy(self.dayNightTabuList[0])
-                        tabuCheck.add(nurse.id)
+                        if nurse.id in tabuCheck:
+                            tabuCheck.remove(nurse.id)
                         if tabuCheck in self.dayNightTabuList:  # Calculate if the move is making a tabu configuration on the dayNightTabulist
                             tabuCon = True
 
@@ -368,7 +367,36 @@ class TabuSearch_SIMPLE:
         :return: move, changed day/night:
         """
         print("Running Under Covering...")
-        return None
+        bestSolution = None, None, 0, None
+
+        for nurse in schedule.nurses:
+            for pattern in self.feasiblePatterns[nurse.id]:
+                if nurse.id not in self.tabuList:
+                    tabuCheck = copy.copy(self.dayNightTabuList[0])
+                    if nurse.worksNight:
+                        tabuCheck.add(nurse.id)
+                    else:
+                        if nurse.id in tabuCheck:
+                            tabuCheck.remove(nurse.id)
+                    if tabuCheck not in self.dayNightTabuList:
+                        ccDif = calculateDifferenceCC(schedule, nurse, pattern)
+                        if ccDif < bestSolution[2]:
+                            bestSolution = nurse.id, pattern, ccDif, nurse.worksNight
+
+
+        if bestSolution[0] is None:
+            return None
+        else:
+            neighbour = copy.deepcopy(schedule)
+            n_nurse = neighbour.nurses[bestSolution[0]]
+            neighbour.assignPatternToNurse(n_nurse, bestSolution[1])
+            self.tabuList = []
+            self.tabuList.append(n_nurse.id)
+            print(neighbour.scores())
+            return neighbour, bestSolution[3] != n_nurse.worksNight
+
+
+
 
     def randomKick(self, schedule):
         """
@@ -380,7 +408,13 @@ class TabuSearch_SIMPLE:
         while True:
             nurse = schedule.nurses[random.randint(0, len(schedule.nurses) - 1)]
             nurseWorkedNight = copy.copy(nurse.worksNight)
-            if nurse.id not in self.tabuList:
+            tabuCheck = copy.copy(self.dayNightTabuList[0])
+            if nurse.worksNight:
+                tabuCheck.add(nurse.id)
+            else:
+                if nurse.id in tabuCheck:
+                    tabuCheck.remove(nurse.id)
+            if nurse.id not in self.tabuList and tabuCheck not in self.dayNightTabuList:
                 pattern = self.feasiblePatterns[nurse.id][random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)]
                 neighbour = copy.deepcopy(schedule)
                 n_nurse = neighbour.nurses[nurse.id]
