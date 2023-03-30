@@ -37,7 +37,6 @@ class DirectedGraph:
         self._dfs(source, sink, visited, path)
         return self._findFirstValidSolution()
 
-
     def _dfs(self, node, goal, visited, path):
         visited[node] = True
         path.append(node)
@@ -52,17 +51,14 @@ class DirectedGraph:
         path.pop()
         visited[node] = False
 
-
     def _findNeighbours(self, node):
         neighbours = []
         for edge in self.graph.get(node):
             neighbours.append(edge.toNode)
         return neighbours
 
-
     def _findFirstValidSolution(self):
         pass
-
 
     def __str__(self):
         string = ""
