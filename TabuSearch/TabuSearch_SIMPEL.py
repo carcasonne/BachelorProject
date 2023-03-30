@@ -4,12 +4,11 @@ Tabu Search Class
 import copy
 import random
 
-import networkx as nx
-import matplotlib.pyplot as plt
-
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
+from TabuSearch.DirectedGraph import DirectedGraph
+from TabuSearch.DirectedGraph import Edge
 
 
 # TODO: THIS SOLUTION IS ONLY BASED ON GRADE THREE
@@ -51,8 +50,7 @@ class TabuSearch_SIMPLE:
         self.acceptableScoreThreshold = None
         self.tabuTenure = None
 
-    def initSchedule(
-            self):  # Just assigning the first pattern to every nurse for testing purposes, instead of randomized, since it solves it too fast with a randomized initial solution.
+    def initSchedule(self):
         for nurse in self.bestSolution.nurses:
             randomizeConstraints(nurse)
             # self.bestSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][0])
@@ -233,6 +231,7 @@ class TabuSearch_SIMPLE:
                 return None
 
 
+    # TODO: Function is kinda scuffed. Make it better computationally.
     def shiftChain(self, schedule):
         """
         Step 1.3 For each of the grades, attempt to find a chain of moves using Shift Chain Neighbourhood from s_now to s_final, so that CC is reduced and PC does not increase
@@ -240,21 +239,85 @@ class TabuSearch_SIMPLE:
         :return move, changed day/night:
         """
         print("Running Shift Chain...")
-        return None
-        overCovered = []
-        underCovered = []
-        Gday = nx.MultiDiGraph()
+
+        for grade in [Grade.ONE, Grade.TWO, Grade.THREE]:
+
+            utilities = self._shiftChainUtil(schedule, grade)
+            if utilities is not None:
+                (overCovered, underCovered, dayGraph, nightGraph) = utilities
+
+                for oShift in overCovered:
+                    if oShift.shiftType == TabuShiftType.DAY:
+                        for uShift in underCovered:
+                            if uShift.shiftType == TabuShiftType.DAY:
+                                neighbour = copy.deepcopy(schedule)
+                                edges = dayGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)
+                                if len(edges) > 0:
+                                    print("Performing chain operation on day...")
+                                    self.tabuList = []
+                                    for edge in edges:
+                                        nurse = neighbour.nurses[edge.nurseId]
+                                        patternDay = copy.copy(nurse.shiftPattern.day)
+                                        patternDay[edge.fromNode] = 0
+                                        patternDay[edge.toNode] = 1
+                                        neighbour.assignPatternToNurse(nurse, TabuShiftPattern(patternDay, [0] * 7))
+                                        self.tabuList.append(nurse.id)
+                                else:
+                                    return None
+                                return neighbour, False
+
+                    else:
+                        for uShift in underCovered:
+                            if uShift.shiftType == TabuShiftType.NIGHT:
+                                neighbour = copy.deepcopy(schedule)
+                                edges = nightGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)
+                                if len(edges) > 0:
+                                    print("Performing chain operation on night...")
+                                    self.tabuList = []
+                                    for edge in edges:
+                                        nurse = neighbour.nurses[edge.nurseId]
+                                        patternNight = copy.copy(nurse.shiftPattern.night)
+                                        patternNight[edge.fromNode] = 0
+                                        patternNight[edge.toNode] = 1
+                                        neighbour.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, patternNight))
+                                        self.tabuList.append(nurse.id)
+                                else:
+                                    return None
+                                return neighbour, False
+
+
+
+    def _shiftChainUtil(self, schedule, grade):
+        print("Checking grade: " + str(grade.value) + "...")
+        overCovered = ([], [])
+        underCovered = ([], [])
+        dayGraph = DirectedGraph()
+        nightGraph = DirectedGraph()
+
         for shift in schedule.shifts:
-            if shift.coverRequirements[Grade.ONE] - len(shift.assignedNurses[Grade.ONE]) < 0:
-                overCovered.append(shift)
-            elif shift.coverRequirements[Grade.ONE] - len(shift.assignedNurses[Grade.ONE]) > 0:
-                underCovered.append(shift)
+            if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
+                if shift.shiftType.DAY == TabuShiftType.DAY:
+                    overCovered[0].append(shift)
+                else:
+                    overCovered[1].append(shift)
+            elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
+                if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
+                    if shift.shiftType.DAY == TabuShiftType.DAY:
+                        underCovered[0].append(shift)
+                    else:
+                        underCovered[1].append(shift)
+            if shift.shiftType == TabuShiftType.NIGHT:
+                nightGraph.addNode(shift.shiftDay.value - 1)
+            else:
+                dayGraph.addNode(shift.shiftDay.value - 1)
 
         if len(overCovered) == 0 or len(underCovered) == 0:
             return None
+        if (overCovered[0] is [] or underCovered[0] is []) and (overCovered[1] is [] or underCovered[1] is []):
+            return None
 
         for nurse in schedule.nurses:
-            if not nurse.worksNight:
+            if not nurse.worksNight and nurse.grade == grade:
                 for i in range(7):
                     if nurse.shiftPattern.day[i] == 1:
                         for j in range(7):
@@ -262,11 +325,20 @@ class TabuSearch_SIMPLE:
                                 patternDay = copy.copy(nurse.shiftPattern.day)
                                 patternDay[i] = 0
                                 patternDay[j] = 1
-                                Gday.add_edge(i, j, weight=calculateDifferencePC(nurse, TabuShiftPattern(patternDay, [0]*7)))
-        print(str(Gday))
-        nx.draw(Gday)
-        plt.show()
-        print(list(nx.dfs_edges(Gday, 0, 5)))
+                                dayGraph.addEdge(i, j, nurse.id, calculateDifferencePC(nurse, TabuShiftPattern(patternDay, [0] * 7)))
+            elif nurse.worksNight and nurse.grade == grade:
+                for i in range(7):
+                    if nurse.shiftPattern.night[i] == 1:
+                        for j in range(7):
+                            if nurse.shiftPattern.night[j] == 0:
+                                patternNight = copy.copy(nurse.shiftPattern.night)
+                                patternNight[i] = 0
+                                patternNight[j] = 1
+                                nightGraph.addEdge(i, j, nurse.id, calculateDifferencePC(nurse, TabuShiftPattern([0] * 7, patternNight)))
+
+        return overCovered, underCovered, dayGraph, nightGraph
+
+
 
 
     def nurseChain(self, schedule):

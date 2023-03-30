@@ -16,7 +16,7 @@ class TestTabuData:
             self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.NIGHT, day))
 
         self.nurses = []
-        # Minimal amount of nurses:
+        # Almost minimal amount of nurses:
         for x in range(1):
             self.nurses.append(Nurse(0 + (x * 12), Grade.ONE, Contract(5, 4)))
             self.nurses.append(Nurse(1 + (x * 12), Grade.ONE, Contract(3, 2)))
@@ -34,7 +34,7 @@ class TestTabuData:
         self.nurses.append(Nurse(13, Grade.TWO, Contract(4, 3)))
         self.nurses.append(Nurse(14, Grade.THREE, Contract(4, 3)))
         self.nurses.append(Nurse(15, Grade.ONE, Contract(3, 3)))
-        self.nurses.append(Nurse(16, Grade.TWO, Contract(4, 3)))
+        self.nurses.append(Nurse(16, Grade.TWO, Contract(3, 3)))
         self.nurses.append(Nurse(17, Grade.THREE, Contract(4, 3)))
 
 

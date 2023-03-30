@@ -17,9 +17,8 @@ schedule = TabuSchedule(solver.schedule)
 
 search = TabuSearch_SIMPLE(schedule)
 search.initSchedule()
-
-search.shiftChain(schedule)
-
+#print(str(search.bestSolution))
+#search.shiftChain(schedule)
 
 print(str(search.bestSolution))
 search.run()
