@@ -302,8 +302,6 @@ class TabuSearch_SIMPLE:
                                     return None
                                 return neighbour, False
 
-
-
     def _shiftChainUtil(self, schedule, grade):
         print("Checking grade: " + str(grade.value) + "...")
         overCovered = ([], [])
@@ -318,11 +316,10 @@ class TabuSearch_SIMPLE:
                 else:
                     overCovered[1].append(shift)
             elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
-                if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
-                    if shift.shiftType.DAY == TabuShiftType.DAY:
-                        underCovered[0].append(shift)
-                    else:
-                        underCovered[1].append(shift)
+                if shift.shiftType.DAY == TabuShiftType.DAY:
+                    underCovered[0].append(shift)
+                else:
+                    underCovered[1].append(shift)
             if shift.shiftType == TabuShiftType.NIGHT:
                 nightGraph.addNode(shift.shiftDay.value - 1)
             else:
@@ -354,9 +351,6 @@ class TabuSearch_SIMPLE:
                                 nightGraph.addEdge(i, j, nurse.id, calculateDifferencePC(nurse, TabuShiftPattern([0] * 7, patternNight)))
 
         return overCovered, underCovered, dayGraph, nightGraph
-
-
-
 
     def nurseChain(self, schedule):
         """

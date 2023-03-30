@@ -118,6 +118,18 @@ class Test_DirectedGraph(unittest.TestCase):
         for i in range(2):
             self.assertEqual(expected[i].nurseId, actual[i].nurseId)
 
+    def test_path_to_edges_between_0_2_returns_path_in_edges(self):
+        path = [0, 2]
+        expected = []
+        for edge in self.graph.graph[0]:
+            if edge.toNode == 2:
+                expected.append(edge)
+
+        actual = self.graph._pathToEdges(path, 2)
+        self.assertEqual(expected[0].nurseId, actual[0].nurseId)
+        self.assertEqual(expected[0].fromNode, actual[0].fromNode)
+        self.assertEqual(expected[0].toNode, actual[0].toNode)
+        self.assertEqual(expected[0].weight, expected[0].weight)
 
 
 

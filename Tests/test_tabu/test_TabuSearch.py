@@ -277,6 +277,27 @@ class Test_TabuSearch(unittest.TestCase):
         self.assertEqual(2, tmpnurse)
         self.assertEqual(True, schedule.nurses[0].worksNight)
 
+    # ----------------------------------- shiftChain(self, schedule) -----------------------------------
+    def test_shift_chain_on_an_only_night_schedule_returns_decrease_in_cc_and_pc(self):
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 0, 1, 1, 1, 1, 1]))
+
+        newSchedule = copy.deepcopy(self.schedule)
+        newSchedule = self.ts.shiftChain(newSchedule)[0]
+        self.assertTrue(newSchedule.CC < self.schedule.CC)
+        self.assertTrue(newSchedule.PC < self.schedule.PC)
+
+    def test_shift_chain_on_an_only_day_schedule_returns_decrease_in_cc_and_pc(self):
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([1, 0, 1, 1, 1, 1, 1], [0] * 7))
+
+        newSchedule = copy.deepcopy(self.schedule)
+        newSchedule = self.ts.shiftChain(newSchedule)[0]
+        self.assertTrue(newSchedule.CC < self.schedule.CC)
+        self.assertTrue(newSchedule.PC < self.schedule.PC)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
