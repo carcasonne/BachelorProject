@@ -6,6 +6,10 @@ from TabuSearch.StaticMethods import evaluateCC
 from TabuSearch.StaticMethods import evaluatePC
 from TabuSearch.StaticMethods import evaluateLB
 
+from tabulate import tabulate
+import colorama
+from colorama import Fore
+
 
 class TabuSchedule:
     def __init__(self, Schedule):
@@ -55,7 +59,26 @@ class TabuSchedule:
         string += f"CC Score: {self.CC} \n"
         string += f"PC Score: {self.PC}"
         return string
-
+    
+    def __str__(self):
+        string = "\n \n \n"
+        string += "                  SHIFT REQUIREMENTS/COVERAGE                 \n"
+        shifts = []
+        for shift in self.shifts:
+            basicColor = Fore.RESET
+            coverString = ""
+            assignedString = ""
+            for key, value in shift.coverRequirements.items():
+                coverString += f"{str(key)}:    {str(value)}\n"
+            for key, value in shift.assignedNurses.items():
+                color = Fore.RED if len(value) > shift.coverRequirements[key] else Fore.GREEN
+                assignedString += f"{str(key)}:     {color + str(len(value)) + basicColor}\n"
+            item = [shift.shiftDay, shift.shiftType, coverString, assignedString]
+            shifts.append(item)
+        string += tabulate(shifts, headers=["Day", "ShiftType", "Requirements", "Assigned"], tablefmt='fancy_grid', showindex="always")
+        string += f"\n \n                 CC Score: {self.CC}       PC Score: {self.PC}\n"
+        return string
+        
     def scores(self):
         string = f"CC Score: {self.CC} \n"
         string += f"PC Score: {self.PC}"

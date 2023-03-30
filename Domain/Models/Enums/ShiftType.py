@@ -10,3 +10,9 @@ class ShiftType(Enum):
 class TabuShiftType(Enum):
     DAY = 1
     NIGHT = 2
+
+    def __repr__(self) -> str:
+        return str(self.name)
+    
+    def __str__(self) -> str:
+        return str(self.name)
