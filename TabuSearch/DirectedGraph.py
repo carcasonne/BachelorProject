@@ -1,6 +1,10 @@
+import copy
+
+
 class DirectedGraph:
     def __init__(self):
         self.graph = dict()
+        self.solutions = []
 
     def addNode(self, id):
         self.graph.update({id: []})
@@ -25,19 +29,39 @@ class DirectedGraph:
                 self.graph.get(nFrom).remove(edge)
 
     def search(self, source, sink):
-        self.dfs(set(), source, sink)
+        visited = {}
+        for key in self.graph.keys():
+            visited.update({key: False})
+        path = []
+        self.solutions = []
+        self._dfs(source, sink, visited, path)
+        return self._findFirstValidSolution()
 
-    def dfs(self, visited, node, goal):
-        if node not in visited:
-            visited.add(node)
-            for neighbour in self.findNeighbours(node):
-                self.dfs(visited, self.graph, neighbour)
 
-    def findNeighbours(self, node):
+    def _dfs(self, node, goal, visited, path):
+        visited[node] = True
+        path.append(node)
+
+        if node == goal:
+            self.solutions.append(copy.copy((path)))
+        else:
+            for neighbour in self._findNeighbours(node):
+                if not visited[neighbour]:
+                    self._dfs(neighbour, goal, visited, path)
+
+        path.pop()
+        visited[node] = False
+
+
+    def _findNeighbours(self, node):
         neighbours = []
         for edge in self.graph.get(node):
             neighbours.append(edge.toNode)
-        return  neighbours
+        return neighbours
+
+
+    def _findFirstValidSolution(self):
+        pass
 
 
     def __str__(self):
