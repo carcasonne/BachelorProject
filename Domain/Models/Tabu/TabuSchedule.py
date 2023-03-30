@@ -1,4 +1,6 @@
 from Domain.Models.Enums.Grade import Grade
+from Domain.Models.Enums.Days import Days
+from Domain.Models.Enums.ShiftType import TabuShiftType
 from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuShift import TabuShift
 from Domain.Models.Enums.ShiftType import TabuShiftType
@@ -71,7 +73,7 @@ class TabuSchedule:
             for key, value in shift.coverRequirements.items():
                 coverString += f"{str(key)}:    {str(value)}\n"
             for key, value in shift.assignedNurses.items():
-                color = Fore.RED if len(value) > shift.coverRequirements[key] else Fore.GREEN
+                color = Fore.GREEN if len(value) == shift.coverRequirements[key] else Fore.RED
                 assignedString += f"{str(key)}:     {color + str(len(value)) + basicColor}\n"
             item = [shift.shiftDay, shift.shiftType, coverString, assignedString]
             shifts.append(item)
@@ -84,7 +86,25 @@ class TabuSchedule:
         # ROWS: SHIFTS
         # CELLS: IDS OF NURSES WORKING SHIFT ON DAY
 
+        string = "\n \n \n"
+        string += "                  NURSE WORK PATTERNS                 \n"
+        rows = [str(typ) for typ in TabuShiftType]
+        dayRow = [""] * 7
+        nightRow = [""] * 7
+
+        for i in range(7):
+            item = []
+            rows.append(item)
+            shift = self.shifts[i*2]
+            ids = shift.assignedNurses[Grade.THREE]
+            content = ""
+            for idd in ids:
+                content += f"{idd}, "      
+            nightRow[i] = content
         
+        #headers = ["Shoft Type", str(day) for day in Days]
+
+        string += tabulate(rows, headers=[], tablefmt='fancy_grid', showindex="always")
 
 
         pass
