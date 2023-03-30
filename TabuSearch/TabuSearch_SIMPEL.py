@@ -92,16 +92,22 @@ class TabuSearch_SIMPLE:
                             if self.makeMove(self.underCovering(self.bestSolution)) is None:
                                 self.makeMove(self.randomKick(self.bestSolution))
                                 self.steps[5] += 1
+                                print(self.bestSolution.scores())
                             else:
                                 self.steps[4] += 1
+                                print(self.bestSolution.scores())
                         else:
                             self.steps[3] += 1
+                            print(self.bestSolution.scores())
                     else:
                         self.steps[2] += 1
+                        print(self.bestSolution.scores())
                 else:
                     self.steps[1] += 1
+                    print(self.bestSolution.scores())
             else:
                 self.steps[0] += 1
+                print(self.bestSolution.scores())
 
     # Phase 1 Moves:
     # TODO: Random decent after PC and LB
@@ -127,7 +133,6 @@ class TabuSearch_SIMPLE:
                             neighbour.assignPatternToNurse(n_nurse, pattern)
                             self.tabuList = []
                             self.tabuList.append(nurse.id)
-                            print(neighbour.scores())
                             return neighbour, False
         return None
 
@@ -191,7 +196,6 @@ class TabuSearch_SIMPLE:
             neighbour.assignPatternToNurse(n_nurse, move[1])
             self.tabuList = []
             self.tabuList.append(n_nurse.id)
-            print(neighbour.scores())
             return neighbour, True
         else:
             return self.balanceSwap(schedule, relaxed)
@@ -237,7 +241,6 @@ class TabuSearch_SIMPLE:
             self.tabuList = []
             self.tabuList.append(n_nurse1.id)
             self.tabuList.append(n_nurse2.id)
-            print(neighbour.scores())
             return neighbour, True
         else:
             if not relaxed:
@@ -269,36 +272,42 @@ class TabuSearch_SIMPLE:
                                 neighbour = copy.deepcopy(schedule)
                                 edges = dayGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)
                                 if len(edges) > 0:
-                                    print("Performing chain operation on day...")
-                                    self.tabuList = []
+                                    tempTabuList = []
                                     for edge in edges:
                                         nurse = neighbour.nurses[edge.nurseId]
                                         patternDay = copy.copy(nurse.shiftPattern.day)
                                         patternDay[edge.fromNode] = 0
                                         patternDay[edge.toNode] = 1
                                         neighbour.assignPatternToNurse(nurse, TabuShiftPattern(patternDay, [0] * 7))
-                                        self.tabuList.append(nurse.id)
+                                        tempTabuList.append(nurse.id)
                                 else:
                                     return None
-                                return neighbour, False
+                                if schedule.CC > neighbour.CC:
+                                    print("Performing chain operation on day...")
+                                    self.tabuList = []
+                                    return neighbour, False
+
                     else:
                         for uShift in underCovered[1]:
                             if uShift.shiftType == TabuShiftType.NIGHT:
                                 neighbour = copy.deepcopy(schedule)
                                 edges = nightGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)
                                 if len(edges) > 0:
-                                    print("Performing chain operation on night...")
-                                    self.tabuList = []
+                                    tempTabuList = []
                                     for edge in edges:
                                         nurse = neighbour.nurses[edge.nurseId]
                                         patternNight = copy.copy(nurse.shiftPattern.night)
                                         patternNight[edge.fromNode] = 0
                                         patternNight[edge.toNode] = 1
                                         neighbour.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, patternNight))
-                                        self.tabuList.append(nurse.id)
+                                        tempTabuList.append(nurse.id)
                                 else:
                                     return None
-                                return neighbour, False
+                                if schedule.CC > neighbour.CC:
+                                    print("Performing chain operation on night...")
+                                    self.tabuList = tempTabuList
+                                    return neighbour, False
+
 
     def _shiftChainUtil(self, schedule, grade):
         print("Checking grade: " + str(grade.value) + "...")
@@ -392,7 +401,6 @@ class TabuSearch_SIMPLE:
             neighbour.assignPatternToNurse(n_nurse, bestMove[1])
             self.tabuList = []
             self.tabuList.append(n_nurse.id)
-            print(neighbour.scores())
             return neighbour, bestMove[3] != n_nurse.worksNight
 
 
@@ -421,6 +429,5 @@ class TabuSearch_SIMPLE:
                 neighbour.assignPatternToNurse(n_nurse, pattern)
                 self.tabuList = []
                 self.tabuList.append(nurse.id)
-                print(neighbour.scores())
                 return neighbour, nurseWorkedNight != n_nurse.worksNight
         pass
