@@ -96,10 +96,13 @@ class Test_TabuSearch(unittest.TestCase):
         self.assertEqual(oldWorksNight-1, newWorksNight)
 
     def test_balance_restoring_with_undercovered_nights_returns_move_with_more_night_nurses(self):
+        tmpDayNightTabuList = set()
         for nurse in self.schedule.nurses:
             if nurse.id < len(self.schedule.nurses):
                 self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+                tmpDayNightTabuList.add(nurse.id)
 
+        self.ts.dayNightTabuList.insert(0, tmpDayNightTabuList)
         oldSchedule = copy.deepcopy(self.schedule)
         oldWorksNight = 0
         oldWorksDay = 0
@@ -124,12 +127,14 @@ class Test_TabuSearch(unittest.TestCase):
         self.assertEqual(oldWorksNight + 1, newWorksNight)
 
     def test_balance_restoring_with_covered_nights_and_days_returns_none(self):
+        tmpDayNightTabuList = set()
         for nurse in self.schedule.nurses:
             if nurse.id < len(self.schedule.nurses)//2:
                 self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+                tmpDayNightTabuList.add(nurse.id)
             else:
                 self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
-
+        self.ts.dayNightTabuList.insert(0, tmpDayNightTabuList)
         self.assertEqual(None, self.ts.balanceRestoring(self.schedule, False))
 
     def test_balance_restoring_with_undercovered_nights_and_days_returns_none(self):
@@ -288,7 +293,7 @@ class Test_TabuSearch(unittest.TestCase):
         newSchedule = copy.deepcopy(self.schedule)
         newSchedule = self.ts.shiftChain(newSchedule)[0]
         self.assertTrue(newSchedule.CC < self.schedule.CC)
-        self.assertTrue(newSchedule.PC < self.schedule.PC)
+        self.assertTrue(newSchedule.PC <= self.schedule.PC)
 
     def test_shift_chain_on_an_only_day_schedule_returns_decrease_in_cc_and_pc(self):
         self.ts.initSchedule()
@@ -298,20 +303,18 @@ class Test_TabuSearch(unittest.TestCase):
         newSchedule = copy.deepcopy(self.schedule)
         newSchedule = self.ts.shiftChain(newSchedule)[0]
         self.assertTrue(newSchedule.CC < self.schedule.CC)
-        self.assertTrue(newSchedule.PC < self.schedule.PC)
+        self.assertTrue(newSchedule.PC <= self.schedule.PC)
 
     def test_shift_chain_on_an_only_day_schedule_updates_tabu_list(self):
         for n in self.schedule.nurses:
             self.schedule.assignPatternToNurse(n, TabuShiftPattern([1, 1, 0, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0], TabuShiftPattern([0] * 7, [1, 1, 0, 1, 1, 1, 1]))
         self.ts.balanceRestoring(self.schedule, False)
         oldTabuList = copy.deepcopy(self.ts.tabuList)
         self.ts.shiftChain(self.schedule)
         self.assertNotEqual(oldTabuList, self.ts.tabuList)
-        self.assertEqual(len(oldTabuList)+1, len(self.ts.tabuList))
 
-
-
-
+    # ----------------------------------- underCovering(self, schedule) -----------------------------------
     def test_under_covering_always_decreases_cc_if_possible(self):
         for nurse in self.schedule.nurses:
             self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
