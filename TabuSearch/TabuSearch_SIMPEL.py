@@ -239,6 +239,7 @@ class TabuSearch_SIMPLE:
         :return move, changed day/night:
         """
         print("Running Shift Chain...")
+        return None
         overCovered = []
         underCovered = []
         Gday = nx.MultiDiGraph()
