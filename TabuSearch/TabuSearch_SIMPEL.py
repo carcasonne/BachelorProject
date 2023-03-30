@@ -26,7 +26,7 @@ class TabuSearch_SIMPLE:
         self.tabuList = []
 
         # Tabu criteria 2:dayNightTabuList - Nurses working days - list[set(nurse working days), ...] - Length 6 (binary representation)
-        self.dayNightTabuList = []  # TODO: Maybe this should be an array of sets for makeing easy and quick comparisons
+        self.dayNightTabuList = []
         firstTabuSet = set()
         for n in initialSolution.nurses:
             if n.worksNight is False:
@@ -244,7 +244,7 @@ class TabuSearch_SIMPLE:
         else:
             if not relaxed:
                 print("Relaxing Balance Restoration...")
-                self.balanceRestoring(schedule, True)
+                return self.balanceRestoring(schedule, True)
             else:
                 return None
 
@@ -283,7 +283,7 @@ class TabuSearch_SIMPLE:
                                     return None
                                 if schedule.CC > neighbour.CC and schedule.PC >= neighbour.PC:
                                     print("Performing chain operation on day...")
-                                    self.tabuList = []
+                                    self.tabuList = tempTabuList
                                     return neighbour, False
 
                     else:
