@@ -89,17 +89,17 @@ class Test_DirectedGraph(unittest.TestCase):
             self.assertTrue(path in actualPaths)
 
     def test_search_for_path_between_0_3_returns_0_2_3(self):
-        expected = [0, 2, 3]
+        expected = self.graph._pathToEdges([0, 2, 3], 3)
         actual = self.graph.search(0, 3)
         self.assertEqual(expected, actual)
 
     def test_search_for_path_between_0_2_returns_0_2(self):
-        expected = [0, 2]
+        expected = self.graph._pathToEdges([0, 2], 2)
         actual = self.graph.search(0, 2)
         self.assertEqual(expected, actual)
 
     def test_search_for_path_between_3_0_returns_nothing(self):
-        expected = None
+        expected = self.graph._pathToEdges([], 0)
         actual = self.graph.search(3, 0)
         self.assertEqual(expected, actual)
 
