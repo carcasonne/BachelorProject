@@ -299,5 +299,47 @@ class Test_TabuSearch(unittest.TestCase):
 
 
 
+    def test_under_covering_always_decreases_cc_if_possible(self):
+        for nurse in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+
+        oldSchedule = copy.deepcopy(self.schedule)
+
+        self.schedule = self.ts.underCovering(self.schedule)[0]
+
+        self.assertTrue(oldSchedule.CC > self.schedule.CC)
+
+    def test_under_covering_always_returns_best_cc_score_that_it_can_find(self):
+        for nurse in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+
+        oldSchedule = copy.deepcopy(self.schedule)
+
+        self.schedule = self.ts.underCovering(self.schedule)[0]
+
+        self.assertEqual(oldSchedule.CC - 15, self.schedule.CC)
+
+    def test_under_covering_does_not_choose_tabu_nurses(self):
+        for nurse in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+            self.ts.tabuList.append(nurse.id)
+
+        returnvalue = self.ts.underCovering(self.schedule)
+
+        self.assertIsNone(returnvalue)
+
+    def test_under_covering_does_not_choose_end_up_with_day_night_tabu_coverage(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id != 0:
+                self.schedule.nurses.remove(nurse)
+
+        self.ts.dayNightTabuList.append(set().add(0))
+
+        returnvalue = self.ts.underCovering(self.schedule)
+
+        self.assertIsNone(returnvalue)
+
+
+
 if __name__ == '__main__':
     unittest.main()

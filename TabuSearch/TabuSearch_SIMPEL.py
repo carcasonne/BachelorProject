@@ -367,7 +367,7 @@ class TabuSearch_SIMPLE:
         :return: move, changed day/night:
         """
         print("Running Under Covering...")
-        bestSolution = None, None, 0, None
+        bestMove = None, None, 0, None
 
         for nurse in schedule.nurses:
             for pattern in self.feasiblePatterns[nurse.id]:
@@ -380,20 +380,20 @@ class TabuSearch_SIMPLE:
                             tabuCheck.remove(nurse.id)
                     if tabuCheck not in self.dayNightTabuList:
                         ccDif = calculateDifferenceCC(schedule, nurse, pattern)
-                        if ccDif < bestSolution[2]:
-                            bestSolution = nurse.id, pattern, ccDif, nurse.worksNight
+                        if ccDif < bestMove[2]:
+                            bestMove = nurse.id, pattern, ccDif, nurse.worksNight
 
 
-        if bestSolution[0] is None:
+        if bestMove[0] is None:
             return None
         else:
             neighbour = copy.deepcopy(schedule)
-            n_nurse = neighbour.nurses[bestSolution[0]]
-            neighbour.assignPatternToNurse(n_nurse, bestSolution[1])
+            n_nurse = neighbour.nurses[bestMove[0]]
+            neighbour.assignPatternToNurse(n_nurse, bestMove[1])
             self.tabuList = []
             self.tabuList.append(n_nurse.id)
             print(neighbour.scores())
-            return neighbour, bestSolution[3] != n_nurse.worksNight
+            return neighbour, bestMove[3] != n_nurse.worksNight
 
 
 
