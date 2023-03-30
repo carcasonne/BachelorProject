@@ -78,6 +78,16 @@ class TabuSchedule:
         string += tabulate(shifts, headers=["Day", "ShiftType", "Requirements", "Assigned"], tablefmt='fancy_grid', showindex="always")
         string += f"\n \n                 CC Score: {self.CC}       PC Score: {self.PC}\n"
         return string
+    
+    def scheduleTable(self):
+        # COLUMNS: DAYS
+        # ROWS: SHIFTS
+        # CELLS: IDS OF NURSES WORKING SHIFT ON DAY
+
+        
+
+
+        pass
         
     def scores(self):
         string = f"CC Score: {self.CC} \n"
