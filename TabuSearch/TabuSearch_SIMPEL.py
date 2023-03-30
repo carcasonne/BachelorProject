@@ -50,6 +50,8 @@ class TabuSearch_SIMPLE:
         self.acceptableScoreThreshold = None
         self.tabuTenure = None
 
+        self.steps = [0, 0, 0, 0, 0, 0]
+
     def initSchedule(self):
         for nurse in self.bestSolution.nurses:
             randomizeConstraints(nurse)
@@ -89,6 +91,17 @@ class TabuSearch_SIMPLE:
                         if self.makeMove(self.nurseChain(self.bestSolution)) is None:
                             if self.makeMove(self.underCovering(self.bestSolution)) is None:
                                 self.makeMove(self.randomKick(self.bestSolution))
+                                self.steps[5] += 1
+                            else:
+                                self.steps[4] += 1
+                        else:
+                            self.steps[3] += 1
+                    else:
+                        self.steps[2] += 1
+                else:
+                    self.steps[1] += 1
+            else:
+                self.steps[0] += 1
 
     # Phase 1 Moves:
     # TODO: Random decent after PC and LB
@@ -101,6 +114,9 @@ class TabuSearch_SIMPLE:
         :return move, changed day/night:
         """
         print("Running Random Descent...")
+        if self.dayNightCounter >= self.maxits:
+            return None
+
         for nurse in schedule.nurses:
             if nurse.id not in self.tabuList:
                 for pattern in self.feasiblePatterns[nurse.id]:
@@ -190,6 +206,7 @@ class TabuSearch_SIMPLE:
         :return move, with two swapped nurses:
         """
         print("Running Balance Swap...")
+        return None
         ccAndMove = 0, None
         for nurse1 in schedule.nurses:
             if nurse1.worksNight and (nurse1.id not in self.tabuList or relaxed):
@@ -246,9 +263,9 @@ class TabuSearch_SIMPLE:
             if utilities is not None:
                 (overCovered, underCovered, dayGraph, nightGraph) = utilities
 
-                for oShift in overCovered:
+                for oShift in overCovered[0] + overCovered[1]:
                     if oShift.shiftType == TabuShiftType.DAY:
-                        for uShift in underCovered:
+                        for uShift in underCovered[0]:
                             if uShift.shiftType == TabuShiftType.DAY:
                                 neighbour = copy.deepcopy(schedule)
                                 edges = dayGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)
@@ -267,7 +284,7 @@ class TabuSearch_SIMPLE:
                                 return neighbour, False
 
                     else:
-                        for uShift in underCovered:
+                        for uShift in underCovered[1]:
                             if uShift.shiftType == TabuShiftType.NIGHT:
                                 neighbour = copy.deepcopy(schedule)
                                 edges = nightGraph.search(oShift.shiftDay.value - 1, uShift.shiftDay.value - 1)

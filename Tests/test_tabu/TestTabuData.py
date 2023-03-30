@@ -35,7 +35,7 @@ class TestTabuData:
         self.nurses.append(Nurse(14, Grade.THREE, Contract(4, 3)))
         self.nurses.append(Nurse(15, Grade.ONE, Contract(3, 3)))
         self.nurses.append(Nurse(16, Grade.TWO, Contract(3, 3)))
-        self.nurses.append(Nurse(17, Grade.THREE, Contract(4, 3)))
+        self.nurses.append(Nurse(17, Grade.THREE, Contract(3, 3)))
 
 
 
