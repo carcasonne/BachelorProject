@@ -57,6 +57,8 @@ class Test_TabuSearch(unittest.TestCase):
     def test_random_kick_changes_one_pattern_for_one_nurse(self):
         oldSchedule = copy.deepcopy(self.schedule)
         scheduleWasChanged = False
+        for nurse in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
         self.schedule = self.ts.randomKick(self.schedule)[0]
         for nurse in self.schedule.nurses:
             if nurse.shiftPattern != oldSchedule.nurses[nurse.id].shiftPattern:
