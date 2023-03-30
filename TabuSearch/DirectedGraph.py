@@ -35,13 +35,6 @@ class DirectedGraph:
         path = []
         self.solutions = []
         self._dfs(source, sink, visited, path)
-        print(self.solutions)
-        counter = 0
-        while counter < len(self.solutions):
-            print("Solution " + str(counter) + " Weight: " + str(self._calcPathWeight(self.solutions[counter], sink)))
-            counter += 1
-        print("Chosen solution first: " + str(self._findFirstValidSolution(sink)))
-        print("Chosen solution best: " + str(self._findBestValidSolution(sink)))
         best = self._findBestValidSolution(sink)
         return self._pathToEdges(best, sink)
 
@@ -102,7 +95,6 @@ class DirectedGraph:
             else:
                 edges.append(self._findEdge(node, path[next]))
                 next += 1
-        return edges
 
 
     def __str__(self):
