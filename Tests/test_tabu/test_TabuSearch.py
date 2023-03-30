@@ -189,9 +189,93 @@ class Test_TabuSearch(unittest.TestCase):
         self.assertTrue(ccBefore > ccAfter)
 
     # ----------------------------------- balanceSwap(self, schedule) -----------------------------------
-    @unittest.skip("Not Implemented")
     def test_balance_swap_swaps_two_nurses(self):
-        pass
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        oldPattern = TabuShiftPattern([1, 0, 0, 0, 0, 0, 0], [0] * 7)
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0], oldPattern)
+        schedule = self.ts.balanceSwap(self.schedule, False)[0]
+        counter = 0
+        tmpnurse = None
+        for nurse in schedule.nurses:
+            if nurse.worksNight is False:
+                tmpnurse = nurse.id
+                counter += 1
+        self.assertEqual(1, counter)
+        self.assertNotEqual(0, tmpnurse)
+        self.assertEqual(True, schedule.nurses[0].worksNight)
+
+    def test_balance_swap_swaps_two_nurses_with_relaxed_false_does_not_use_tabu_nurse(self):
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        oldPattern = TabuShiftPattern([1, 0, 0, 0, 0, 0, 0], [0] * 7)
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0], oldPattern)
+        self.ts.tabuList.append(self.schedule.nurses[2].id)
+        schedule = self.ts.balanceSwap(self.schedule, False)[0]
+        counter = 0
+        tmpnurse = None
+        for nurse in schedule.nurses:
+            if not nurse.worksNight:
+                tmpnurse = nurse.id
+                counter += 1
+        self.assertEqual(1, counter)
+        self.assertNotEqual(2, tmpnurse)
+        self.assertEqual(True, schedule.nurses[0].worksNight)
+
+    def test_balance_swap_swaps_two_nurses_with_relaxed_true_uses_tabu_nurse(self):
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        oldPattern = TabuShiftPattern([1, 0, 0, 0, 0, 0, 0], [0] * 7)
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0], oldPattern)
+        self.ts.tabuList.append(self.schedule.nurses[2].id)
+        schedule = self.ts.balanceSwap(self.schedule, True)[0]
+        counter = 0
+        tmpnurse = None
+        for nurse in schedule.nurses:
+            if not nurse.worksNight:
+                tmpnurse = nurse.id
+                counter += 1
+        self.assertEqual(1, counter)
+        self.assertEqual(2, tmpnurse)
+        self.assertEqual(True, schedule.nurses[0].worksNight)
+
+    def test_balance_swap_swaps_two_nurses_with_relaxed_false_should_not_result_in_tabu_configuration(self):
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        oldPattern = TabuShiftPattern([0, 1, 0, 0, 0, 0, 0], [0] * 7)
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0], oldPattern)
+        tmpset = set()
+        tmpset.add(self.schedule.nurses[2].id)
+        self.ts.dayNightTabuList.append(tmpset)
+        schedule = self.ts.balanceSwap(self.schedule, False)[0]
+        counter = 0
+        tmpnurse = None
+        for nurse in schedule.nurses:
+            if not nurse.worksNight:
+                tmpnurse = nurse.id
+                counter += 1
+        self.assertEqual(1, counter)
+        self.assertNotEqual(2, tmpnurse)
+        self.assertEqual(True, schedule.nurses[0].worksNight)
+
+    def test_balance_swap_swaps_two_nurses_with_relaxed_true_results_in_tabu_configuration(self):
+        for n in self.schedule.nurses:
+            self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        oldPattern = TabuShiftPattern([1, 0, 0, 0, 0, 0, 0], [0] * 7)
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0], oldPattern)
+        tmpset = set()
+        tmpset.add(self.schedule.nurses[2].id)
+        self.ts.dayNightTabuList.append(tmpset)
+        schedule = self.ts.balanceSwap(self.schedule, True)[0]
+        counter = 0
+        tmpnurse = None
+        for nurse in schedule.nurses:
+            if not nurse.worksNight:
+                tmpnurse = nurse.id
+                counter += 1
+        self.assertEqual(1, counter)
+        self.assertEqual(2, tmpnurse)
+        self.assertEqual(True, schedule.nurses[0].worksNight)
 
 
 if __name__ == '__main__':

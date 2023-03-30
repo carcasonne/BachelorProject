@@ -60,6 +60,7 @@ class TabuSearch_SIMPLE:
                 random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)])
 
     # TODO: There was a mistake here. We need tests for this also.
+    # TODO: This has to take count for TabuList also instead of the methods does it
     def makeMove(self, move):
         if move is None:
             return None
@@ -193,9 +194,9 @@ class TabuSearch_SIMPLE:
         print("Running Balance Swap...")
         ccAndMove = 0, None
         for nurse1 in schedule.nurses:
-            if nurse1.worksNight and (nurse1 not in self.tabuList or relaxed):
+            if nurse1.worksNight and (nurse1.id not in self.tabuList or relaxed):
                 for nurse2 in schedule.nurses:
-                    if not nurse2.worksNight and (nurse2 not in self.tabuList or relaxed):
+                    if not nurse2.worksNight and (nurse2.id not in self.tabuList or relaxed):
                         tabuCon = False
                         tabuCheck = copy.copy(self.dayNightTabuList[0])
                         tabuCheck.add(nurse1.id)

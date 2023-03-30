@@ -1,4 +1,13 @@
 from Knapsack.Problems.ZeroOneKnapsack import ZeroOneKnapsack
+import queue
+
+from dataclasses import dataclass, field
+from typing import Any
+
+@dataclass(order=True)
+class PrioritizedItem:
+    priority: int
+    item: Any=field(compare=False)
 
 class Node:
     # level: level of node (id)
@@ -25,30 +34,30 @@ class BranchAndBound_MODERN:
         self.items = zeroOneKnapsack.items
         self.C = zeroOneKnapsack.C
         self.N = len(self.items)
-        self.PQ = Priority_Queue()
 
         self.v = Node(-1, 0, 0)
         self.v.U = BranchAndBound_MODERN.get_bound(self.v, self.items, self.C, self.N)
         self.nodeCount = 1
-        self.PQ.insert(self.v, self.items, self.C, self.N)
 
         self.bestSolution = self.v
         self.lowerBound = lowerBound
+
+        self.queue = queue.PriorityQueue()
+        self.queue.put(PrioritizedItem(0, self.v))
 
     def resetSearch(self):
         self.v = Node(-1, 0, 0)
         self.v.U = BranchAndBound_MODERN.get_bound(self.v, self.items, self.C, self.N)
         self.nodeCount = 1
-        self.PQ = Priority_Queue()
-        self.PQ.insert(self.v, self.items, self.C, self.N)
         self.bestSolution = self.v
     
     # lowerBound: if not None, any solution must havr Z value greater than lowerBound
     # earlyExit: Whether the solution should exit at first found, feasible solution (bound to lowerBound)
     def startSearch(self, earlyExit=False):
-        while self.PQ.length != 0:
-            v = self.PQ.remove()
-
+        while self.queue.qsize() != 0:
+            pi = self.queue.get()
+            v = pi.item
+            
             # Ignore node if upper bound falls too low
             # Branches by making 2 solutions: 1 where we insert the item, 1 where we do not
             if v.U > self.bestSolution.Z: 
@@ -89,7 +98,7 @@ class BranchAndBound_MODERN:
 
                 # If the new solution could potentiall be better, add it to PQ
                 if includeItemSolution.U > self.bestSolution.Z:
-                    self.PQ.insert(includeItemSolution, self.items, self.C, self.N)
+                    self.queue.put(PrioritizedItem(-includeItemSolution.U, includeItemSolution))
 
                 # Generate another solution corresponding to not inserting the item
                 excludeItemSolution = Node(newLevel, v.Z, v.usedC)
@@ -100,11 +109,10 @@ class BranchAndBound_MODERN:
 
                 # If potential to be better than best solution, even without adding the item, then add to PQ
                 if excludeItemSolution.U > self.bestSolution.Z:
-                    self.PQ.insert(excludeItemSolution, self.items, self.C, self.N)
+                    self.queue.put(PrioritizedItem(-excludeItemSolution.U, excludeItemSolution))
                 
                 if exit: 
                     return
-
 
     def get_bound(node, items, totalC, N):
         if node.usedC >= totalC:
@@ -129,29 +137,3 @@ class BranchAndBound_MODERN:
                 sumZ = sumZ + (totalC - sumC) * ratio
 
             return sumZ
-
-# This priority queue is very simple and not effective if number of nodes grows too large
-class Priority_Queue:
-    def __init__(self):
-        self.pqueue = []
-        self.length = 0
-    
-    def insert(self, node, items, totalC, N):
-        j = 0
-        for i in range(len(self.pqueue)):
-            if self.pqueue[i].U > node.U:
-                j = i
-                break
-
-        self.pqueue.insert(j, node)
-        self.length += 1
-
-                    
-    def remove(self):
-        try:
-            result = self.pqueue.pop()
-            self.length -= 1
-        except Exception:
-            raise Exception("Priority queue cannot be popped when its empty") from None
-        else:
-            return result
