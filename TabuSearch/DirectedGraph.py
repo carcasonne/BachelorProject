@@ -1,32 +1,43 @@
 class DirectedGraph:
     def __init__(self):
         self.graph = dict()
-        self.visited = set()
 
     def addNode(self, id):
         self.graph.update({id: []})
 
     def addEdge(self, nFrom, nTo, id, weight):
-        exists = False
-        for edge in self.graph.get(nFrom):
-            if edge.toNode == nTo:
-                exists = True
-                if edge.weight > weight:
-                    self.graph.get(nFrom).remove(edge)
-                    self.graph.get(nFrom).append(Edge(id, weight, nTo))
-                break
-        if not exists:
+        edge = self._findEdge(nFrom, nTo)
+        if edge is None:
+            self.graph.get(nFrom).append(Edge(id, weight, nTo))
+        elif edge.weight > weight:
+            self._removeEdge(nFrom, nTo)
             self.graph.get(nFrom).append(Edge(id, weight, nTo))
 
-    def search(self, source, sink):
-        visited = set()
+    def _findEdge(self, nFrom, nTo):
+        for edge in self.graph.get(nFrom):
+            if edge.toNode == nTo:
+                return edge
+        return None
 
-        def dfs(visited, graph, node):
-            if node not in visited:
-                print(node)
-                visited.add(node)
-                for neighbour in graph[node]:
-                    dfs(visited, graph, neighbour)
+    def _removeEdge(self, nFrom, nTo):
+        for edge in self.graph.get(nFrom):
+            if edge.toNode == nTo:
+                self.graph.get(nFrom).remove(edge)
+
+    def search(self, source, sink):
+        self.dfs(set(), source, sink)
+
+    def dfs(self, visited, node, goal):
+        if node not in visited:
+            visited.add(node)
+            for neighbour in self.findNeighbours(node):
+                self.dfs(visited, self.graph, neighbour)
+
+    def findNeighbours(self, node):
+        neighbours = []
+        for edge in self.graph.get(node):
+            neighbours.append(edge.toNode)
+        return  neighbours
 
 
     def __str__(self):
