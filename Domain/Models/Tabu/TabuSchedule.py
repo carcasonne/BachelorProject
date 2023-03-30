@@ -1,10 +1,16 @@
 from Domain.Models.Enums.Grade import Grade
+from Domain.Models.Enums.Days import Days
+from Domain.Models.Enums.ShiftType import TabuShiftType
 from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuShift import TabuShift
 from Domain.Models.Enums.ShiftType import TabuShiftType
 from TabuSearch.StaticMethods import evaluateCC
 from TabuSearch.StaticMethods import evaluatePC
 from TabuSearch.StaticMethods import evaluateLB
+
+from tabulate import tabulate
+import colorama
+from colorama import Fore
 
 
 class TabuSchedule:
@@ -55,7 +61,60 @@ class TabuSchedule:
         string += f"CC Score: {self.CC} \n"
         string += f"PC Score: {self.PC}"
         return string
+    
+    def __str__(self):
+        string = "\n \n \n"
+        string += "                  SHIFT REQUIREMENTS/COVERAGE                 \n"
+        shifts = []
+        for shift in self.shifts:
+            basicColor = Fore.RESET
+            coverString = ""
+            assignedString = ""
+            for key, value in shift.coverRequirements.items():
+                coverString += f"{str(key)}:    {str(value)}\n"
+            for key, value in shift.assignedNurses.items():
+                color = None
+                if len(value) > shift.coverRequirements[key]:
+                    color = Fore.YELLOW
+                elif len(value) == shift.coverRequirements[key]:
+                    color = Fore.GREEN
+                else:
+                    color = Fore.RED
+                assignedString += f"{str(key)}:     {color + str(len(value)) + basicColor}\n"
+            item = [shift.shiftDay, shift.shiftType, coverString, assignedString]
+            shifts.append(item)
+        string += tabulate(shifts, headers=["Day", "ShiftType", "Requirements", "Assigned"], tablefmt='fancy_grid', showindex="always")
+        string += f"\n \n                 CC Score: {self.CC}       PC Score: {self.PC}\n"
+        return string
+    
+    def scheduleTable(self):
+        # COLUMNS: DAYS
+        # ROWS: SHIFTS
+        # CELLS: IDS OF NURSES WORKING SHIFT ON DAY
 
+        string = "\n \n \n"
+        string += "                  NURSE WORK PATTERNS                 \n"
+        rows = [str(typ) for typ in TabuShiftType]
+        dayRow = [""] * 7
+        nightRow = [""] * 7
+
+        for i in range(7):
+            item = []
+            rows.append(item)
+            shift = self.shifts[i*2]
+            ids = shift.assignedNurses[Grade.THREE]
+            content = ""
+            for idd in ids:
+                content += f"{idd}, "      
+            nightRow[i] = content
+        
+        #headers = ["Shoft Type", str(day) for day in Days]
+
+        string += tabulate(rows, headers=[], tablefmt='fancy_grid', showindex="always")
+
+
+        pass
+        
     def scores(self):
         string = f"CC Score: {self.CC} \n"
         string += f"PC Score: {self.PC}"

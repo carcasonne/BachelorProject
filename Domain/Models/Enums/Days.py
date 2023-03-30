@@ -9,3 +9,9 @@ class Days(Enum):
     FRIDAY = 5
     SATURDAY = 6
     SUNDAY = 7
+
+    def __repr__(self) -> str:
+        return str(self.name)
+    
+    def __str__(self) -> str:
+        return str(self.name)

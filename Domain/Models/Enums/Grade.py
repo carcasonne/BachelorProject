@@ -12,3 +12,9 @@ class Grade(Enum):
             return self.value < other.value
         else:
             return False
+    
+    def __repr__(self) -> str:
+        return f"Grade {self.value}"
+    
+    def __str__(self) -> str:
+        return f"Grade {self.value}"

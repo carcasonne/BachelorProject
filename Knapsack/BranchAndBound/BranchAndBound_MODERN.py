@@ -30,7 +30,7 @@ class BranchAndBound_MODERN:
     # v: The node currently being looked at (dummy node at init)
     # nodeCount: Amount of nodes generated (possible solutions generated)
     # bestSolution: The best solution found so far
-    def __init__(self, zeroOneKnapsack: ZeroOneKnapsack, lowerBound=None):
+    def __init__(self, zeroOneKnapsack: ZeroOneKnapsack, targetValue=None):
         self.items = zeroOneKnapsack.items
         self.C = zeroOneKnapsack.C
         self.N = len(self.items)
@@ -40,7 +40,7 @@ class BranchAndBound_MODERN:
         self.nodeCount = 1
 
         self.bestSolution = self.v
-        self.lowerBound = lowerBound
+        self.targetValue = targetValue
 
         self.queue = queue.PriorityQueue()
         self.queue.put(PrioritizedItem(0, self.v))
@@ -51,8 +51,8 @@ class BranchAndBound_MODERN:
         self.nodeCount = 1
         self.bestSolution = self.v
     
-    # lowerBound: if not None, any solution must havr Z value greater than lowerBound
-    # earlyExit: Whether the solution should exit at first found, feasible solution (bound to lowerBound)
+    # targetValue: if not None, any solution must havr Z value greater than targetValue
+    # earlyExit: Whether the solution should exit at first found, feasible solution (bound to targetValue)
     def startSearch(self, earlyExit=False):
         while self.queue.qsize() != 0:
             pi = self.queue.get()
@@ -88,8 +88,8 @@ class BranchAndBound_MODERN:
                 if  includeItemSolution.usedC <= self.C:
                     # If a lower bound is given, we must take into consideration
                     # whether to update the solution or just stop now
-                    if self.lowerBound is not None:
-                        if includeItemSolution.Z >= self.lowerBound:
+                    if self.targetValue is not None:
+                        if includeItemSolution.Z >= self.targetValue:
                             if includeItemSolution.Z > self.bestSolution.Z:
                                 self.bestSolution = includeItemSolution
                                 exit = earlyExit

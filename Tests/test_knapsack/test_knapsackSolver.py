@@ -543,14 +543,11 @@ class TestKnapsackSolver(unittest.TestCase):
 
         # I miss c# linq :(
         nightShift = next((shift for shift in feasibleSchedule.shifts if shift.shiftType == ShiftType.NIGHT), None)
-        # By adding 1 Grade3 nurse to the night shift requirements, 
+        # By adding 1 Grade1 nurse to the night shift requirements, 
         # the schedule will no longer have a feasible solution for Grade3
-        nightShift.coverRequirements[Grade.ONE] += 3
-        nightShift.coverRequirements[Grade.ONE] += 3
-        nightShift.coverRequirements[Grade.TWO] += 3
-        nightShift.coverRequirements[Grade.TWO] += 3
-        nightShift.coverRequirements[Grade.THREE] += 3
-        nightShift.coverRequirements[Grade.THREE] += 3
+        nightShift.coverRequirements[Grade.ONE] += 4
+        nightShift.coverRequirements[Grade.TWO] += 4
+        nightShift.coverRequirements[Grade.THREE] += 4
 
         return feasibleSchedule
         

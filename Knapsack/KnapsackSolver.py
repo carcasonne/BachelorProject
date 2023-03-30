@@ -103,6 +103,17 @@ class KnapsackSolver:
 
         print("Found grade 1 solution with items: ")
         print(SEARCH_1.bestSolution.items)
+        print(f"Required cover, day {self.D}")
+        print(f"Required cover, night {self.E}")
+
+        days = 0
+        nights = 0
+        for nurse in self.schedule.nurses:
+            days += nurse.contract.days
+            nights += nurse.contract.nights
+
+        print(f"Contract cover, day {days}")
+        print(f"Contract cover, night {nights}")
 
         return SEARCH_1   
 
@@ -121,7 +132,7 @@ class KnapsackSolver:
             if(cost < lowerBound):
                 print("-------------")
                 print("There are insufficent grade 3 nurses to cover all requirements")
-                n = lowerBound - cost + 1
+                n = lowerBound - cost
                 #n //= self.bankNurseContract.nights       
                 print(f"Adding {n} nurses")      
                 for _ in range(n):
@@ -134,8 +145,8 @@ class KnapsackSolver:
             boundedKnapsack = BoundedKnapsack(boundedItemGroups, cost)
             zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
             branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
-
             branchAndSearch.startSearch(True)
+                
             solution = branchAndSearch.bestSolution
 
             # If solution.level is -1, then no feasible solution exists
@@ -143,6 +154,9 @@ class KnapsackSolver:
             if solution.level == -1:
                 # Add nurses equivelant to difference between lower and global upper bound
                 bankN = cost - lowerBound
+                if bankN == 0:
+                    bankN = 1
+                print(f'No solution found. Adding {bankN} extra bank nurses of Grade 3')
                 for _ in range(bankN):
                     self.addBankNurse(Grade.THREE)
                 continue
@@ -162,9 +176,9 @@ class KnapsackSolver:
             upperBounds[contract] = 0
             typeToCount[contract] = 0
 
-        lowerBound = E_2
         isFeasible = False
         while not isFeasible:
+            lowerBound = E_2
             N_I_G = self.getContractToGrade()
             for contract in self.contracts:
                 Q_i = Q_3[contract]
@@ -178,7 +192,7 @@ class KnapsackSolver:
                 else:
                     sub = Q_i - N_I_3
                     upperBounds[contract] = N_I_1 + N_I_2 - sub
-                    lowerBound = E_2 - sub
+                    #lowerBound = lowerBound - sub
                 
                 if Q_i < upperBounds[contract]:
                     upperBounds[contract] = Q_i
@@ -192,17 +206,31 @@ class KnapsackSolver:
                 print(f"Adding {nursesNeeded} nurses") 
                 for _ in range(nursesNeeded):
                     self.addBankNurse(Grade.TWO)
+                    #Q_3[self.bankNurseContract] += 1
                 continue
             else:
-                isFeasible = True
+                # Represent the problem in bounded knapsack item groups
+                items = self.createBoundedItemGroups(typeToCount)
+                boundedKnapsack = BoundedKnapsack(items, cost)
+                zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
+                branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
 
-        # Represent the problem in bounded knapsack item groups
-        items = self.createBoundedItemGroups(typeToCount)
-        boundedKnapsack = BoundedKnapsack(items, cost)
-        zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
-        branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
+                branchAndSearch.startSearch(True)
+                solution = branchAndSearch.bestSolution
 
-        branchAndSearch.startSearch(True)
+                # If solution.level is -1, then no feasible solution exists
+                # Else we have found a solution and exit the while loop
+                if solution.level == -1:
+                    # Add nurses equivelant to difference between lower and global upper bound
+                    bankN = cost - lowerBound
+                    if bankN == 0:
+                        bankN = 1
+                    print(f'No solution found. Adding {bankN} extra bank nurses of Grade 2')
+                    for _ in range(bankN):
+                        self.addBankNurse(Grade.TWO)
+                    continue
+                else:
+                    isFeasible = True
 
         return branchAndSearch
     
@@ -234,7 +262,7 @@ class KnapsackSolver:
                 else:
                     sub = Q_i - N_I_2
                     upperBounds[contract] = N_I_1 - sub 
-                    lowerBound = E_1 - sub
+                    #lowerBound = E_1 - sub
                 if Q_i < upperBounds[contract]:
                     upperBounds[contract] = Q_i
 
@@ -249,15 +277,28 @@ class KnapsackSolver:
                     self.addBankNurse(Grade.ONE)
                 continue
             else:
-                isFeasible = True
+                # Represent the problem in bounded knapsack item groups
+                items = self.createBoundedItemGroups(typeToCount)
+                boundedKnapsack = BoundedKnapsack(items, cost)
+                zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
+                branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
 
-        # Represent the problem in bounded knapsack item groups
-        items = self.createBoundedItemGroups(typeToCount)
-        boundedKnapsack = BoundedKnapsack(items, cost)
-        zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
-        branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
+                branchAndSearch.startSearch(True)
+                solution = branchAndSearch.bestSolution
 
-        branchAndSearch.startSearch(True)
+                # If solution.level is -1, then no feasible solution exists
+                # Else we have found a solution and exit the while loop
+                if solution.level == -1:
+                    # Add nurses equivelant to difference between lower and global upper bound
+                    bankN = cost - lowerBound
+                    if bankN == 0: 
+                        bankN = 1 
+                    print(f'No solution found. Adding {bankN} extra bank nurses of Grade 1')
+                    for _ in range(bankN):
+                        self.addBankNurse(Grade.ONE)
+                    continue
+                else:
+                    isFeasible = True
         
         return branchAndSearch
     
