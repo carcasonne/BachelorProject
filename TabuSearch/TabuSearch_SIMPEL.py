@@ -402,9 +402,7 @@ class TabuSearch_SIMPLE:
             self.tabuList.append(n_nurse.id)
             return neighbour, bestMove[3] != n_nurse.worksNight
 
-
-
-
+    # ----------------------------------- randomKick(self, schedule) -----------------------------------
     def randomKick(self, schedule):
         """
         Step 1.6 Randomly select a move satisfying non-tabu conditions 1-3.
@@ -429,4 +427,3 @@ class TabuSearch_SIMPLE:
                 self.tabuList = []
                 self.tabuList.append(nurse.id)
                 return neighbour, nurseWorkedNight != n_nurse.worksNight
-        pass
