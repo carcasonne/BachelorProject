@@ -100,7 +100,7 @@ class DirectedGraph:
             if node == goal:
                 return edges
             else:
-                edges.append(self._findEdge(node, next))
+                edges.append(self._findEdge(node, path[next]))
                 next += 1
         return edges
 
