@@ -68,19 +68,28 @@ class Test_StaticMethods(unittest.TestCase):
         self.assertEqual(126, evaluateCC(self.schedule))
 
     def test_evaluate_CC_with_nurses_added_on_all_days_returns_42(self):
-        self.schedule.assignPatternToNurse(self.schedule.nurses[0], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[1], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[2], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[3], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[4], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[5], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0],
+                                           TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[1],
+                                           TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[2],
+                                           TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[3],
+                                           TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[4],
+                                           TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[5],
+                                           TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
 
         self.assertEqual(42, evaluateCC(self.schedule))
 
     def test_evaluate_CC_with_nurses_added_on_all_days_returns_84(self):
-        self.schedule.assignPatternToNurse(self.schedule.nurses[0], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[1], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[2], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[1],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[2],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
 
         self.assertEqual(84, evaluateCC(self.schedule))
 
@@ -88,20 +97,29 @@ class Test_StaticMethods(unittest.TestCase):
         for i in range(len(self.schedule.nurses) // 9):
             for x in range(9):
                 if x % 3 == 0:
-                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0]))
+                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x],
+                                                       TabuShiftPattern([1, 1, 1, 1, 1, 1, 1, 1],
+                                                                        [0, 0, 0, 0, 0, 0, 0]))
                 else:
-                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]))
+                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x],
+                                                       TabuShiftPattern([0, 0, 0, 0, 0, 0, 0],
+                                                                        [1, 1, 1, 1, 1, 1, 1, 1]))
         self.assertEqual(0, evaluateCC(self.schedule))
 
     # TODO: This test currently fails, but based on the article it should fail... Make it different if Paloma say so.
     def test_evaluate_CC_over_assignment_of_a_shift_does_not_return_a_better_CC(self):
-        self.schedule.assignPatternToNurse(self.schedule.nurses[0], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[1], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[2], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[1],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[2],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
         notOverAssigned = evaluateCC(self.schedule)
 
-        self.schedule.assignPatternToNurse(self.schedule.nurses[3], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[4], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[3],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[4],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
         overAssigned = evaluateCC(self.schedule)
 
         self.assertFalse(notOverAssigned > overAssigned)
@@ -115,7 +133,7 @@ class Test_StaticMethods(unittest.TestCase):
             for x in p.merged:
                 if x == 1:
                     counter += 1
-            if p.night == [0]*7:  # If pattern is a day pattern
+            if p.night == [0] * 7:  # If pattern is a day pattern
                 self.assertEqual(nurse.contract.days, counter)
             if p.day == [0] * 7:  # If pattern is a night pattern
                 self.assertEqual(nurse.contract.nights, counter)
@@ -149,7 +167,14 @@ class Test_StaticMethods(unittest.TestCase):
         self.schedule.assignPatternToNurse(nurse, pattern)
         afterCC = evaluateCC(self.schedule)
 
-        self.assertEqual(afterCC-beforeCC, result)
+        self.assertEqual(afterCC - beforeCC, result)
+
+    def test_calculate_differenceCC_same_pattern_is_moved_to_night_returns_0(self):
+        pattern = TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0])
+        nurse = self.schedule.nurses[0]
+        self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        result = calculateDifferenceCC(self.schedule, nurse, pattern)
+        self.assertEqual(0, result)
 
     def test_calculate_differenceCC_calculates_same_difference_as_changing_the_schedule_night_pattern(self):
         pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1])
@@ -172,10 +197,14 @@ class Test_StaticMethods(unittest.TestCase):
         self.assertEqual(6, result)
 
     def test_calculate_differenceCC_for_over_covered_shift_returns_only_decrease_in_CC(self):
-        self.schedule.assignPatternToNurse(self.schedule.nurses[0], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[1], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[2], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[3], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[0],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[1],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[2],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[3],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
         CC = self.schedule.CC
 
         pattern = TabuShiftPattern([0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0])
@@ -186,10 +215,14 @@ class Test_StaticMethods(unittest.TestCase):
         self.assertEqual(self.schedule.CC - CC, result)
 
     def test_calculate_differenceCC_for_semi_covered_shifts_returns_no_decrease_or_increase_in_CC(self):
-        self.schedule.assignPatternToNurse(self.schedule.nurses[8], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[9], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0, 1]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[10], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
-        self.schedule.assignPatternToNurse(self.schedule.nurses[11], TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[8],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[9],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[10],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(self.schedule.nurses[11],
+                                           TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]))
         CC = self.schedule.CC
 
         pattern = TabuShiftPattern([0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0])
@@ -203,23 +236,93 @@ class Test_StaticMethods(unittest.TestCase):
         nurse = self.schedule.nurses[0]
         nurse.undesiredWeekend = True
         nurse.completeWeekend = True
-        self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0]*7, [0, 1, 0, 1, 0, 1, 0]))
+        self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [0, 1, 0, 1, 0, 1, 0]))
 
-        self.assertEqual(-60, calculateDifferencePC(nurse, TabuShiftPattern([0]*7, [0, 1, 0, 1, 1, 0, 0])))
+        self.assertEqual(-60, calculateDifferencePC(nurse, TabuShiftPattern([0] * 7, [0, 1, 0, 1, 1, 0, 0])))
 
     # ----------------------------------- evaluatePC(nurse, pattern) -----------------------------------
     def test_evaluate_pc_adding_new_shift_pattern_to_nurse_decrease_pc_with_60(self):
         nurse = self.schedule.nurses[0]
         nurse.undesiredWeekend = True
         nurse.completeWeekend = True
-        self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0]*7, [0, 1, 0, 1, 0, 1, 0]))
+        self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [0, 1, 0, 1, 0, 1, 0]))
         oldPC = self.schedule.PC
-        self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0]*7, [0, 1, 0, 1, 1, 0, 0]))
+        self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [0, 1, 0, 1, 1, 0, 0]))
         newPC = self.schedule.PC
 
-        self.assertEqual(oldPC-60, newPC)
+        self.assertEqual(oldPC - 60, newPC)
 
+    # ----------------------------------- checkBalance(schedule) -----------------------------------
+    # TODO: checkBalance() Tests...
+    def test_check_with_satisfied_balance_returns_true_true(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses) // 2:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+            else:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
 
+        self.assertEqual((True, True), checkBalance(self.schedule))
+
+    def test_check_with_unsatisfied_day_balance_returns_false_true(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses):
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+
+        self.assertEqual((False, True), checkBalance(self.schedule))
+
+    def test_check_with_unsatisfied_night_balance_returns_true_false(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses):
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+
+        self.assertEqual((True, False), checkBalance(self.schedule))
+
+    def test_check_with_unsatisfied_day_and_night_balance_returns_false_false(self):
+        self.assertEqual((False, False), checkBalance(self.schedule))
+
+    def test_check_balance_with_one_unsatisfied_with_enough_nurses_the_other_days_returns_true_true(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id % 3 == 2:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+            else:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 0, 1, 1, 1], [0] * 7))
+        self.assertEqual((True, True), checkBalance(self.schedule))
+
+    def test_check_balance_with_one_unsatisfied_with_enough_nurses_the_other_night_returns_true_true(self):
+        for nurse in self.schedule.nurses:
+            if nurse.id < len(self.schedule.nurses) // 2:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 0, 1]))
+            else:
+                self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.assertEqual((True, True), checkBalance(self.schedule))
+
+    # ----------------------------------- calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1, pattern2) -----------------------------------
+    def test_calculate_difference_duo_cc_only_two_nurses_assigned_in_schedule_swap_returns_negative_21(self):
+        nurse1 = self.schedule.nurses[0]
+        nurse2 = self.schedule.nurses[1]
+        self.schedule.assignPatternToNurse(nurse1, TabuShiftPattern([1, 0, 0, 1, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 0, 0, 1]))
+        self.assertEqual(-21, calculateDifferenceDuoCC(self.schedule, nurse1, nurse2,
+                                                       TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1]),
+                                                       TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0])))
+
+    def test_calculate_difference_duo_cc_swap_nurses_with_no_overlapping_shifts_returns_negative_18(self):
+        nurse1 = self.schedule.nurses[0]
+        nurse2 = self.schedule.nurses[1]
+        self.schedule.assignPatternToNurse(nurse1, TabuShiftPattern([1, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0]))
+        self.schedule.assignPatternToNurse(nurse2, TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1]))
+        self.assertEqual(-18, calculateDifferenceDuoCC(self.schedule, nurse1, nurse2,
+                                                       TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 1, 1, 1, 0]),
+                                                       TabuShiftPattern([0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0])))
+
+    def test_calculate_difference_duo_cc_swap_nurses_with_only_overlapping_shifts_returns_0(self):
+        nurse1 = self.schedule.nurses[0]
+        nurse2 = self.schedule.nurses[1]
+        pattern1 = TabuShiftPattern([0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0])
+        pattern2 = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 0])
+        self.schedule.assignPatternToNurse(nurse1, pattern1)
+        self.schedule.assignPatternToNurse(nurse2, pattern2)
+        self.assertEqual(0, calculateDifferenceDuoCC(self.schedule, nurse1, nurse2, pattern2, pattern1))
 
 
 if __name__ == '__main__':
