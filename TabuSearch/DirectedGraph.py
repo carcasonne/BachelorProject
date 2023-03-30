@@ -44,7 +44,6 @@ class DirectedGraph:
         print("Chosen solution best: " + str(self._findBestValidSolution(sink)))
         return self._findBestValidSolution(sink)
 
-
     def _dfs(self, node, goal, visited, path):
         visited[node] = True
         path.append(node)
@@ -58,7 +57,6 @@ class DirectedGraph:
 
         path.pop()
         visited[node] = False
-
 
     def _findNeighbours(self, node):
         neighbours = []
@@ -93,7 +91,6 @@ class DirectedGraph:
             else:
                 accWeight += self._findEdge(node, path[next]).weight
                 next += 1
-
 
 
     def __str__(self):
