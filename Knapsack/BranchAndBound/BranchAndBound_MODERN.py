@@ -130,6 +130,7 @@ class BranchAndBound_MODERN:
 
             return sumZ
 
+# This priority queue is very simple and not effective if number of nodes grows too large
 class Priority_Queue:
     def __init__(self):
         self.pqueue = []
