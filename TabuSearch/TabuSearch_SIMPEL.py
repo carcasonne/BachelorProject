@@ -209,7 +209,6 @@ class TabuSearch_SIMPLE:
         :return move, with two swapped nurses:
         """
         print("Running Balance Swap...")
-        return None
         ccAndMove = 0, None
         for nurse1 in schedule.nurses:
             if nurse1.worksNight and (nurse1.id not in self.tabuList or relaxed):
