@@ -366,6 +366,7 @@ class TabuSearch_SIMPLE:
         :return: move, changed day/night:
         """
         print("Running Nurse Chain...")
+        
         return None
 
     def underCovering(self, schedule):

@@ -314,6 +314,24 @@ class Test_TabuSearch(unittest.TestCase):
         self.ts.shiftChain(self.schedule, 1)
         self.assertNotEqual(oldTabuList, self.ts.tabuList)
 
+    def test_shift_chain_on_an_strict_little_undercovered_day_pattern_does_not_return_pc_increase(self):
+        nurses = self.schedule.nurses
+        self.schedule.assignPatternToNurse(nurses[0], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[1], TabuShiftPattern([1, 0, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[2], TabuShiftPattern([1, 0, 0, 0, 0, 0, 0], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[3], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(nurses[4], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[5], TabuShiftPattern([0, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[6], TabuShiftPattern([0, 1, 0, 0, 0, 0, 0], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[7], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(nurses[8], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[9], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[10], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(nurses[11], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+
+        print(str(self.schedule))
+        self.assertEqual(None, self.ts.shiftChain(self.schedule))
+
     # ----------------------------------- underCovering(self, schedule) -----------------------------------
     def test_under_covering_always_decreases_cc_if_possible(self):
         for nurse in self.schedule.nurses:
