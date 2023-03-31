@@ -86,7 +86,7 @@ class TabuSearch_SIMPLE:
             return move[0]
 
     def run(self):
-        maxRuns = 1000
+        maxRuns = 1
         runs = 0
         print(str(self.currSolution))
         if runs % 50 == 0:
@@ -262,7 +262,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        return None
+        #return None
         if self.debug:
             print("Running Balance Swap...")
         ccAndMove = 0, None
