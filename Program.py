@@ -26,12 +26,8 @@ end_knapsack_time = time.time()
 search = TabuSearch_SIMPLE(schedule)
 search.initSchedule()
 #print(str(search.currSolution))
-#search.shiftChain(schedule)
 
-
-print(str(search.currSolution))
 search.run()
-print(str(search.currSolution))
 
 end_tabu_time = time.time()
 
