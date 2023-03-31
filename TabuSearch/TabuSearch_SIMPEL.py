@@ -74,7 +74,11 @@ class TabuSearch_SIMPLE:
                 if len(self.dayNightTabuList) == 7:
                     self.dayNightTabuList.pop(6)
                 self.dayNightCounter = 0
-                self.lowerBound = None  # TODO: Calculate lowerbound Eq.(6)
+                self.lowerBound = evaluateLB(move[0], self.feasiblePatterns)  # TODO: Calculate lowerbound Eq.(6)
+                if self.lowerBound < move[0].PC:
+                    self.maxits = 50
+                else:
+                    self.maxits = 5
             else:  # if move does not change the day night split
                 self.dayNightCounter += 1
             self.bestSolution = move[0]
