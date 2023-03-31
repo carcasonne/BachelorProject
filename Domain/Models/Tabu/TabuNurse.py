@@ -16,9 +16,20 @@ class TabuNurse:
         # Soft constraints:
         self.consecutiveWorkingDays = nurse.consecutiveWorkingDays
         self.consecutiveDaysOff = nurse.consecutiveDaysOff
-        self.undesiredShifts = TabuShiftPattern(nurse.undesiredShifts[0], nurse.undesiredShifts[1])
+        self.undesiredShifts = TabuShiftPattern(self.combineDayShiftRequests(nurse.undesiredShifts[0], nurse.undesiredShifts[1]), nurse.undesiredShifts[2])
         self.completeWeekend = nurse.completeWeekend
         self.undesiredWeekend = nurse.undesiredWeekend
+
+    def combineDayShiftRequests(self, undesiredEarlyShifts, undesiredLateShifts):
+        composite = [0] * 7
+        for i in range(7):
+            r1 = undesiredEarlyShifts[i]
+            r2 = undesiredLateShifts[i]
+
+            if r1 == 1 or r2 == 1:
+                composite[i] == 1
+        
+        return composite
 
     def _assignShiftPattern(self, pattern):
         if pattern.day == [0] * 7:

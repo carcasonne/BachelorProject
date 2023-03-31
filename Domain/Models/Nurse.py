@@ -1,21 +1,20 @@
-from Domain.Models.Enums import Contract
+from Domain.Models.Enums.Contract import Contract
+from Domain.Models.Enums.Grade import Grade
 
 
 class Nurse:
-    def __init__(self, id, grade, contract):
+    def __init__(self, id, grade:Grade, contract:Contract):
         self.id = id
         self.grade = grade
         self.contract = contract
         self.assignedShiftPattern = None
 
         # Soft constraints:
-        self.consecutiveWorkingDays = (0, 7)
-        self.consecutiveDaysOff = (0, 7)
-        self.undesiredShifts = ([0] * 7, [0] * 7)
-        self.completeWeekend = False
+        self.consecutiveWorkingDays = (contract.minConsecutiveDays, contract.maxConsecutiveDays)
+        self.consecutiveDaysOff = (contract.minConsecutiveDaysOff, contract.maxConsecutiveDaysOff)
+        self.undesiredShifts = ([0] * 7, [0] * 7, [0] * 7)
+        self.completeWeekend = contract.completeWeekend
         self.undesiredWeekend = False
-
-
 
     def assignShiftPattern(self, shiftPattern):  # A bit representation of ether (day, night) or (early, late, night)
         self.assignedShiftPattern = shiftPattern

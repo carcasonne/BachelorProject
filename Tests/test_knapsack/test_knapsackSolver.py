@@ -8,6 +8,7 @@ from Domain.Models.Enums.Days import Days
 from Domain.Models.Shift import Shift
 from Domain.Models.Nurse import Nurse
 from Domain.Models.Schedule import Schedule
+from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 
 from Knapsack.BranchAndBound.BranchAndBound_MT import BranchAndBound_MT
 from Knapsack.BranchAndBound.BranchAndBound_MODERN import BranchAndBound_MODERN
