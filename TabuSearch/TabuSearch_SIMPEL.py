@@ -362,15 +362,58 @@ class TabuSearch_SIMPLE:
 
         return overCovered, underCovered, dayGraph, nightGraph
 
-    def nurseChain(self, schedule):
+    def nurseChain(self, schedule, phase):
         """
         Step 1.4 For each of the grades, attempt to find a chain of moves from Nurse Chain Neighbourhood s_now to s_final, so that CC is reduced and PC does not increase
         :param schedule:
         :return: move, changed day/night:
         """
         print("Running Nurse Chain...")
-        
+
+        for grade in [Grade.ONE, Grade.TWO, Grade.THREE]:
+            graph = self._graphCreatorNurseChainUtil(schedule, grade, phase)
+
         return None
+
+    def _graphCreatorNurseChainUtil(self, schedule, grade, phase):
+        overCovered = []
+        underCovered = []
+        nurseList = []
+        graph = DirectedGraph()
+        for nurse in schedule.nurses:
+            if nurse.grade == grade:
+                nurseList.append(nurse)
+                graph.addNode(nurse.id)
+
+        for nurse1 in nurseList:
+            for nurse2 in nurseList:
+                if nurse2 != nurse1:
+                    if nurse2.worksNight and nurse2.contract.nights == nurse1.contract.nights:
+                        graph.addEdge(nurse1.id, nurse2.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
+                    if nurse2.worksNight is False and nurse2.contract.days == nurse1.contract.days:
+                        graph.addEdge(nurse1.id, nurse2.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
+
+        for shift in schedule.shifts:
+            if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
+                overCovered.append(shift)
+            elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
+                underCovered.append(shift)
+
+        sources = []
+        sinks = []
+        if phase == 1:
+            for nurse in nurseList:
+                isSource = False
+                for o in overCovered:
+                    if patternCoverShift(nurse.shiftPattern, o):
+                        for u in underCovered:
+                            if patternCoverShift(nurse.shiftPattern, u):
+                                sources.append(nurse.id)
+                                isSource = True
+
+        elif phase == 2:
+            return None, None, None
+        return graph, sources, sinks
 
     def underCovering(self, schedule):
         """
