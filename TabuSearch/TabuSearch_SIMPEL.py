@@ -228,7 +228,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        #return None
+        return None
         print("Running Balance Swap...")
         ccAndMove = 0, None
         for nurse1 in schedule.nurses:
@@ -452,7 +452,9 @@ class TabuSearch_SIMPLE:
         print("Running Nurse Chain...")
 
         for grade in [Grade.ONE, Grade.TWO, Grade.THREE]:
-            graph = self._graphCreatorNurseChainUtil(schedule, grade, phase)
+            value = self._graphCreatorNurseChainUtil(schedule, grade, phase)
+            if value is not None:
+                return value
 
         return None
 
@@ -461,18 +463,18 @@ class TabuSearch_SIMPLE:
         underCovered = []
         nurseList = []
         graph = DirectedGraph()
-        for nurse in schedule.nurses:
-            if nurse.grade == grade:
-                nurseList.append(nurse)
-                graph.addNode(nurse.id)
+        for source in schedule.nurses:
+            if source.grade == grade:
+                nurseList.append(source)
+                graph.addNode(source.id)
 
         for nurse1 in nurseList:
             for nurse2 in nurseList:
                 if nurse2 != nurse1:
                     if nurse2.worksNight and nurse2.contract.nights == nurse1.contract.nights:
-                        graph.addEdge(nurse1.id, nurse2.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
-                    if nurse2.worksNight is False and nurse2.contract.days == nurse1.contract.days:
-                        graph.addEdge(nurse1.id, nurse2.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
+                        graph.addEdge(nurse1.id, nurse2.id, nurse1.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
+                    elif nurse2.worksNight is False and nurse2.contract.days == nurse1.contract.days:
+                        graph.addEdge(nurse1.id, nurse2.id, nurse1.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
 
         for shift in schedule.shifts:
             if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
@@ -480,21 +482,36 @@ class TabuSearch_SIMPLE:
             elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
                 underCovered.append(shift)
 
-        sources = []
-        sinks = []
         if phase == 1:
-            for nurse in nurseList:
-                isSource = False
+            for source in nurseList:
                 for o in overCovered:
-                    if patternCoverShift(nurse.shiftPattern, o):
-                        for u in underCovered:
-                            if patternCoverShift(nurse.shiftPattern, u):
-                                sources.append(nurse.id)
-                                isSource = True
-
+                    if patternCoverShift(source.shiftPattern, o):
+                        for u in underCovered:  # TODO: Maybe break here to make it more efficient
+                            if patternCoverShift(source.shiftPattern, u):
+                                for pattern in self.feasiblePatterns[source.id]:
+                                    if calculateDifferenceCC(schedule, source, pattern) < 0:
+                                        for sink in nurseList:
+                                            if pattern in self.feasiblePatterns[sink.id]:
+                                                edges = graph.search(source.id, sink.id)
+                                                if len(edges) > 0:
+                                                    pcCounter = 0
+                                                    for edge in edges:
+                                                        pcCounter += edge.weight
+                                                    if pcCounter <= 0:
+                                                        neighbour = copy.deepcopy(schedule)
+                                                        change = False
+                                                        for edge in edges:
+                                                            fromN = neighbour.nurses[edge.fromNode]
+                                                            toN = neighbour.nurses[edge.toNode]
+                                                            if fromN.worksNight != toN.worksNight:
+                                                                change = True
+                                                            neighbour.assignPatternToNurse(fromN, toN.shiftPattern)
+                                                        neighbour.assignPatternToNurse(neighbour.nurses[sink.id], pattern)
+                                                        if neighbour.CC < schedule.CC:
+                                                            "Move Nurse Chain XXX"
+                                                            return neighbour, change
         elif phase == 2:
             return None, None, None
-        return graph, sources, sinks
 
     def underCovering(self, schedule):
         """
