@@ -106,7 +106,6 @@ class Test_StaticMethods(unittest.TestCase):
                                                                         [1, 1, 1, 1, 1, 1, 1, 1]))
         self.assertEqual(0, evaluateCC(self.schedule))
 
-    # TODO: This test currently fails, but based on the article it should fail... Make it different if Paloma say so.
     def test_evaluate_CC_over_assignment_of_a_shift_does_not_return_a_better_CC(self):
         self.schedule.assignPatternToNurse(self.schedule.nurses[0],
                                            TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0, 0]))
@@ -251,6 +250,30 @@ class Test_StaticMethods(unittest.TestCase):
         newPC = self.schedule.PC
 
         self.assertEqual(oldPC - 60, newPC)
+
+    # ----------------------------------- evaluateLB(schedule, feasibleShiftPatterns) -----------------------------------
+    def test_evaluate_lb_on_empty_penalty_schedule_returns_0(self):
+        fp = dict()
+        for nurse in self.schedule.nurses:
+            fp[nurse.id] = findFeasiblePatterns(nurse)
+            self.schedule.assignPatternToNurse(nurse, fp[nurse.id][0])
+        self.assertEqual(0, evaluateLB(self.schedule, fp))
+
+    def test_evaluate_lb_with_one_nurse_who_wants_to_work_7_days_in_a_row_returns_LB_as_60(self):
+        fp = dict()
+        for nurse in self.schedule.nurses:
+            fp[nurse.id] = findFeasiblePatterns(nurse)
+            self.schedule.assignPatternToNurse(nurse, fp[nurse.id][0])
+        self.schedule.nurses[0].consecutiveWorkingDays = (7, 7)
+        self.assertEqual(60, evaluateLB(self.schedule, fp))
+
+    def test_evaluate_lb_with_one_nurse_who_wants_does_not_want_to_work_any_day_returns_LB_as_40(self):
+        fp = dict()
+        for nurse in self.schedule.nurses:
+            fp[nurse.id] = findFeasiblePatterns(nurse)
+            self.schedule.assignPatternToNurse(nurse, fp[nurse.id][30])  # This is a night pattern
+        self.schedule.nurses[0].undesiredShifts = TabuShiftPattern([1]*7, [1]*7)
+        self.assertEqual(40, evaluateLB(self.schedule, fp))
 
     # ----------------------------------- checkBalance(schedule) -----------------------------------
     # TODO: checkBalance() Tests...

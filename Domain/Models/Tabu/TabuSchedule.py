@@ -34,7 +34,7 @@ class TabuSchedule:
             raise Exception("Must be exactly 14 shifts")
         self.CC = evaluateCC(self)  # The covering cost of the schedule - Eq(4)
         self.PC = evaluatePC(self)  # The penalty cost of the schedule - Z / Eq(1)
-        self.LB = evaluateLB(self)  # The lower bound of the schedule - Eq(5)
+        #self.LB = evaluateLB(self)  # The lower bound of the schedule - Eq(5)
 
     # TODO: Tests for this one
     def assignPatternToNurse(self, nurse, pattern):
