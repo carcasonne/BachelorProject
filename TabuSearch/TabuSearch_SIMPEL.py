@@ -43,7 +43,7 @@ class TabuSearch_SIMPLE:
             self.feasiblePatterns[n.id] = findFeasiblePatterns(n)
 
         self.currSolution = initialSolution
-        self.bestSolution = initialSolution
+        self.bestSolution = None
         self.evaluate = None
         self.aspirationCriteria = None
         self.neighborOperator = None
@@ -54,10 +54,10 @@ class TabuSearch_SIMPLE:
         self.stepsP2 = [0, 0, 0]
 
     def initSchedule(self):
-        for nurse in self.bestSolution.nurses:
+        for nurse in self.currSolution.nurses:
             randomizeConstraints(nurse)
-            # self.bestSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][0])
-            self.bestSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][
+            # self.currSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][0])
+            self.currSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][
                 random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)])
 
     # TODO: There was a mistake here. We need tests for this also.
@@ -82,49 +82,50 @@ class TabuSearch_SIMPLE:
                     self.maxits = 5
             else:  # if move does not change the day night split
                 self.dayNightCounter += 1
-            self.bestSolution = move[0]
+            self.currSolution = move[0]
             return move[0]
 
     def run(self):
         # Phase 0:
         # self.initSchedule()
         # Phase 1:
-        while self.bestSolution.CC > 0:
-            if self.makeMove(self.randomDecent(self.bestSolution, 1)) is None:
-                if self.makeMove(self.balanceRestoring(self.bestSolution, False)) is None:
-                    if self.makeMove(self.shiftChain(self.bestSolution, 1)) is None:
-                        if self.makeMove(self.nurseChain(self.bestSolution, 1)) is None:
-                            if self.makeMove(self.underCovering(self.bestSolution)) is None:
-                                self.makeMove(self.randomKick(self.bestSolution))
+        while self.currSolution.CC > 0:
+            if self.makeMove(self.randomDecent(self.currSolution, 1)) is None:
+                if self.makeMove(self.balanceRestoring(self.currSolution, False)) is None:
+                    if self.makeMove(self.shiftChain(self.currSolution, 1)) is None:
+                        if self.makeMove(self.nurseChain(self.currSolution, 1)) is None:
+                            if self.makeMove(self.underCovering(self.currSolution)) is None:
+                                self.makeMove(self.randomKick(self.currSolution))
                                 self.stepsP1[5] += 1
-                                print(self.bestSolution.scores())
+                                print(self.currSolution.scores())
                             else:
                                 self.stepsP1[4] += 1
-                                print(self.bestSolution.scores())
+                                print(self.currSolution.scores())
                         else:
                             self.stepsP1[3] += 1
-                            print(self.bestSolution.scores())
+                            print(self.currSolution.scores())
                     else:
                         self.stepsP1[2] += 1
-                        print(self.bestSolution.scores())
+                        print(self.currSolution.scores())
                 else:
                     self.stepsP1[1] += 1
-                    print(self.bestSolution.scores())
+                    print(self.currSolution.scores())
             else:
                 self.stepsP1[0] += 1
-                print(self.bestSolution.scores())
+                print(self.currSolution.scores())
 
         # Phase 2:
-        while self.bestSolution.PC > 0:
-            if self.makeMove(self.randomDecent(self.bestSolution, 2)) is None:
-                if self.makeMove(self.shiftChain(self.bestSolution, 2)) is not None:
+        while self.currSolution.PC > 0:
+            if self.makeMove(self.randomDecent(self.currSolution, 2)) is None:
+                if self.makeMove(self.shiftChain(self.currSolution, 2)) is not None:
                     self.stepsP2[1] += 1
-                    print(self.bestSolution.scores())
+                    print(self.currSolution.scores())
                 else:
+                    self.bestSolution = copy.deepcopy(self.currSolution)
                     break
             else:
                 self.stepsP2[0] += 1
-                print(self.bestSolution.scores())
+                print(self.currSolution.scores())
 
 
 
@@ -227,7 +228,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        return None
+        #return None
         print("Running Balance Swap...")
         ccAndMove = 0, None
         for nurse1 in schedule.nurses:
