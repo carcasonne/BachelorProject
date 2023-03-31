@@ -85,9 +85,9 @@ class TabuSearch_SIMPLE:
         # self.initSchedule()
         # Phase 1:
         while self.bestSolution.CC > 0:
-            if self.makeMove(self.randomDecent(self.bestSolution)) is None:
+            if self.makeMove(self.randomDecent(self.bestSolution, 1)) is None:
                 if self.makeMove(self.balanceRestoring(self.bestSolution, False)) is None:
-                    if self.makeMove(self.shiftChain(self.bestSolution)) is None:
+                    if self.makeMove(self.shiftChain(self.bestSolution, 1)) is None:
                         if self.makeMove(self.nurseChain(self.bestSolution)) is None:
                             if self.makeMove(self.underCovering(self.bestSolution)) is None:
                                 self.makeMove(self.randomKick(self.bestSolution))
@@ -112,7 +112,7 @@ class TabuSearch_SIMPLE:
     # Phase 1 Moves:
     # TODO: Random decent after PC and LB
     # TODO: Is Tabu criteria 2 taken into count here?
-    def randomDecent(self, schedule):
+    def randomDecent(self, schedule, phase):
         """
         Step 1.1 (Random decent). Carry out random decent by accepting the first neighbourhood move that satisfies
         non-tabu conditions 1 - 3 and improves CC and does not increase PC. Repeat until no satisfactory move exists.
@@ -127,7 +127,7 @@ class TabuSearch_SIMPLE:
             if nurse.id not in self.tabuList:
                 for pattern in self.feasiblePatterns[nurse.id]:
                     if (nurse.worksNight and pattern.day == [0] * 7) or (not nurse.worksNight and pattern.day != [0] * 7):
-                        if calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse, pattern) <= 0:
+                        if (calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse, pattern) <= 0 and phase == 1) or (calculateDifferencePC(nurse, pattern) < 0 and calculateDifferenceCC(schedule, nurse, pattern) <= 0 and phase == 2):
                             neighbour = copy.deepcopy(schedule)
                             n_nurse = neighbour.nurses[nurse.id]
                             neighbour.assignPatternToNurse(n_nurse, pattern)
@@ -250,7 +250,7 @@ class TabuSearch_SIMPLE:
 
 
     # TODO: Function is kinda scuffed. Make it better computationally.
-    def shiftChain(self, schedule):
+    def shiftChain(self, schedule, phase):
         """
         Step 1.3 For each of the grades, attempt to find a chain of moves using Shift Chain Neighbourhood from s_now to s_final, so that CC is reduced and PC does not increase
         :param schedule:

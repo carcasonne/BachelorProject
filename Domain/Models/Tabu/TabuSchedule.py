@@ -9,7 +9,6 @@ from TabuSearch.StaticMethods import evaluatePC
 from TabuSearch.StaticMethods import evaluateLB
 
 from tabulate import tabulate
-import colorama
 from colorama import Fore
 
 
