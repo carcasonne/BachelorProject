@@ -10,22 +10,34 @@ class DirectedGraph:
         self.graph.update({id: []})
 
     def addEdge(self, nFrom, nTo, id, weight):
-        edge = self._findEdge(nFrom, nTo)
-        if edge is None:
+        edges = self._findEdges(nFrom, nTo)
+        if len(edges) < 3:
             self.graph.get(nFrom).append(Edge(id, weight, nTo, nFrom))
-        elif edge.weight > weight:
-            self._removeEdge(nFrom, nTo)
+        else:
+            worst = self._findWorstEdge(nFrom, nTo)
+            self._removeEdge(worst.fromNode, worst.toNode, worst.nurseId)
             self.graph.get(nFrom).append(Edge(id, weight, nTo, nFrom))
 
-    def _findEdge(self, nFrom, nTo):
+    def _findEdges(self, nFrom, nTo):
+        edges = []
         for edge in self.graph.get(nFrom):
             if edge.toNode == nTo:
-                return edge
-        return None
+                edges.append(edge)
+        return edges
 
-    def _removeEdge(self, nFrom, nTo):
+    def _findWorstEdge(self, nFrom, nTo):
+        worst = None
         for edge in self.graph.get(nFrom):
             if edge.toNode == nTo:
+                if worst is None:
+                    worst = edge
+                elif worst.weight < edge.weight:
+                    worst = edge
+        return worst
+
+    def _removeEdge(self, nFrom, nTo, id):
+        for edge in self.graph.get(nFrom):
+            if edge.toNode == nTo and edge.nurseId == id:
                 self.graph.get(nFrom).remove(edge)
 
     def search(self, source, sink):
@@ -35,8 +47,7 @@ class DirectedGraph:
         path = []
         self.solutions = []
         self._dfs(source, sink, visited, path)
-        best = self._findBestValidSolution(sink)
-        return self._pathToEdges(best, sink)
+        return self._findBestValidSolution(sink)
 
     def _dfs(self, node, goal, visited, path):
         visited[node] = True
@@ -63,31 +74,40 @@ class DirectedGraph:
         bestSolution = [], 1
         for path in self.solutions:
             if len(path) <= 5:
-                calculatedWeight = self._calcPathWeight(path, goal)
-                if calculatedWeight < bestSolution[1]:
-                    bestSolution = path, calculatedWeight
+                calculatedPath = self._calcPathWeight(path, goal)
+                if calculatedPath[1] < bestSolution[1]:
+                    bestSolution = calculatedPath
         return bestSolution[0]
 
+
     def _calcPathWeight(self, path, goal):
+        usedIds = set()
         accWeight = 0
         next = 1
-        for node in path:
-            if node == goal:
-                return accWeight
-            else:
-                accWeight += self._findEdge(node, path[next]).weight
-                next += 1
+        edgePath = []
 
-    def _pathToEdges(self, path, goal):
-        edges = []
-        next = 1
         for node in path:
             if node == goal:
-                return edges
+                return edgePath, accWeight
             else:
-                edges.append(self._findEdge(node, path[next]))
+                bestEdge = None
+                for edge in self._findEdges(node, path[next]):
+                    if edge.nurseId not in usedIds:
+                        if bestEdge is None:
+                            bestEdge = edge
+                            usedIds.add(bestEdge.nurseId)
+                            edgePath.append(edge)
+
+                        elif bestEdge.weight > edge.weight:
+                            bestEdge = edge
+                            usedIds.add(bestEdge.nurseId)
+                            edgePath.append(edge)
+
+                    else:
+                        return [], 1000 # Not a valid solution.
+
+                accWeight += bestEdge.weight
                 next += 1
-        return []
 
 
     def __str__(self):
