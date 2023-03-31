@@ -111,7 +111,6 @@ class TabuSearch_SIMPLE:
 
     # Phase 1 Moves:
     # TODO: Random decent after PC and LB
-    # TODO: Is Tabu criteria 2 taken into count here?
     def randomDecent(self, schedule, phase):
         """
         Step 1.1 (Random decent). Carry out random decent by accepting the first neighbourhood move that satisfies
@@ -302,8 +301,8 @@ class TabuSearch_SIMPLE:
                                         tempTabuList.append(nurse.id)
                                 else:
                                     return None
-                                if schedule.CC > neighbour.CC and schedule.PC >= neighbour.PC:
-                                    #("Performing chain operation on night...")
+                                if schedule.CC > neighbour.CC:
+                                    print("Performing chain operation on night...")
                                     self.tabuList = tempTabuList
                                     return neighbour, False
 
