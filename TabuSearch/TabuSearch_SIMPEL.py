@@ -50,7 +50,8 @@ class TabuSearch_SIMPLE:
         self.acceptableScoreThreshold = None
         self.tabuTenure = None
 
-        self.steps = [0, 0, 0, 0, 0, 0]
+        self.stepsP1 = [0, 0, 0, 0, 0, 0]
+        self.stepsP2 = [0, 0, 0]
 
     def initSchedule(self):
         for nurse in self.bestSolution.nurses:
@@ -88,26 +89,40 @@ class TabuSearch_SIMPLE:
             if self.makeMove(self.randomDecent(self.bestSolution, 1)) is None:
                 if self.makeMove(self.balanceRestoring(self.bestSolution, False)) is None:
                     if self.makeMove(self.shiftChain(self.bestSolution, 1)) is None:
-                        if self.makeMove(self.nurseChain(self.bestSolution)) is None:
+                        if self.makeMove(self.nurseChain(self.bestSolution, 1)) is None:
                             if self.makeMove(self.underCovering(self.bestSolution)) is None:
                                 self.makeMove(self.randomKick(self.bestSolution))
-                                self.steps[5] += 1
+                                self.stepsP1[5] += 1
                                 print(self.bestSolution.scores())
                             else:
-                                self.steps[4] += 1
+                                self.stepsP1[4] += 1
                                 print(self.bestSolution.scores())
                         else:
-                            self.steps[3] += 1
+                            self.stepsP1[3] += 1
                             print(self.bestSolution.scores())
                     else:
-                        self.steps[2] += 1
+                        self.stepsP1[2] += 1
                         print(self.bestSolution.scores())
                 else:
-                    self.steps[1] += 1
+                    self.stepsP1[1] += 1
                     print(self.bestSolution.scores())
             else:
-                self.steps[0] += 1
+                self.stepsP1[0] += 1
                 print(self.bestSolution.scores())
+
+        # Phase 2:
+        while self.bestSolution.PC > 0:
+            if self.makeMove(self.randomDecent(self.bestSolution, 2)) is None:
+                if self.makeMove(self.shiftChain(self.bestSolution, 2)) is not None:
+                    self.stepsP2[1] += 1
+                    print(self.bestSolution.scores())
+                else:
+                    break
+            else:
+                self.stepsP2[0] += 1
+                print(self.bestSolution.scores())
+
+
 
     # Phase 1 Moves:
     # TODO: Random decent after PC and LB
@@ -116,6 +131,7 @@ class TabuSearch_SIMPLE:
         Step 1.1 (Random decent). Carry out random decent by accepting the first neighbourhood move that satisfies
         non-tabu conditions 1 - 3 and improves CC and does not increase PC. Repeat until no satisfactory move exists.
         :param schedule:
+        :param phase:
         :return move, changed day/night:
         """
         print("Running Random Descent...")
@@ -207,6 +223,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
+        return None
         print("Running Balance Swap...")
         ccAndMove = 0, None
         for nurse1 in schedule.nurses:
@@ -253,14 +270,15 @@ class TabuSearch_SIMPLE:
         """
         Step 1.3 For each of the grades, attempt to find a chain of moves using Shift Chain Neighbourhood from s_now to s_final, so that CC is reduced and PC does not increase
         :param schedule:
+        :param phase:
         :return move, changed day/night:
         """
         print("Running Shift Chain...")
 
         for grade in [Grade.ONE, Grade.TWO, Grade.THREE]:
 
-            utilities = self._shiftChainUtil(schedule, grade)
-            if utilities is not None:
+            utilities = self._shiftChainUtil(schedule, grade, phase)
+            if utilities is not None and phase == 1:
                 (overCovered, underCovered, dayGraph, nightGraph) = utilities
 
                 for oShift in (overCovered[0] + overCovered[1]):
@@ -307,34 +325,95 @@ class TabuSearch_SIMPLE:
                                     return neighbour, False
 
 
-    def _shiftChainUtil(self, schedule, grade):
+            elif phase == 2:
+                (fromShifts, toShifts, dayGraph, nightGraph) = utilities
+
+                for shift in fromShifts[0] + fromShifts[1]:
+                    if shift.shiftType == TabuShiftType.DAY:
+                        neighbour = copy.deepcopy(schedule)
+                        edges = dayGraph.search(shift.shiftDay.value - 1, shift.shiftDay.value - 1)
+                        if len(edges) > 0:
+                            tempTabuList = []
+                            for edge in edges:
+                                nurse = neighbour.nurses[edge.nurseId]
+                                patternDay = copy.copy(nurse.shiftPattern.day)
+                                patternDay[edge.fromNode] = 0
+                                patternDay[edge.toNode] = 1
+                                neighbour.assignPatternToNurse(nurse, TabuShiftPattern(patternDay, [0] * 7))
+                                tempTabuList.append(nurse.id)
+                        else:
+                            continue
+                        if schedule.PC > neighbour.PC and schedule.CC == neighbour.CC:
+                            print("Performing chain operation on day...")
+                            self.tabuList = tempTabuList
+                            return neighbour, False
+
+                    else:
+                        neighbour = copy.deepcopy(schedule)
+                        edges = nightGraph.search(shift.shiftDay.value - 1, shift.shiftDay.value - 1)
+                        if len(edges) > 0:
+                            tempTabuList = []
+                            for edge in edges:
+                                nurse = neighbour.nurses[edge.nurseId]
+                                patternNight = copy.copy(nurse.shiftPattern.night)
+                                patternNight[edge.fromNode] = 0
+                                patternNight[edge.toNode] = 1
+                                neighbour.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, patternNight))
+                                tempTabuList.append(nurse.id)
+                        else:
+                            continue
+                        if schedule.PC > neighbour.PC and schedule.CC == neighbour.CC:
+                            print("Performing chain operation on night...")
+                            self.tabuList = tempTabuList
+                            return neighbour, False
+
+
+
+
+
+    def _shiftChainUtil(self, schedule, grade, phase):
         print("Checking grade: " + str(grade.value) + "...")
-        overCovered = ([], [])
-        underCovered = ([], [])
+        fromShifts = ([], [])
+        toShifts = ([], [])
         dayGraph = DirectedGraph()
         nightGraph = DirectedGraph()
 
-        for shift in schedule.shifts:
-            if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
-                if shift.shiftType == TabuShiftType.DAY:
-                    overCovered[0].append(shift)
-                else:
-                    overCovered[1].append(shift)
-            elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
-                if shift.shiftType == TabuShiftType.DAY:
-                    underCovered[0].append(shift)
-                else:
-                    underCovered[1].append(shift)
+        if phase == 1:
 
-            if shift.shiftType == TabuShiftType.NIGHT:
-                nightGraph.addNode(shift.shiftDay.value - 1)
-            else:
-                dayGraph.addNode(shift.shiftDay.value - 1)
+            for shift in schedule.shifts:
+                if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
+                    if shift.shiftType == TabuShiftType.DAY:
+                        fromShifts[0].append(shift)
+                    else:
+                        fromShifts[1].append(shift)
+                elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
+                    if shift.shiftType == TabuShiftType.DAY:
+                        toShifts[0].append(shift)
+                    else:
+                        toShifts[1].append(shift)
 
-        if len(overCovered) == 0 or len(underCovered) == 0:
-            return None
-        if (overCovered[0] is [] or underCovered[0] is []) and (overCovered[1] is [] or underCovered[1] is []):
-            return None
+                if shift.shiftType == TabuShiftType.NIGHT:
+                    nightGraph.addNode(shift.shiftDay.value - 1)
+                else:
+                    dayGraph.addNode(shift.shiftDay.value - 1)
+
+            if len(fromShifts) == 0 or len(toShifts) == 0:
+                return None
+            if (fromShifts[0] is [] or toShifts[0] is []) and (fromShifts[1] is [] or toShifts[1] is []):
+                return None
+
+        else:
+
+            for shift in schedule.shifts:
+                if shift.coverRequirements[grade] and shift.shiftType == TabuShiftType.DAY:
+                    fromShifts[0].append(shift)
+                    toShifts[0].append(shift)
+                    dayGraph.addNode(shift.shiftDay.value - 1)
+                elif shift.coverRequirements[grade] and shift.shiftType == TabuShiftType.NIGHT:
+                    fromShifts[1].append(shift)
+                    toShifts[1].append(shift)
+                    nightGraph.addNode(shift.shiftDay.value - 1)
+
 
         for nurse in schedule.nurses:
             if not nurse.worksNight and nurse.grade == grade:
@@ -356,12 +435,13 @@ class TabuSearch_SIMPLE:
                                 patternNight[j] = 1
                                 nightGraph.addEdge(i, j, nurse.id, calculateDifferencePC(nurse, TabuShiftPattern([0] * 7, patternNight)))
 
-        return overCovered, underCovered, dayGraph, nightGraph
+        return fromShifts, toShifts, dayGraph, nightGraph
 
-    def nurseChain(self, schedule):
+    def nurseChain(self, schedule, phase):
         """
         Step 1.4 For each of the grades, attempt to find a chain of moves from Nurse Chain Neighbourhood s_now to s_final, so that CC is reduced and PC does not increase
         :param schedule:
+        :param phase:
         :return: move, changed day/night:
         """
         print("Running Nurse Chain...")

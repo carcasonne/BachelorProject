@@ -53,7 +53,10 @@ class DirectedGraph:
         visited[node] = True
         path.append(node)
 
-        if node == goal:
+        if len(path) == 1 and node == goal:
+            visited[node] = False
+
+        if node == goal and len(path) > 1:
             self.solutions.append(copy.copy(path))
         else:
             for neighbour in self._findNeighbours(node):
@@ -87,7 +90,7 @@ class DirectedGraph:
         edgePath = []
 
         for node in path:
-            if node == goal:
+            if node == goal and len(edgePath) > 0:
                 return edgePath, accWeight
             else:
                 bestEdge = None
