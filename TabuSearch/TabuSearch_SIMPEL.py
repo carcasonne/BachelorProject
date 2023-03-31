@@ -280,7 +280,7 @@ class TabuSearch_SIMPLE:
                                         tempTabuList.append(nurse.id)
                                 else:
                                     return None
-                                if schedule.CC > neighbour.CC and schedule.PC >= neighbour.PC:
+                                if schedule.CC > neighbour.CC:
                                     print("Performing chain operation on day...")
                                     self.tabuList = tempTabuList
                                     return neighbour, False

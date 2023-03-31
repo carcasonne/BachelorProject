@@ -330,7 +330,7 @@ class Test_TabuSearch(unittest.TestCase):
         self.schedule.assignPatternToNurse(nurses[11], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
 
         print(str(self.schedule))
-        self.assertEqual(None, self.ts.shiftChain(self.schedule))
+        self.assertEqual(None, self.ts.shiftChain(self.schedule, 1))
 
     # ----------------------------------- underCovering(self, schedule) -----------------------------------
     def test_under_covering_always_decreases_cc_if_possible(self):
