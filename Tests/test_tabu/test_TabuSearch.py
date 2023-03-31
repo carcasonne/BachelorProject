@@ -31,12 +31,12 @@ class Test_TabuSearch(unittest.TestCase):
     # ----------------------------------- randomDecent(self, schedule) -----------------------------------
     def test_random_decent_returns_schedule_with_better_CC(self):
         oldCC = self.schedule.CC
-        newCC = self.ts.randomDecent(self.schedule)[0].CC
+        newCC = self.ts.randomDecent(self.schedule, 1)[0].CC
         self.assertTrue(oldCC > newCC)
 
     def test_random_decent_does_not_change_old_schedules_CC(self):
         oldCC = self.schedule.CC
-        self.ts.randomDecent(self.schedule)
+        self.ts.randomDecent(self.schedule, 1)
         newCC = evaluateCC(self.schedule)
         self.assertEqual(oldCC, newCC)
 
@@ -51,7 +51,7 @@ class Test_TabuSearch(unittest.TestCase):
                     self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x],
                                                        TabuShiftPattern([0, 0, 0, 0, 0, 0, 0],
                                                                         [1, 1, 1, 1, 1, 1, 1, 1]))
-        out = self.ts.randomDecent(self.schedule)
+        out = self.ts.randomDecent(self.schedule, 1)
         self.assertEqual(None, out)
 
     def test_random_kick_changes_one_pattern_for_one_nurse(self):
@@ -291,7 +291,7 @@ class Test_TabuSearch(unittest.TestCase):
             self.schedule.assignPatternToNurse(n, TabuShiftPattern([0] * 7, [1, 0, 1, 1, 1, 1, 1]))
 
         newSchedule = copy.deepcopy(self.schedule)
-        newSchedule = self.ts.shiftChain(newSchedule)[0]
+        newSchedule = self.ts.shiftChain(newSchedule, 1)[0]
         self.assertTrue(newSchedule.CC < self.schedule.CC)
         self.assertTrue(newSchedule.PC <= self.schedule.PC)
 
@@ -301,7 +301,7 @@ class Test_TabuSearch(unittest.TestCase):
             self.schedule.assignPatternToNurse(n, TabuShiftPattern([1, 0, 1, 1, 1, 1, 1], [0] * 7))
 
         newSchedule = copy.deepcopy(self.schedule)
-        newSchedule = self.ts.shiftChain(newSchedule)[0]
+        newSchedule = self.ts.shiftChain(newSchedule, 1)[0]
         self.assertTrue(newSchedule.CC < self.schedule.CC)
         self.assertTrue(newSchedule.PC <= self.schedule.PC)
 
@@ -311,8 +311,26 @@ class Test_TabuSearch(unittest.TestCase):
         self.schedule.assignPatternToNurse(self.schedule.nurses[0], TabuShiftPattern([0] * 7, [1, 1, 0, 1, 1, 1, 1]))
         self.ts.balanceRestoring(self.schedule, False)
         oldTabuList = copy.deepcopy(self.ts.tabuList)
-        self.ts.shiftChain(self.schedule)
+        self.ts.shiftChain(self.schedule, 1)
         self.assertNotEqual(oldTabuList, self.ts.tabuList)
+
+    def test_shift_chain_on_an_strict_little_undercovered_day_pattern_does_not_return_pc_increase(self):
+        nurses = self.schedule.nurses
+        self.schedule.assignPatternToNurse(nurses[0], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[1], TabuShiftPattern([1, 0, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[2], TabuShiftPattern([1, 0, 0, 0, 0, 0, 0], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[3], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(nurses[4], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[5], TabuShiftPattern([0, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[6], TabuShiftPattern([0, 1, 0, 0, 0, 0, 0], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[7], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(nurses[8], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[9], TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [0] * 7))
+        self.schedule.assignPatternToNurse(nurses[10], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+        self.schedule.assignPatternToNurse(nurses[11], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
+
+        print(str(self.schedule))
+        self.assertEqual(None, self.ts.shiftChain(self.schedule, 1))
 
     # ----------------------------------- underCovering(self, schedule) -----------------------------------
     def test_under_covering_always_decreases_cc_if_possible(self):
