@@ -25,23 +25,29 @@ end_knapsack_time = time.time()
 
 search = TabuSearch_SIMPLE(schedule)
 search.initSchedule()
-#print(str(search.bestSolution))
+#print(str(search.currSolution))
 #search.shiftChain(schedule)
 
 
-print(str(search.bestSolution))
+print(str(search.currSolution))
 search.run()
-print(str(search.bestSolution))
+print(str(search.currSolution))
 
 end_tabu_time = time.time()
 
-#print(search.bestSolution.scheduleTable())
-print("Executed Random Descent: " + str(search.steps[0]) + " times.")
-print("Executed Balance Restoration: " + str(search.steps[1]) + " times.")
-print("Executed Shift Chain: " + str(search.steps[2]) + " times.")
-print("Executed Nurse Chain: " + str(search.steps[3]) + " times.")
-print("Executed Under Covering: " + str(search.steps[4]) + " times.")
-print("Executed Random Kick: " + str(search.steps[5]) + " times.")
+#print(search.currSolution.scheduleTable())
+print("Executed P1 Random Descent: " + str(search.stepsP1[0]) + " times.")
+print("Executed P1 Balance Restoration: " + str(search.stepsP1[1]) + " times.")
+print("Executed P1 Shift Chain: " + str(search.stepsP1[2]) + " times.")
+print("Executed P1 Nurse Chain: " + str(search.stepsP1[3]) + " times.")
+print("Executed P1 Under Covering: " + str(search.stepsP1[4]) + " times.")
+print("Executed P1 Random Kick: " + str(search.stepsP1[5]) + " times.")
+
+print("\n")
+
+print("Executed P2 Random Descent: " + str(search.stepsP2[0]) + " times.")
+print("Executed P2 Shift Chain: " + str(search.stepsP2[1]) + " times.")
+print("Executed P2 Nurse Chain: " + str(search.stepsP2[2]) + " times.")
 
 print("\n")
 
