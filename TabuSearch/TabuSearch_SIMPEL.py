@@ -541,6 +541,7 @@ class TabuSearch_SIMPLE:
                                                     pcCounter = 0
                                                     for edge in edges:
                                                         pcCounter += edge.weight
+                                                    pcCounter += calculateDifferencePC(schedule.nurses[edges[len(edges)-1].toNode], pattern)
                                                     if pcCounter <= 0:
                                                         neighbour = copy.deepcopy(schedule)
                                                         change = False

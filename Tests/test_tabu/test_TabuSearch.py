@@ -330,7 +330,33 @@ class Test_TabuSearch(unittest.TestCase):
         self.schedule.assignPatternToNurse(nurses[11], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
 
         print(str(self.schedule))
+
         self.assertEqual(None, self.ts.shiftChain(self.schedule, 1))
+
+    # ----------------------------------- nurseChain(self, schedule, phase) -----------------------------------
+    def test_nurse_chain_on_an_with_one_nurse_having_weekend_penalty_returns_schedule_with_decrease_in_covering_and_penalty(self):
+        nurses = self.schedule.nurses
+        for i in range(len(self.schedule.nurses) // 9):
+            for x in range(9):
+                if x % 3 == 0:
+                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x], self.ts.feasiblePatterns[self.schedule.nurses[0 + i * 9 + x].id][0])
+                else:
+                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x], self.ts.feasiblePatterns[self.schedule.nurses[0+i*9+x].id][23])
+
+        newSchedule = copy.copy(self.schedule)
+        newSchedule = self.ts.nurseChain(newSchedule, 1)[0]
+        print(str(self.schedule))
+        self.assertTrue(self.schedule.CC > newSchedule.CC)
+        self.assertTrue(self.schedule.PC >= newSchedule.PC)
+
+    def test_nurse_chain_with_random_init_function(self):
+        self.ts.initSchedule()
+        self.schedule = self.ts.currSolution
+        newSchedule = copy.deepcopy(self.schedule)
+        newSchedule = self.ts.nurseChain(newSchedule, 1)[0]
+        print(str(self.schedule))
+        self.assertTrue(self.schedule.CC > newSchedule.CC)
+        self.assertTrue(self.schedule.PC >= newSchedule.PC)
 
     # ----------------------------------- underCovering(self, schedule) -----------------------------------
     def test_under_covering_always_decreases_cc_if_possible(self):
