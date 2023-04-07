@@ -17,7 +17,6 @@ start_time = time.time()
 
 parser = NurseParser()
 schedule = parser.parseScenario("n030w4")
-schedule.nurses = schedule.nurses[:len(schedule.nurses)//2]
 #schedule = copy.deepcopy(TestTabuData().schedule)
 
 end_parser_time = time.time()
@@ -31,25 +30,26 @@ end_knapsack_time = time.time()
 
 search = TabuSearch_SIMPLE(schedule)
 search.initSchedule()
-#print(str(search.bestSolution))
-#search.shiftChain(schedule)
+#print(str(search.currSolution))
 
-
-print(str(search.bestSolution))
 search.run()
 end_tabu_time = time.time()
 #print(str(search.bestSolution))
 print(search.bestSolution.nursePatternSchedule())
-print(str(search.bestSolution))
 
+#print(search.currSolution.scheduleTable())
+print("Executed P1 Random Descent: " + str(search.stepsP1[0]) + " times.")
+print("Executed P1 Balance Restoration: " + str(search.stepsP1[1]) + " times.")
+print("Executed P1 Shift Chain: " + str(search.stepsP1[2]) + " times.")
+print("Executed P1 Nurse Chain: " + str(search.stepsP1[3]) + " times.")
+print("Executed P1 Under Covering: " + str(search.stepsP1[4]) + " times.")
+print("Executed P1 Random Kick: " + str(search.stepsP1[5]) + " times.")
 
-#print(search.bestSolution.scheduleTable())
-print("Executed Random Descent: " + str(search.steps[0]) + " times.")
-print("Executed Balance Restoration: " + str(search.steps[1]) + " times.")
-print("Executed Shift Chain: " + str(search.steps[2]) + " times.")
-print("Executed Nurse Chain: " + str(search.steps[3]) + " times.")
-print("Executed Under Covering: " + str(search.steps[4]) + " times.")
-print("Executed Random Kick: " + str(search.steps[5]) + " times.")
+print("\n")
+
+print("Executed P2 Random Descent: " + str(search.stepsP2[0]) + " times.")
+print("Executed P2 Shift Chain: " + str(search.stepsP2[1]) + " times.")
+print("Executed P2 Nurse Chain: " + str(search.stepsP2[2]) + " times.")
 
 print("\n")
 

@@ -42,21 +42,22 @@ class TabuSearch_SIMPLE:
         for n in initialSolution.nurses:
             self.feasiblePatterns[n.id] = findFeasiblePatterns(n)
 
-        self.currSolution = initialSolution
-        self.bestSolution = initialSolution
-        self.evaluate = None
-        self.aspirationCriteria = None
-        self.neighborOperator = None
-        self.acceptableScoreThreshold = None
-        self.tabuTenure = None
+        initialSolution.PC = 1000000
 
-        self.steps = [0, 0, 0, 0, 0, 0]
+        self.currSolution = copy.deepcopy(initialSolution)
+        self.bestSolution = copy.deepcopy(initialSolution)
+        self.lowerBound = evaluateLB(self.bestSolution, self.feasiblePatterns)
+
+        self.stepsP1 = [0, 0, 0, 0, 0, 0]
+        self.stepsP2 = [0, 0, 0]
+
+        self.debug = True
 
     def initSchedule(self):
-        for nurse in self.bestSolution.nurses:
+        for nurse in self.currSolution.nurses:
             randomizeConstraints(nurse)
-            # self.bestSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][0])
-            self.bestSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][
+            # self.currSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][0])
+            self.currSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][
                 random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)])
 
     # TODO: There was a mistake here. We need tests for this also.
@@ -74,52 +75,104 @@ class TabuSearch_SIMPLE:
                 if len(self.dayNightTabuList) == 7:
                     self.dayNightTabuList.pop(6)
                 self.dayNightCounter = 0
-                self.lowerBound = None  # TODO: Calculate lowerbound Eq.(6)
+                self.lowerBound = evaluateLB(move[0], self.feasiblePatterns)  # TODO: Calculate lowerbound Eq.(6)
+                if self.lowerBound < move[0].PC:
+                    self.maxits = 50
+                else:
+                    self.maxits = 5
             else:  # if move does not change the day night split
                 self.dayNightCounter += 1
-            self.bestSolution = move[0]
+            self.currSolution = move[0]
             return move[0]
 
     def run(self):
+        maxRuns = 1
+        runs = 0
+        print(str(self.currSolution))
+        if runs % 50 == 0:
+            print("Initiating run #" + str(runs))
+
         # Phase 0:
         # self.initSchedule()
-        # Phase 1:
-        while self.bestSolution.CC > 0:
-            if self.makeMove(self.randomDecent(self.bestSolution, 1)) is None:
-                if self.makeMove(self.balanceRestoring(self.bestSolution, False)) is None:
-                    if self.makeMove(self.shiftChain(self.bestSolution, 1)) is None:
-                        if self.makeMove(self.nurseChain(self.bestSolution)) is None:
-                            if self.makeMove(self.underCovering(self.bestSolution)) is None:
-                                self.makeMove(self.randomKick(self.bestSolution))
-                                self.steps[5] += 1
-                                print(self.bestSolution.scores())
+        while runs < maxRuns or self.bestSolution.PC == 0:
+            # Phase 1:
+            while self.currSolution.CC > 0:
+                if self.makeMove(self.randomDecent(self.currSolution, 1)) is None:
+                    if self.makeMove(self.balanceRestoring(self.currSolution, False)) is None:
+                        if self.makeMove(self.shiftChain(self.currSolution, 1)) is None:
+                            if self.makeMove(self.nurseChain(self.currSolution, 1)) is None:
+                                if self.makeMove(self.underCovering(self.currSolution)) is None:
+                                    self.makeMove(self.randomKick(self.currSolution))
+                                    self.stepsP1[5] += 1
+                                    if self.debug:
+                                        print(self.currSolution.scores())
+                                else:
+                                    self.stepsP1[4] += 1
+                                    if self.debug:
+                                        print(self.currSolution.scores())
                             else:
-                                self.steps[4] += 1
-                                print(self.bestSolution.scores())
+                                self.stepsP1[3] += 1
+                                if self.debug:
+                                    print(self.currSolution.scores())
                         else:
-                            self.steps[3] += 1
-                            print(self.bestSolution.scores())
+                            self.stepsP1[2] += 1
+                            if self.debug:
+                                print(self.currSolution.scores())
                     else:
-                        self.steps[2] += 1
-                        print(self.bestSolution.scores())
+                        self.stepsP1[1] += 1
+                        if self.debug:
+                            print(self.currSolution.scores())
                 else:
-                    self.steps[1] += 1
-                    print(self.bestSolution.scores())
-            else:
-                self.steps[0] += 1
-                print(self.bestSolution.scores())
+                    self.stepsP1[0] += 1
+                    if self.debug:
+                        print(self.currSolution.scores())
+
+            # Phase 2:
+            while self.currSolution.PC > 0:
+                if self.makeMove(self.randomDecent(self.currSolution, 2)) is None:
+                    if self.makeMove(self.shiftChain(self.currSolution, 2)) is not None:
+                        self.stepsP2[1] += 1
+                        if self.debug:
+                            print(self.currSolution.scores())
+                    else:
+                        if self.currSolution.PC < self.bestSolution.PC:
+                            print()
+                            print("FOUND A BETTER SOLUTION THAN THE LAST ONE!")
+                            print("RUN: " + str(runs) + " PC: FROM: " + str(self.bestSolution.PC) + " TO: " + str(self.currSolution.PC))
+                            print()
+                            print(str(self.currSolution))
+                            self.bestSolution = copy.deepcopy(self.currSolution)
+                        break
+                else:
+                    self.stepsP2[0] += 1
+                    if self.debug:
+                        print(self.currSolution.scores())
+
+            # Phase 3:
+            if runs + 1 != maxRuns:
+                self.makeMove(self.searchStuck(self.currSolution))
+                if self.debug:
+                    print(self.currSolution.scores())
+
+            runs += 1
+
+        print(str(self.bestSolution))
+        return self.bestSolution
+
+
 
     # Phase 1 Moves:
     # TODO: Random decent after PC and LB
-    # TODO: Is Tabu criteria 2 taken into count here?
     def randomDecent(self, schedule, phase):
         """
         Step 1.1 (Random decent). Carry out random decent by accepting the first neighbourhood move that satisfies
         non-tabu conditions 1 - 3 and improves CC and does not increase PC. Repeat until no satisfactory move exists.
         :param schedule:
+        :param phase:
         :return move, changed day/night:
         """
-        print("Running Random Descent...")
+        if self.debug:
+            print("Running Random Descent...")
         if self.dayNightCounter >= self.maxits:
             return None
 
@@ -150,7 +203,8 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return: move, changed day/night:
         """
-        print("Running Balance Restoration...")
+        if self.debug:
+            print("Running Balance Restoration...")
         balance = checkBalance(schedule)
         ccAndMove = 0, None
         if balance == (False, False):  # There are not enough nurses on days or nights
@@ -208,7 +262,9 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        print("Running Balance Swap...")
+        #return None
+        if self.debug:
+            print("Running Balance Swap...")
         ccAndMove = 0, None
         for nurse1 in schedule.nurses:
             if nurse1.worksNight and (nurse1.id not in self.tabuList or relaxed):
@@ -243,7 +299,8 @@ class TabuSearch_SIMPLE:
             return neighbour, True
         else:
             if not relaxed:
-                print("Relaxing Balance Restoration...")
+                if self.debug:
+                    print("Relaxing Balance Restoration...")
                 return self.balanceRestoring(schedule, True)
             else:
                 return None
@@ -254,14 +311,16 @@ class TabuSearch_SIMPLE:
         """
         Step 1.3 For each of the grades, attempt to find a chain of moves using Shift Chain Neighbourhood from s_now to s_final, so that CC is reduced and PC does not increase
         :param schedule:
+        :param phase:
         :return move, changed day/night:
         """
-        print("Running Shift Chain...")
+        if self.debug:
+            print("Running Shift Chain...")
 
         for grade in [Grade.ONE, Grade.TWO, Grade.THREE]:
 
-            utilities = self._shiftChainUtil(schedule, grade)
-            if utilities is not None:
+            utilities = self._shiftChainUtil(schedule, grade, phase)
+            if utilities is not None and phase == 1:
                 (overCovered, underCovered, dayGraph, nightGraph) = utilities
 
                 for oShift in (overCovered[0] + overCovered[1]):
@@ -281,8 +340,9 @@ class TabuSearch_SIMPLE:
                                         tempTabuList.append(nurse.id)
                                 else:
                                     return None
-                                if schedule.CC > neighbour.CC and schedule.PC >= neighbour.PC:
-                                    print("Performing chain operation on day...")
+                                if schedule.CC > neighbour.CC:
+                                    if self.debug:
+                                        print("Performing chain operation on day...")
                                     self.tabuList = tempTabuList
                                     return neighbour, False
 
@@ -302,40 +362,105 @@ class TabuSearch_SIMPLE:
                                         tempTabuList.append(nurse.id)
                                 else:
                                     return None
-                                if schedule.CC > neighbour.CC and schedule.PC >= neighbour.PC:
-                                    #("Performing chain operation on night...")
+                                if schedule.CC > neighbour.CC:
+                                    if self.debug:
+                                        print("Performing chain operation on night...")
                                     self.tabuList = tempTabuList
                                     return neighbour, False
 
 
-    def _shiftChainUtil(self, schedule, grade):
-        print("Checking grade: " + str(grade.value) + "...")
-        overCovered = ([], [])
-        underCovered = ([], [])
+            elif phase == 2:
+                (fromShifts, toShifts, dayGraph, nightGraph) = utilities
+
+                for shift in fromShifts[0] + fromShifts[1]:
+                    if shift.shiftType == TabuShiftType.DAY:
+                        neighbour = copy.deepcopy(schedule)
+                        edges = dayGraph.search(shift.shiftDay.value - 1, shift.shiftDay.value - 1)
+                        if len(edges) > 0:
+                            tempTabuList = []
+                            for edge in edges:
+                                nurse = neighbour.nurses[edge.nurseId]
+                                patternDay = copy.copy(nurse.shiftPattern.day)
+                                patternDay[edge.fromNode] = 0
+                                patternDay[edge.toNode] = 1
+                                neighbour.assignPatternToNurse(nurse, TabuShiftPattern(patternDay, [0] * 7))
+                                tempTabuList.append(nurse.id)
+                        else:
+                            continue
+                        if schedule.PC > neighbour.PC and schedule.CC == neighbour.CC:
+                            if self.debug:
+                                print("Performing chain operation on day...")
+                            self.tabuList = tempTabuList
+                            return neighbour, False
+
+                    else:
+                        neighbour = copy.deepcopy(schedule)
+                        edges = nightGraph.search(shift.shiftDay.value - 1, shift.shiftDay.value - 1)
+                        if len(edges) > 0:
+                            tempTabuList = []
+                            for edge in edges:
+                                nurse = neighbour.nurses[edge.nurseId]
+                                patternNight = copy.copy(nurse.shiftPattern.night)
+                                patternNight[edge.fromNode] = 0
+                                patternNight[edge.toNode] = 1
+                                neighbour.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, patternNight))
+                                tempTabuList.append(nurse.id)
+                        else:
+                            continue
+                        if schedule.PC > neighbour.PC and schedule.CC == neighbour.CC:
+                            if self.debug:
+                                print("Performing chain operation on night...")
+                            self.tabuList = tempTabuList
+                            return neighbour, False
+
+
+
+
+
+    def _shiftChainUtil(self, schedule, grade, phase):
+        if self.debug:
+            print("Checking grade: " + str(grade.value) + "...")
+        fromShifts = ([], [])
+        toShifts = ([], [])
         dayGraph = DirectedGraph()
         nightGraph = DirectedGraph()
 
-        for shift in schedule.shifts:
-            if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
-                if shift.shiftType == TabuShiftType.DAY:
-                    overCovered[0].append(shift)
-                else:
-                    overCovered[1].append(shift)
-            elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
-                if shift.shiftType == TabuShiftType.DAY:
-                    underCovered[0].append(shift)
-                else:
-                    underCovered[1].append(shift)
+        if phase == 1:
 
-            if shift.shiftType == TabuShiftType.NIGHT:
-                nightGraph.addNode(shift.shiftDay.value - 1)
-            else:
-                dayGraph.addNode(shift.shiftDay.value - 1)
+            for shift in schedule.shifts:
+                if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
+                    if shift.shiftType == TabuShiftType.DAY:
+                        fromShifts[0].append(shift)
+                    else:
+                        fromShifts[1].append(shift)
+                elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
+                    if shift.shiftType == TabuShiftType.DAY:
+                        toShifts[0].append(shift)
+                    else:
+                        toShifts[1].append(shift)
 
-        if len(overCovered) == 0 or len(underCovered) == 0:
-            return None
-        if (overCovered[0] is [] or underCovered[0] is []) and (overCovered[1] is [] or underCovered[1] is []):
-            return None
+                if shift.shiftType == TabuShiftType.NIGHT:
+                    nightGraph.addNode(shift.shiftDay.value - 1)
+                else:
+                    dayGraph.addNode(shift.shiftDay.value - 1)
+
+            if len(fromShifts) == 0 or len(toShifts) == 0:
+                return None
+            if (fromShifts[0] is [] or toShifts[0] is []) and (fromShifts[1] is [] or toShifts[1] is []):
+                return None
+
+        else:
+
+            for shift in schedule.shifts:
+                if shift.coverRequirements[grade] and shift.shiftType == TabuShiftType.DAY:
+                    fromShifts[0].append(shift)
+                    toShifts[0].append(shift)
+                    dayGraph.addNode(shift.shiftDay.value - 1)
+                elif shift.coverRequirements[grade] and shift.shiftType == TabuShiftType.NIGHT:
+                    fromShifts[1].append(shift)
+                    toShifts[1].append(shift)
+                    nightGraph.addNode(shift.shiftDay.value - 1)
+
 
         for nurse in schedule.nurses:
             if not nurse.worksNight and nurse.grade == grade:
@@ -357,16 +482,80 @@ class TabuSearch_SIMPLE:
                                 patternNight[j] = 1
                                 nightGraph.addEdge(i, j, nurse.id, calculateDifferencePC(nurse, TabuShiftPattern([0] * 7, patternNight)))
 
-        return overCovered, underCovered, dayGraph, nightGraph
+        return fromShifts, toShifts, dayGraph, nightGraph
 
-    def nurseChain(self, schedule):
+    def nurseChain(self, schedule, phase):
         """
         Step 1.4 For each of the grades, attempt to find a chain of moves from Nurse Chain Neighbourhood s_now to s_final, so that CC is reduced and PC does not increase
         :param schedule:
+        :param phase:
         :return: move, changed day/night:
         """
-        print("Running Nurse Chain...")
+        if self.debug:
+            print("Running Nurse Chain...")
+
+
+        for grade in [Grade.ONE, Grade.TWO, Grade.THREE]:
+            value = self._graphCreatorNurseChainUtil(schedule, grade, phase)
+            if value is not None:
+                return value
+
         return None
+
+    def _graphCreatorNurseChainUtil(self, schedule, grade, phase):
+        overCovered = []
+        underCovered = []
+        nurseList = []
+        graph = DirectedGraph()
+        for source in schedule.nurses:
+            if source.grade == grade:
+                nurseList.append(source)
+                graph.addNode(source.id)
+
+        for nurse1 in nurseList:
+            for nurse2 in nurseList:
+                if nurse2 != nurse1:
+                    if nurse2.worksNight and nurse2.contract.nights == nurse1.contract.nights:
+                        graph.addEdge(nurse1.id, nurse2.id, nurse1.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
+                    elif nurse2.worksNight is False and nurse2.contract.days == nurse1.contract.days:
+                        graph.addEdge(nurse1.id, nurse2.id, nurse1.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
+
+        for shift in schedule.shifts:
+            if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
+                overCovered.append(shift)
+            elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
+                underCovered.append(shift)
+
+        if phase == 1:
+            for source in nurseList:
+                for o in overCovered:
+                    if patternCoverShift(source.shiftPattern, o):
+                        for u in underCovered:  # TODO: Maybe break here to make it more efficient
+                            if patternCoverShift(source.shiftPattern, u):
+                                for pattern in self.feasiblePatterns[source.id]:
+                                    if calculateDifferenceCC(schedule, source, pattern) < 0:
+                                        for sink in nurseList:
+                                            if pattern in self.feasiblePatterns[sink.id]:
+                                                edges = graph.search(source.id, sink.id)
+                                                if len(edges) > 0:
+                                                    pcCounter = 0
+                                                    for edge in edges:
+                                                        pcCounter += edge.weight
+                                                    if pcCounter <= 0:
+                                                        neighbour = copy.deepcopy(schedule)
+                                                        change = False
+                                                        for edge in edges:
+                                                            fromN = neighbour.nurses[edge.fromNode]
+                                                            toN = neighbour.nurses[edge.toNode]
+                                                            if fromN.worksNight != toN.worksNight:
+                                                                change = True
+                                                            neighbour.assignPatternToNurse(fromN, toN.shiftPattern)
+                                                        neighbour.assignPatternToNurse(neighbour.nurses[sink.id], pattern)
+                                                        if neighbour.CC < schedule.CC:
+                                                            "Move Nurse Chain XXX"
+                                                            return neighbour, change
+        elif phase == 2:
+            return None, None, None
 
     def underCovering(self, schedule):
         """
@@ -374,7 +563,8 @@ class TabuSearch_SIMPLE:
         :param schedule:
         :return: move, changed day/night:
         """
-        print("Running Under Covering...")
+        if self.debug:
+            print("Running Under Covering...")
         bestMove = None, None, 0, None
 
         for nurse in schedule.nurses:
@@ -402,14 +592,15 @@ class TabuSearch_SIMPLE:
             self.tabuList.append(n_nurse.id)
             return neighbour, bestMove[3] != n_nurse.worksNight
 
-    # ----------------------------------- randomKick(self, schedule) -----------------------------------
+
     def randomKick(self, schedule):
         """
         Step 1.6 Randomly select a move satisfying non-tabu conditions 1-3.
         :param schedule:
         :return: move, changed day/night:
         """
-        print("Running Random Kick...")
+        if self.debug:
+            print("Running Random Kick...")
         while True:
             nurse = schedule.nurses[random.randint(0, len(schedule.nurses) - 1)]
             nurseWorkedNight = copy.copy(nurse.worksNight)
@@ -427,3 +618,22 @@ class TabuSearch_SIMPLE:
                 self.tabuList = []
                 self.tabuList.append(nurse.id)
                 return neighbour, nurseWorkedNight != n_nurse.worksNight
+
+
+    def searchStuck(self, schedule):
+        if self.debug:
+            print("Running Search Stuck...")
+        bestMove = None, None, 0, None
+
+        for nurse in schedule.nurses:
+            for pattern in self.feasiblePatterns[nurse.id]:
+                pcDif = calculateDifferencePC(nurse, pattern)
+                if pcDif < bestMove[2]:
+                    bestMove = nurse.id, pattern, pcDif, nurse.worksNight
+
+        neighbour = copy.deepcopy(schedule)
+        n_nurse = neighbour.nurses[bestMove[0]]
+        neighbour.assignPatternToNurse(n_nurse, bestMove[1])
+        self.tabuList = []
+        self.tabuList.append(n_nurse.id)
+        return neighbour, bestMove[3] != n_nurse.worksNight

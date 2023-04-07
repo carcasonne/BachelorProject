@@ -231,15 +231,25 @@ def randomizeConstraints(nurse):
         nurse.completeWeekend = True
 
 
-# TODO: Make implementation for evaluateLB
-# TODO: This method is very hard to understand
-def evaluateLB(schedule):
+def evaluateLB(schedule, feasibleShiftPatterns):
     """
-    evaluateLB: LB - The sum of the minimal penalty cost for all nurses in the schedule.
+    evaluateLB: LB - The sum of the minimal penalty cost for all nurses in the schedule with the current partition.
+    :param feasibleShiftPatterns:
     :param schedule:
     :return LB:
     """
-    pass
+    LB = schedule.PC
+    for nurse in schedule.nurses:
+        nurseLowestPC = calculateDifferencePC(nurse, nurse.shiftPattern)
+        for pattern in feasibleShiftPatterns[nurse.id]:
+            if nurse.worksNight and pattern.day == [0]*7:
+                nurseLowestPC = min(nurseLowestPC, calculateDifferencePC(nurse, pattern))
+            if nurse.worksNight is False and pattern.night == [0]*7:
+                nurseLowestPC = min(nurseLowestPC, calculateDifferencePC(nurse, pattern))
+        LB += nurseLowestPC
+    return LB
+
+
 
 
 # TODO: There is properly a smarter way to do this
