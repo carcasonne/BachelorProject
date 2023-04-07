@@ -251,56 +251,6 @@ class JSONParser:
             case _:
                 raise ValueError(f'{i} out of bounds')
 
-    def parse(self, jsonData):
-        nurses = []
-        shifts = []
-
-        try:
-            startDate = jsonData["StartDate"]
-            duration = jsonData["DurationWeeks"]
-
-            for rawNurse in jsonData["Nurses"]:
-                id = rawNurse["Id"]
-                intGrade = rawNurse["Grade"]
-                grade = self.intToGrade(intGrade)
-
-                # Snak om hvad der er smartest at implementere ift. kontrakt
-                contract = None
-
-                # Preferences bliver bare sprunget over nu
-
-                nurse = Nurse(id, grade, contract)
-                nurses.append(nurse)
-            
-            for days in jsonData["Shifts"]:
-                dayName = None
-                for name in days:
-                    dayName = name
-                 
-                day = list(days.values())[0]
-                for rawShift in day:
-                    strShiftType    = rawShift["ShiftType"]
-                    noGradeOne      = rawShift["Grade1"]
-                    noGradeTwo      = rawShift["Grade2"]
-                    noGradeThree    = rawShift["Grade3"]
-
-                    shiftType   = self.strToShiftType(strShiftType)
-                    dayType     = self.strToDay(dayName)
-
-                    coverRequirements = {
-                        Grade.ONE: noGradeOne,
-                        Grade.TWO: noGradeTwo,
-                        Grade.THREE: noGradeThree 
-                    }
-
-                    shift = Shift(coverRequirements, shiftType, dayType)
-                    shifts.append(shift)
-
-            return Schedule(shifts, nurses)
-        except Exception as e:
-            raise ValueError("Failed to parse json: " + str(e)) from e
-
-
     def intToGrade(self, i):
         match i:
             case 1:

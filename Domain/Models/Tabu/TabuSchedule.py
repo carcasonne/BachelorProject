@@ -86,63 +86,7 @@ class TabuSchedule:
         string += f"\n \n                 CC Score: {self.CC}       PC Score: {self.PC}\n"
         
         return string + "\n"
-    
-    def scheduleTable(self):
-        # COLUMNS: DAYS
-        # ROWS: SHIFTS
-        # CELLS: IDS OF NURSES WORKING SHIFT ON DAY
-
-        string = "\n \n \n"
-        string += "                                             NURSE WORK PATTERNS\n\n"
-        #rows = [str(typ) for typ in TabuShiftType]
-        dayRow = [None] * 8
-        dayRow[0] = "Day"
-        nightRow = [None] * 8
-        nightRow[0] = "Night"
-
-        colors = [Back.RED, Back.GREEN, Back.BLUE, Back.WHITE, Back.YELLOW, Back.MAGENTA, Back.CYAN, Back.WHITE, Back.LIGHTRED_EX, Back.LIGHTGREEN_EX, Back.LIGHTYELLOW_EX, Back.LIGHTBLUE_EX, Back.LIGHTMAGENTA_EX, Back.LIGHTCYAN_EX, Back.LIGHTWHITE_EX]
-        resetColor = Back.RESET
-
-        idToColor = {}
-
-        for i in range(len(self.nurses)):
-            nurse = self.nurses[i]
-            idToColor[nurse.id] = colors[i % len(colors)]
-
-        rows = [dayRow, nightRow]
-
-        for i in range(7):
-            item = []
-            n = 1 + (i * 2)
-
-            shift = self.shifts[n]
-            ids = list(shift.assignedNurses[Grade.THREE])
-            ids.sort()
-            content = resetColor
-            for idd in ids:
-                color = idToColor[idd]
-                content += f"{color + str(idd)},     {resetColor}\n"
-            nightRow[i + 1] = content
         
-        for i in range(7):
-            item = []
-            n = i * 2
-
-            shift = self.shifts[n]
-            ids = list(shift.assignedNurses[Grade.THREE])
-            ids.sort()
-            content = ""
-            for idd in ids:
-                color = idToColor[idd]
-                content += f"{color + str(idd)},     {resetColor}\n"
-            dayRow[i + 1] = content
-
-        headers = ["Shift Type"]
-        days = [str(day) for day in Days]
-        headers = headers + days
-        string += tabulate(rows, headers=headers, tablefmt='fancy_grid')
-        return string
-    
     def nursePatternSchedule(self):
         # COLUMNS: DAYS
         # ROWS: SHIFTS
