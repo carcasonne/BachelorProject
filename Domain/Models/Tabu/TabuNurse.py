@@ -18,7 +18,6 @@ class TabuNurse:
         self.consecutiveDaysOff = nurse.consecutiveDaysOff
         self.undesiredShifts = TabuShiftPattern(nurse.undesiredShifts[0], nurse.undesiredShifts[1])
         self.completeWeekend = nurse.completeWeekend
-        self.undesiredWeekend = nurse.undesiredWeekend
 
     def _assignShiftPattern(self, pattern):
         if pattern.day == [0] * 7:
@@ -82,9 +81,6 @@ class TabuNurse:
                 newPen += 10
         # Calculation of the penalty score of the nurse not working a complete weekend:
         if pattern[5] != pattern[6] and self.completeWeekend:
-            newPen += 30
-        # Calculation of the penalty score of a nurse working an undesired weekend:
-        if (pattern[5] == 1 or pattern[6] == 1) and self.undesiredWeekend:
             newPen += 30
 
         return newPen
