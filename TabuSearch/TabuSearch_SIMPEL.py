@@ -2,20 +2,15 @@
 Tabu Search Class
 """
 import copy
-import random
 
-from Domain.Models.Tabu.TabuSchedule import TabuSchedule
-from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
 from TabuSearch.DirectedGraph import DirectedGraph
-from TabuSearch.DirectedGraph import Edge
 
 
 # TODO: THIS SOLUTION IS ONLY BASED ON GRADE THREE
 
 class TabuSearch_SIMPLE:
-    def __init__(self,
-                 initialSolution):  # (initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure)
+    def __init__(self, initialSolution):  # (initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure)
         """
         The next three variables is there to make sure that we hold the 3 tabu criteria:
             1) A move involves the tabu nurse (i.e. the nurse moved last time) from tabuList.
@@ -36,7 +31,7 @@ class TabuSearch_SIMPLE:
         # Tabu criteria 3:
         self.dayNightCounter = 0
         self.maxits = 50
-        self.lowerBound = None  # TODO: Calculate Lower Bound
+        self.lowerBound = None
         # Feasible shift patterns for nurses is provided in this dict
         self.feasiblePatterns = dict()
         for n in initialSolution.nurses:
@@ -61,7 +56,6 @@ class TabuSearch_SIMPLE:
                 random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)])
 
     # TODO: There was a mistake here. We need tests for this also.
-    # TODO: This has to take count for TabuList also instead of the methods does it
     def makeMove(self, move):
         if move is None:
             return None
@@ -75,7 +69,7 @@ class TabuSearch_SIMPLE:
                 if len(self.dayNightTabuList) == 7:
                     self.dayNightTabuList.pop(6)
                 self.dayNightCounter = 0
-                self.lowerBound = evaluateLB(move[0], self.feasiblePatterns)  # TODO: Calculate lowerbound Eq.(6)
+                self.lowerBound = evaluateLB(move[0], self.feasiblePatterns)
                 if self.lowerBound < move[0].PC:
                     self.maxits = 50
                 else:
@@ -89,75 +83,79 @@ class TabuSearch_SIMPLE:
         maxRuns = 1
         runs = 0
         print(str(self.currSolution))
-        if runs % 50 == 0:
-            print("Initiating run #" + str(runs))
 
-        # Phase 0:
-        # self.initSchedule()
         while runs < maxRuns or self.bestSolution.PC == 0:
-            # Phase 1:
-            while self.currSolution.CC > 0:
-                if self.makeMove(self.randomDecent(self.currSolution, 1)) is None:
-                    if self.makeMove(self.balanceRestoring(self.currSolution, False)) is None:
-                        if self.makeMove(self.shiftChain(self.currSolution, 1)) is None:
-                            if self.makeMove(self.nurseChain(self.currSolution, 1)) is None:
-                                if self.makeMove(self.underCovering(self.currSolution)) is None:
-                                    self.makeMove(self.randomKick(self.currSolution))
-                                    self.stepsP1[5] += 1
-                                    if self.debug:
-                                        print(self.currSolution.scores())
-                                else:
-                                    self.stepsP1[4] += 1
-                                    if self.debug:
-                                        print(self.currSolution.scores())
+            if runs % 10 == 0:
+                print("Initiating run #" + str(runs))
+            self.phase1()
+            self.phase2(runs)
+            if runs + 1 != maxRuns:
+                self.phase3()
+
+            runs += 1
+        print(str(self.bestSolution))
+        return self.bestSolution
+
+
+    def phase1(self):
+        while self.currSolution.CC > 0:
+            if self.makeMove(self.randomDecent(self.currSolution, 1)) is None:
+                if self.makeMove(self.balanceRestoring(self.currSolution, False)) is None:
+                    if self.makeMove(self.shiftChain(self.currSolution, 1)) is None:
+                        if self.makeMove(self.nurseChain(self.currSolution, 1)) is None:
+                            if self.makeMove(self.underCovering(self.currSolution)) is None:
+                                self.makeMove(self.randomKick(self.currSolution))
+                                self.stepsP1[5] += 1
+                                if self.debug:
+                                    print(self.currSolution.scores())
                             else:
-                                self.stepsP1[3] += 1
+                                self.stepsP1[4] += 1
                                 if self.debug:
                                     print(self.currSolution.scores())
                         else:
-                            self.stepsP1[2] += 1
+                            self.stepsP1[3] += 1
                             if self.debug:
                                 print(self.currSolution.scores())
                     else:
-                        self.stepsP1[1] += 1
+                        self.stepsP1[2] += 1
                         if self.debug:
                             print(self.currSolution.scores())
                 else:
-                    self.stepsP1[0] += 1
+                    self.stepsP1[1] += 1
                     if self.debug:
                         print(self.currSolution.scores())
-
-            # Phase 2:
-            while self.currSolution.PC > 0:
-                if self.makeMove(self.randomDecent(self.currSolution, 2)) is None:
-                    if self.makeMove(self.shiftChain(self.currSolution, 2)) is not None:
-                        self.stepsP2[1] += 1
-                        if self.debug:
-                            print(self.currSolution.scores())
-                    else:
-                        if self.currSolution.PC < self.bestSolution.PC:
-                            print()
-                            print("FOUND A BETTER SOLUTION THAN THE LAST ONE!")
-                            print("RUN: " + str(runs) + " PC: FROM: " + str(self.bestSolution.PC) + " TO: " + str(self.currSolution.PC))
-                            print()
-                            print(str(self.currSolution))
-                            self.bestSolution = copy.deepcopy(self.currSolution)
-                        break
-                else:
-                    self.stepsP2[0] += 1
-                    if self.debug:
-                        print(self.currSolution.scores())
-
-            # Phase 3:
-            if runs + 1 != maxRuns:
-                self.makeMove(self.searchStuck(self.currSolution))
+            else:
+                self.stepsP1[0] += 1
                 if self.debug:
                     print(self.currSolution.scores())
 
-            runs += 1
+    def phase2(self, runs):
+        while self.currSolution.PC > 0:
+            if self.makeMove(self.randomDecent(self.currSolution, 2)) is None:
+                if self.makeMove(self.shiftChain(self.currSolution, 2)) is not None:
+                    self.stepsP2[1] += 1
+                    if self.debug:
+                        print(self.currSolution.scores())
+                else:
+                    if self.currSolution.PC < self.bestSolution.PC:
+                        print()
+                        print("FOUND A BETTER SOLUTION THAN THE LAST ONE!")
+                        print("RUN: " + str(runs) + " PC: FROM: " + str(self.bestSolution.PC) + " TO: " + str(
+                            self.currSolution.PC))
+                        print()
+                        print(str(self.currSolution))
+                        self.bestSolution = copy.deepcopy(self.currSolution)
+                    break
+            else:
+                self.stepsP2[0] += 1
+                if self.debug:
+                    print(self.currSolution.scores())
 
-        print(str(self.bestSolution))
-        return self.bestSolution
+    def phase3(self):
+        self.makeMove(self.searchStuck(self.currSolution))
+        if self.debug:
+            print(self.currSolution.scores())
+
 
 
 
