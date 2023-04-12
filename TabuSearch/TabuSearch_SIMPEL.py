@@ -37,7 +37,7 @@ class TabuSearch_SIMPLE:
         for n in initialSolution.nurses:
             self.feasiblePatterns[n.id] = findFeasiblePatterns(n)
 
-        initialSolution.PC = 1000000 # Set to a very high value, since it would otherwise be 0, and a best solution would never be found because of this.
+        initialSolution.PC = 1000000 # Sat to a very high value, since it would otherwise be 0, and a best solution would never be found because of this.
 
         self.currSolution = copy.deepcopy(initialSolution)
         self.bestSolution = copy.deepcopy(initialSolution)
@@ -315,7 +315,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        #return None
+        return None
         if self.debug:
             print("Running Balance Swap...")
         ccAndMove = 0, None
