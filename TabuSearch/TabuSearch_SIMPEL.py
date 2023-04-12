@@ -162,7 +162,6 @@ class TabuSearch_SIMPLE:
 
 
     # Phase 1 Moves:
-    # TODO: Random decent after PC and LB
     def randomDecent(self, schedule, phase):
         """
         Step 1.1 (Random decent). Carry out random decent by accepting the first neighbourhood move that satisfies
@@ -190,7 +189,6 @@ class TabuSearch_SIMPLE:
                             return neighbour, False
         return None
 
-    # TODO: Test this balanceRestoring()
     def balanceRestoring(self, schedule, relaxed):
         """
         Step 1.2.1 (Balance days and nights). Check for balance by using checkBalance (Eq(5)) and return None if nether
