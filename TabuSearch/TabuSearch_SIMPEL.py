@@ -4,6 +4,7 @@ Tabu Search Class
 import copy
 import random
 
+from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from Domain.Models.Enums.Grade import Grade
 from TabuSearch.StaticMethods import *
@@ -86,7 +87,7 @@ class TabuSearch_SIMPLE:
             return move[0]
 
     def run(self):
-        maxRuns = 1
+        maxRuns = 10
         runs = 0
         print(str(self.currSolution))
         if runs % 50 == 0:
@@ -113,6 +114,7 @@ class TabuSearch_SIMPLE:
                             else:
                                 self.stepsP1[3] += 1
                                 if self.debug:
+                                    print("XXX")
                                     print(self.currSolution.scores())
                         else:
                             self.stepsP1[2] += 1
@@ -262,7 +264,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        #return None
+        return None
         if self.debug:
             print("Running Balance Swap...")
         ccAndMove = 0, None
@@ -494,7 +496,6 @@ class TabuSearch_SIMPLE:
         if self.debug:
             print("Running Nurse Chain...")
 
-
         for grade in [Grade.ONE, Grade.TWO, Grade.THREE]:
             value = self._graphCreatorNurseChainUtil(schedule, grade, phase)
             if value is not None:
@@ -556,7 +557,7 @@ class TabuSearch_SIMPLE:
                                                             "Move Nurse Chain XXX"
                                                             return neighbour, change
         elif phase == 2:
-            return None, None, None
+            return None
 
     def underCovering(self, schedule):
         """

@@ -250,8 +250,6 @@ def evaluateLB(schedule, feasibleShiftPatterns):
     return LB
 
 
-
-
 # TODO: There is properly a smarter way to do this
 def checkBalance(schedule):  # This balance check is based on Eq (5) in the article
     balancedDays = True
