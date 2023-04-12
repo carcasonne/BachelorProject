@@ -37,7 +37,7 @@ class TabuSearch_SIMPLE:
         for n in initialSolution.nurses:
             self.feasiblePatterns[n.id] = findFeasiblePatterns(n)
 
-        initialSolution.PC = 1000000
+        initialSolution.PC = 1000000 # Set to a very high value, since it would otherwise be 0, and a best solution would never be found because of this.
 
         self.currSolution = copy.deepcopy(initialSolution)
         self.bestSolution = copy.deepcopy(initialSolution)
@@ -49,14 +49,25 @@ class TabuSearch_SIMPLE:
         self.debug = False
 
     def initSchedule(self):
+        """
+        initSchedule. An old method which some tests still rely on, since it is much simpler to let the search ramdomly set patterns
+        of all of the nurses in the tests, than it is to initialize knapsack which otherwise does this for the search.
+        """
         for nurse in self.currSolution.nurses:
             randomizeConstraints(nurse)
-            # self.currSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][0])
             self.currSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][
                 random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)])
 
     # TODO: There was a mistake here. We need tests for this also.
     def makeMove(self, move):
+        """
+        makeMove. Execute the move and calculate if any nurses was moved from day to night or vice versa. Update the
+        dayNightTabuList accordingly. Also update dayNightCounter and set maxits accordingly to 5 in case the lowerBound
+        is reached, or 50 otherwise. Set the currentSolution to the neighbour the move results in and return the move.
+        In case the move was None, return None.
+        :param move:
+        :return move OR None:
+        """
         if move is None:
             return None
         else:
@@ -80,6 +91,11 @@ class TabuSearch_SIMPLE:
             return move[0]
 
     def run(self):
+        """
+        run. Execute Tabu Search with maxRuns amount of runs. Find out which solution is best according to PC and
+        return that.
+        :return bestSolution:
+        """
         maxRuns = 1
         runs = 0
         print(str(self.currSolution))
@@ -87,17 +103,21 @@ class TabuSearch_SIMPLE:
         while runs < maxRuns or self.bestSolution.PC == 0:
             if runs % 10 == 0:
                 print("Initiating run #" + str(runs))
-            self.phase1()
-            self.phase2(runs)
+            self._phase1()
+            self._phase2(runs)
             if runs + 1 != maxRuns:
-                self.phase3()
+                self._phase3()
 
             runs += 1
         print(str(self.bestSolution))
         return self.bestSolution
 
 
-    def phase1(self):
+    def _phase1(self):
+        """
+        phase1. Execute the moves in the following order: randomDescent, balanceRestoring, shiftChain, nurseChain,
+        underCovering, randomKick.
+        """
         while self.currSolution.CC > 0:
             if self.makeMove(self.randomDecent(self.currSolution, 1)) is None:
                 if self.makeMove(self.balanceRestoring(self.currSolution, False)) is None:
@@ -129,7 +149,10 @@ class TabuSearch_SIMPLE:
                 if self.debug:
                     print(self.currSolution.scores())
 
-    def phase2(self, runs):
+    def _phase2(self, runs):
+        """
+        phase1. Execute the moves in the following order: randomDescent, shiftChain, nurseChain.
+        """
         while self.currSolution.PC > 0:
             if self.makeMove(self.randomDecent(self.currSolution, 2)) is None:
                 if self.makeMove(self.shiftChain(self.currSolution, 2)) is not None:
@@ -151,7 +174,10 @@ class TabuSearch_SIMPLE:
                 if self.debug:
                     print(self.currSolution.scores())
 
-    def phase3(self):
+    def _phase3(self):
+        """
+        phase1. Execute the move searchStuck.
+        """
         self.makeMove(self.searchStuck(self.currSolution))
         if self.debug:
             print(self.currSolution.scores())
