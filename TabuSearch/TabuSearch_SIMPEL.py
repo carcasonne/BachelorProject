@@ -6,8 +6,6 @@ from TabuSearch.StaticMethods import *
 from TabuSearch.DirectedGraph import DirectedGraph
 
 
-# TODO: THIS SOLUTION IS ONLY BASED ON GRADE THREE
-
 class TabuSearch_SIMPLE:
     def __init__(self, initialSolution):  # (initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure)
         """
@@ -537,6 +535,7 @@ class TabuSearch_SIMPLE:
 
         return fromShifts, toShifts, dayGraph, nightGraph
 
+    # TODO: There is an issue with the order of going from sink to source. Right now we are going form source to sink
     def nurseChain(self, schedule, phase):
         """
         Step 1.4 For each of the grades, attempt to find a chain of moves from Nurse Chain Neighbourhood s_now to s_final, so that CC is reduced and PC does not increase
