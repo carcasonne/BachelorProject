@@ -13,7 +13,6 @@ class Nurse:
         self.consecutiveDaysOff = (0, 7)
         self.undesiredShifts = ([0] * 7, [0] * 7)
         self.completeWeekend = False
-        self.undesiredWeekend = False
 
 
 
