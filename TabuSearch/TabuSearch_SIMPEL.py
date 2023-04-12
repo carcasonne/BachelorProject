@@ -174,6 +174,7 @@ class TabuSearch_SIMPLE:
         if self.debug:
             print("Running Random Descent...")
         if self.dayNightCounter >= self.maxits:
+            # TODO: Make a submethod that takes into account tabu criteria 2 and 3 and complete the move there.
             return None
 
         for nurse in schedule.nurses:
@@ -608,17 +609,21 @@ class TabuSearch_SIMPLE:
             tabuCheck = copy.copy(self.dayNightTabuList[0])
             if nurse.worksNight:
                 tabuCheck.add(nurse.id)
+                oldWorksNight = True
             else:
                 if nurse.id in tabuCheck:
                     tabuCheck.remove(nurse.id)
+                oldWorksNight = False
+
             if nurse.id not in self.tabuList and tabuCheck not in self.dayNightTabuList:
                 pattern = self.feasiblePatterns[nurse.id][random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)]
-                neighbour = copy.deepcopy(schedule)
-                n_nurse = neighbour.nurses[nurse.id]
-                neighbour.assignPatternToNurse(n_nurse, pattern)
-                self.tabuList = []
-                self.tabuList.append(nurse.id)
-                return neighbour, nurseWorkedNight != n_nurse.worksNight
+                if (((pattern.day == [0] * 7 and not oldWorksNight) or (pattern.night == [0] * 7 and oldWorksNight)) and self.dayNightCounter >= self.maxits) or (self.dayNightCounter < self.maxits):
+                    neighbour = copy.deepcopy(schedule)
+                    n_nurse = neighbour.nurses[nurse.id]
+                    neighbour.assignPatternToNurse(n_nurse, pattern)
+                    self.tabuList = []
+                    self.tabuList.append(nurse.id)
+                    return neighbour, nurseWorkedNight != n_nurse.worksNight
 
 
     def searchStuck(self, schedule):
