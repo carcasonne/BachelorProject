@@ -679,6 +679,11 @@ class TabuSearch_SIMPLE:
 
 
     def searchStuck(self, schedule):
+        """
+        Step 1.6 (Search stuck - oscillate back into infeasible region). Select the best non-tabu move according to PC.
+        :param schedule:
+        :return: move, changed day/night:
+        """
         if self.debug:
             print("Running Search Stuck...")
         bestMove = None, None, 0, None
