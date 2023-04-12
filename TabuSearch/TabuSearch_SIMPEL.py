@@ -173,8 +173,7 @@ class TabuSearch_SIMPLE:
         if self.debug:
             print("Running Random Descent...")
         if self.dayNightCounter >= self.maxits:
-            # TODO: Make a submethod that takes into account tabu criteria 2 and 3 and complete the move there.
-            return None
+            return self.descentDayNightChange(schedule, phase)
 
         for nurse in schedule.nurses:
             if nurse.id not in self.tabuList:
@@ -187,6 +186,37 @@ class TabuSearch_SIMPLE:
                             self.tabuList = []
                             self.tabuList.append(nurse.id)
                             return neighbour, False
+        return None
+
+    def descentDayNightChange(self, schedule, phase):
+        """
+        Step 1.1.2 (Random decent criteria 3). Carry out random decent by accepting the first neighbourhood move that satisfies
+        non-tabu conditions 1 - 3 and improves CC and does not increase PC, forced to switch the chosen nurse to a pattern
+        opposite of what they are currently working, to satisfy tabu condition 3
+        :param schedule:
+        :param phase:
+        :return move, changed day/night:
+        """
+        if self.debug:
+            print("Forcing Random Descent to make a day to night or night to day...")
+        for nurse in schedule.nurses:
+            if nurse.id not in self.tabuList:
+                tabuCheck = copy.copy(self.dayNightTabuList[0])
+                if nurse.worksNight:
+                    tabuCheck.add(nurse.id)
+                else:
+                    if nurse.id in tabuCheck:
+                        tabuCheck.remove(nurse.id)
+                if tabuCheck not in self.dayNightTabuList:
+                    for pattern in self.feasiblePatterns[nurse.id]:
+                        if (nurse.worksNight and pattern.night == [0] * 7) or (not nurse.worksNight and pattern.night != [0] * 7):
+                            if (calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse, pattern) <= 0 and phase == 1) or (calculateDifferencePC(nurse, pattern) < 0 and calculateDifferenceCC(schedule, nurse, pattern) <= 0 and phase == 2):
+                                neighbour = copy.deepcopy(schedule)
+                                n_nurse = neighbour.nurses[nurse.id]
+                                neighbour.assignPatternToNurse(n_nurse, pattern)
+                                self.tabuList = []
+                                self.tabuList.append(nurse.id)
+                                return neighbour, True
         return None
 
     def balanceRestoring(self, schedule, relaxed):
@@ -261,7 +291,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        #return None
+        return None
         if self.debug:
             print("Running Balance Swap...")
         ccAndMove = 0, None
