@@ -24,7 +24,7 @@ end_parser_time = time.time()
 # schedule_parsed.shifts = schedule_artificial.shifts
 # schedule_parsed.nurses = schedule_artificial.nurses
 
-solver = KnapsackSolver(schedule_artificial)
+solver = KnapsackSolver(schedule_parsed)
 solver.solve()
 
 schedule = TabuSchedule(solver.schedule)
@@ -37,8 +37,8 @@ search.initSchedule()
 
 search.run()
 end_tabu_time = time.time()
-#print(str(search.bestSolution))
 print(search.bestSolution.nursePatternSchedule())
+print(str(search.bestSolution))
 
 #print(search.currSolution.scheduleTable())
 print("Executed P1 Random Descent: " + str(search.stepsP1[0]) + " times.")

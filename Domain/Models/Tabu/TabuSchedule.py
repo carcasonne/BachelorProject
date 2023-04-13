@@ -84,6 +84,8 @@ class TabuSchedule:
             shifts.append(item)
         string += tabulate(shifts, headers=["Day", "ShiftType", "Requirements", "Assigned"], tablefmt='fancy_grid', showindex="always")
         string += f"\n \n                 CC Score: {self.CC}       PC Score: {self.PC}\n"
+        averagePc = self.PC/len(self.nurses)
+        string += f"\n \n                 PC/Nurse Score: {averagePc}\n"
         
         return string + "\n"
         

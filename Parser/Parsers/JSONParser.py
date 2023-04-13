@@ -29,50 +29,50 @@ class JSONParser:
         nurses = []
         shifts = []
 
-        dynamicContractDays = True
+        dynamicContractDays = False
 
-        self.fullTimeContract = Contract(5,4)
-        self.halfTimeContract = Contract(4,3)
-        self.pastTimeContract = Contract(3,2)
-        # for jsonContract in nursesJson["contracts"]:
-        #     # The json describes number of shifts to be covered in a month, while we only consider a single week
-        #     days = jsonContract["maximumNumberOfAssignments"] // 4
-        #     nights = days - 1
-        #     contract = Contract(days, nights)
+        self.fullTimeContract = None
+        self.halfTimeContract = None
+        self.pastTimeContract = None
+        for jsonContract in nursesJson["contracts"]:
+            # The json describes number of shifts to be covered in a month, while we only consider a single week
+            days = jsonContract["maximumNumberOfAssignments"] // 4
+            nights = days - 1
+            contract = Contract(days, nights)
 
-        #     contract.minConsecutiveDays = jsonContract["minimumNumberOfConsecutiveWorkingDays"]
-        #     contract.maxConsecutiveDays = jsonContract["maximumNumberOfConsecutiveWorkingDays"]
-        #     contract.minConsecutiveDaysOff = jsonContract["minimumNumberOfConsecutiveDaysOff"]
-        #     contract.maxConsecutiveDaysOff = jsonContract["maximumNumberOfConsecutiveDaysOff"]
-        #     completeWeekend = jsonContract["completeWeekends"]
+            contract.minConsecutiveDays = jsonContract["minimumNumberOfConsecutiveWorkingDays"]
+            contract.maxConsecutiveDays = jsonContract["maximumNumberOfConsecutiveWorkingDays"]
+            contract.minConsecutiveDaysOff = jsonContract["minimumNumberOfConsecutiveDaysOff"]
+            contract.maxConsecutiveDaysOff = jsonContract["maximumNumberOfConsecutiveDaysOff"]
+            completeWeekend = jsonContract["completeWeekends"]
 
-        #     contract.minConsecutiveDays = 0
-        #     contract.minConsecutiveDaysOff = 0
-        #     contract.maxConsecutiveDays = 7
-        #     contract.maxConsecutiveDaysOff = 7
+            contract.minConsecutiveDays = 0
+            contract.minConsecutiveDaysOff = 0
+            contract.maxConsecutiveDays = 7
+            contract.maxConsecutiveDaysOff = 7
 
-        #     bWeekend = False if int(completeWeekend) == 0 else True
-        #     contract.completeWeekend = bWeekend
+            bWeekend = False if int(completeWeekend) == 0 else True
+            contract.completeWeekend = bWeekend
 
-        #     contract.completeWeekend = False
+            contract.completeWeekend = False
 
-        #     if jsonContract["id"] == "FullTime":
-        #         if not dynamicContractDays:
-        #             contract.days = 5
-        #             contract.nights = 4
-        #         self.fullTimeContract = contract
-        #     elif jsonContract["id"] == "PartTime":
-        #         if not dynamicContractDays:
-        #             contract.days = 4
-        #             contract.nights = 3
-        #         self.halfTimeContract = contract
-        #     elif jsonContract["id"] == "HalfTime":
-        #         if not dynamicContractDays:
-        #             contract.days = 3
-        #             contract.nights = 2
-        #         self.pastTimeContract = contract
+            if jsonContract["id"] == "FullTime":
+                if not dynamicContractDays:
+                    contract.days = 5
+                    contract.nights = 4
+                self.fullTimeContract = contract
+            elif jsonContract["id"] == "PartTime":
+                if not dynamicContractDays:
+                    contract.days = 4
+                    contract.nights = 3
+                self.halfTimeContract = contract
+            elif jsonContract["id"] == "HalfTime":
+                if not dynamicContractDays:
+                    contract.days = 3
+                    contract.nights = 2
+                self.pastTimeContract = contract
             
-        #     print(f"Contract working: {contract.days} days, {contract.nights} nights")
+            print(f"Contract working: {contract.days} days, {contract.nights} nights")
 
         # Ignored fields are:
             # numberOfWeeks

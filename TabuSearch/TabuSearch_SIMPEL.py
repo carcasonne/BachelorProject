@@ -46,7 +46,7 @@ class TabuSearch_SIMPLE:
         self.stepsP2 = [0, 0, 0]
         self.stepsP3 = [0]
 
-        self.debug = False
+        self.debug = True
 
     def initSchedule(self):
         """
@@ -328,7 +328,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        return None
+        #return None
         if self.debug:
             print("Running Balance Swap...")
         ccAndMove = 0, None
@@ -518,11 +518,11 @@ class TabuSearch_SIMPLE:
         else:
 
             for shift in schedule.shifts:
-                if shift.coverRequirements[grade] and shift.shiftType == TabuShiftType.DAY:
+                if shift.shiftType == TabuShiftType.DAY:
                     fromShifts[0].append(shift)
                     toShifts[0].append(shift)
                     dayGraph.addNode(shift.shiftDay.value - 1)
-                elif shift.coverRequirements[grade] and shift.shiftType == TabuShiftType.NIGHT:
+                elif shift.shiftType == TabuShiftType.NIGHT:
                     fromShifts[1].append(shift)
                     toShifts[1].append(shift)
                     nightGraph.addNode(shift.shiftDay.value - 1)
