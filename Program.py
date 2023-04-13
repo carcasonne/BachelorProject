@@ -16,12 +16,15 @@ def time_convert(sec, str):
 start_time = time.time()
 
 parser = NurseParser()
-schedule = parser.parseScenario("n030w4")
-#schedule = copy.deepcopy(TestTabuData().schedule)
+schedule_parsed = parser.parseScenario("n030w4")
+schedule_artificial = copy.deepcopy(TestTabuData().schedule)
 
 end_parser_time = time.time()
 
-solver = KnapsackSolver(schedule)
+# schedule_parsed.shifts = schedule_artificial.shifts
+# schedule_parsed.nurses = schedule_artificial.nurses
+
+solver = KnapsackSolver(schedule_artificial)
 solver.solve()
 
 schedule = TabuSchedule(solver.schedule)
@@ -53,8 +56,16 @@ print("Executed P2 Nurse Chain: " + str(search.stepsP2[2]) + " times.")
 
 print("\n")
 
+print("Executed P3 Search Stuck: " + str(search.stepsP3[0]) + " times.")
+
+print("\n")
+
+print("Total iterations: " + str(sum(search.stepsP1) + sum(search.stepsP2) + sum(search.stepsP3)) + ".")
+
+print("\n")
+
 time_parser_lapsed = end_parser_time - start_time
-time_knapsack_lapsed =  end_knapsack_time - end_parser_time
+time_knapsack_lapsed = end_knapsack_time - end_parser_time
 time_tabu_lapsed = end_tabu_time - end_knapsack_time
 time_convert(time_parser_lapsed, "Parser parsing time: ")
 time_convert(time_knapsack_lapsed, "Knapsack computation time: ")

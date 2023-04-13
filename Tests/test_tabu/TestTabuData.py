@@ -40,4 +40,5 @@ class TestTabuData:
 
 
 
+
         self.schedule = Schedule(self.shifts, self.nurses)

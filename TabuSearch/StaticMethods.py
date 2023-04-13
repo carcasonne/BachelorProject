@@ -205,8 +205,6 @@ def randomizeConstraints(nurse):
     # Randomly calculating weekends constraints:
     if random.randint(1, 5) == 1:
         nurse.completeWeekend = True
-    if random.randint(1, 5) == 1:
-        nurse.undesiredWeekend = True
 
     # Setting preferences calculated in the beginning:
     if hatesNight:
@@ -216,7 +214,6 @@ def randomizeConstraints(nurse):
         nurse.undesiredShifts.day[6] = 1
         nurse.undesiredShifts.night[5] = 1
         nurse.undesiredShifts.night[6] = 1
-        nurse.undesiredWeekend = True
         nurse.consecutiveDaysOff = 2, nurse.consecutiveDaysOff[1]
         if nurse.consecutiveDaysOff[1] < 2:
             nurse.consecutiveDaysOff = nurse.consecutiveDaysOff[0], 2
@@ -227,7 +224,6 @@ def randomizeConstraints(nurse):
         nurse.undesiredShifts.day[6] = 0
         nurse.undesiredShifts.night[5] = 0
         nurse.undesiredShifts.night[6] = 0
-        nurse.undesiredWeekend = False
         nurse.completeWeekend = True
 
 
@@ -248,8 +244,6 @@ def evaluateLB(schedule, feasibleShiftPatterns):
                 nurseLowestPC = min(nurseLowestPC, calculateDifferencePC(nurse, pattern))
         LB += nurseLowestPC
     return LB
-
-
 
 
 # TODO: There is properly a smarter way to do this

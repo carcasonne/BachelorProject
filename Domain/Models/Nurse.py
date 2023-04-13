@@ -14,7 +14,6 @@ class Nurse:
         self.consecutiveDaysOff = (contract.minConsecutiveDaysOff, contract.maxConsecutiveDaysOff)
         self.undesiredShifts = ([0] * 7, [0] * 7, [0] * 7)
         self.completeWeekend = contract.completeWeekend
-        self.undesiredWeekend = False
 
     def assignShiftPattern(self, shiftPattern):  # A bit representation of ether (day, night) or (early, late, night)
         self.assignedShiftPattern = shiftPattern

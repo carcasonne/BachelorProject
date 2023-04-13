@@ -18,7 +18,6 @@ class TabuNurse:
         self.consecutiveDaysOff = nurse.consecutiveDaysOff
         self.undesiredShifts = TabuShiftPattern(self.combineDayShiftRequests(nurse.undesiredShifts[0], nurse.undesiredShifts[1]), nurse.undesiredShifts[2])
         self.completeWeekend = nurse.completeWeekend
-        self.undesiredWeekend = nurse.undesiredWeekend
 
     def combineDayShiftRequests(self, undesiredEarlyShifts, undesiredLateShifts):
         composite = [0] * 7
@@ -94,9 +93,6 @@ class TabuNurse:
         # Calculation of the penalty score of the nurse not working a complete weekend:
         if pattern[5] != pattern[6] and self.completeWeekend:
             newPen += 30
-        # Calculation of the penalty score of a nurse working an undesired weekend:
-        if (pattern[5] == 1 or pattern[6] == 1) and self.undesiredWeekend:
-            newPen += 30
 
         return newPen
 
@@ -108,4 +104,7 @@ class TabuNurse:
         return self.id == other.id and self.grade.value == other.grade.value
 
     def __str__(self):
+        return f"TabuNurse - Id: {self.id}, Grade: {self.grade}, {self.shiftPattern}"
+    
+    def __repr__(self):
         return f"TabuNurse - Id: {self.id}, Grade: {self.grade}, {self.shiftPattern}"
