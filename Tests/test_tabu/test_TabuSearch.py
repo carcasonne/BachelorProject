@@ -5,6 +5,7 @@ from Domain.Models.ShiftPatterns.ShiftPattern import TabuShiftPattern
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from TabuSearch.StaticMethods import evaluateCC
 from Tests.test_tabu.TestTabuData import TestTabuData
+from Tests.test_tabu.NurseChainTestData import NurseChainTestData
 from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 
 
@@ -329,8 +330,64 @@ class Test_TabuSearch(unittest.TestCase):
         self.schedule.assignPatternToNurse(nurses[10], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
         self.schedule.assignPatternToNurse(nurses[11], TabuShiftPattern([0] * 7, [1, 1, 1, 1, 1, 1, 1]))
 
-        print(str(self.schedule))
         self.assertEqual(None, self.ts.shiftChain(self.schedule, 1))
+
+    # ----------------------------------- nurseChain(self, schedule, phase) -----------------------------------
+    def test_nurse_chain_phase_2_on_an_with_one_nurse_having_weekend_penalty_returns_schedule_with_decrease_in_covering_and_penalty(self):
+        nurses = self.schedule.nurses
+        for i in range(len(self.schedule.nurses) // 9):
+            for x in range(9):
+                if x % 3 == 0:
+                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x], self.ts.feasiblePatterns[self.schedule.nurses[0 + i * 9 + x].id][0])
+                else:
+                    self.schedule.assignPatternToNurse(self.schedule.nurses[0 + i * 9 + x], self.ts.feasiblePatterns[self.schedule.nurses[0+i*9+x].id][23])
+
+        newSchedule = copy.copy(self.schedule)
+        newSchedule = self.ts.nurseChain(newSchedule, 1)[0]
+        self.assertTrue(self.schedule.CC > newSchedule.CC)
+        self.assertTrue(self.schedule.PC >= newSchedule.PC)
+
+    def test_nurse_chain_phase_1_with_random_init_function(self):
+        self.ts.initSchedule()
+        self.schedule = self.ts.currSolution
+        newSchedule = copy.deepcopy(self.schedule)
+        newSchedule = self.ts.nurseChain(newSchedule, 1)[0]
+        self.assertTrue(self.schedule.CC > newSchedule.CC)
+        self.assertTrue(self.schedule.PC >= newSchedule.PC)
+
+    def test_nurse_chain_10_iterations_of_nurse_chain_does_not_increase_PC_or_CC(self):
+        self.ts.initSchedule()
+        counter = 0
+        while counter < 5:
+            CC = copy.copy(self.ts.currSolution.CC)
+            PC = copy.copy(self.ts.currSolution.PC)
+            self.ts.makeMove(self.ts.nurseChain(self.ts.currSolution, 2))
+            self.assertTrue(CC >= self.ts.currSolution.CC)
+            self.assertTrue(PC >= self.ts.currSolution.PC)
+            counter += 1
+
+    def test_nurse_chain_on_a_very_restricted_schedule_should_return__CC_equal_to_0(self):
+        schedule = NurseChainTestData().tschedule
+        newschedule = self.ts.nurseChain(copy.deepcopy(schedule), 1)[0]
+        self.assertTrue(schedule.CC > newschedule.CC)
+        self.assertTrue(schedule.PC >= newschedule.PC)
+
+    def test_nurse_chain_on_a_very_restricted_with_phase_2_schedule_should_return__None(self):
+        schedule = NurseChainTestData().tschedule
+        newschedule = self.ts.nurseChain(copy.deepcopy(schedule), 2)
+        self.assertEqual(newschedule, None)
+
+    def test_nurse_chain_phase_2_should_return_decrease_in_PC(self):
+        schedule = NurseChainTestData().tschedule
+        schedule = self.ts.nurseChain(copy.deepcopy(schedule), 1)[0]
+        schedule.nurses[1].undesiredShifts.day[3] = 1
+        schedule.assignPatternToNurse(schedule.nurses[1], schedule.nurses[1].shiftPattern)
+        newSchedule = self.ts.nurseChain(copy.deepcopy(schedule), 2)[0]
+
+        self.assertTrue(schedule.PC > newSchedule.PC)
+        self.assertTrue(schedule.CC == newSchedule.CC)
+        self.assertEqual(newSchedule.CC, 0)
+        self.assertEqual(newSchedule.PC, 0)
 
     # ----------------------------------- underCovering(self, schedule) -----------------------------------
     def test_under_covering_always_decreases_cc_if_possible(self):
