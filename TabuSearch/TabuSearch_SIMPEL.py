@@ -612,13 +612,17 @@ class TabuSearch_SIMPLE:
                                         if pcCounter <= 0:
                                             neighbour = copy.deepcopy(schedule)
                                             change = False
+                                            temptabulist = []
                                             for edge in edges:
                                                 fromN = schedule.nurses[edge.fromNode]
                                                 toN = schedule.nurses[edge.toNode]
+                                                temptabulist.append(edge.fromNode)
                                                 if fromN.worksNight != toN.worksNight:
                                                     change = True
                                                 neighbour.assignPatternToNurse(neighbour.nurses[fromN.id], toN.shiftPattern)
+                                            temptabulist.append(sink.id)
                                             neighbour.assignPatternToNurse(neighbour.nurses[sink.id], pattern)
+                                            self.tabuList = temptabulist
                                             return neighbour, change
         elif phase == 2:
             for source in nurseList:
@@ -630,14 +634,17 @@ class TabuSearch_SIMPLE:
                     if pcCounter < 0:
                         neighbour = copy.deepcopy(schedule)
                         change = False
+                        temptabulist = []
                         for edge in edges:
                             fromN = schedule.nurses[edge.fromNode]
                             toN = schedule.nurses[edge.toNode]
+                            temptabulist.append(edge.fromNode)
                             if fromN.worksNight != toN.worksNight:
                                 change = True
                             neighbour.assignPatternToNurse(neighbour.nurses[fromN.id], toN.shiftPattern)
                         print("Current sched PC: " + str(schedule.PC))
                         print("New sched PC: " + str(neighbour.PC))
+                        self.tabuList = temptabulist
                         return neighbour, change
         return None
 
