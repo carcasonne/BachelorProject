@@ -40,11 +40,13 @@ class TabuSearch_SIMPLE:
         self.bestSolution = copy.deepcopy(initialSolution)
         self.lowerBound = evaluateLB(self.bestSolution, self.feasiblePatterns)
 
+        self.foundOptimalSolution = False
+
         self.stepsP1 = [0, 0, 0, 0, 0, 0]
         self.stepsP2 = [0, 0, 0]
         self.stepsP3 = [0]
 
-        self.debug = True
+        self.debug = False
 
     def initSchedule(self):
         """
@@ -98,7 +100,7 @@ class TabuSearch_SIMPLE:
         runs = 0
         print(str(self.currSolution))
 
-        while runs < maxRuns or self.bestSolution.PC == 0:
+        while runs < maxRuns and not self.foundOptimalSolution:
             if runs % 10 == 0:
                 print("Initiating run #" + str(runs))
             self._phase1()
@@ -183,10 +185,15 @@ class TabuSearch_SIMPLE:
         """
         phase1. Execute the move searchStuck.
         """
-        self.makeMove(self.searchStuck(self.currSolution))
-        self.stepsP3[0] += 1
-        if self.debug:
-            print(self.currSolution.scores())
+        if self.makeMove(self.searchStuck(self.currSolution)) is not None:
+            self.stepsP3[0] += 1
+            if self.debug:
+                print(self.currSolution.scores())
+        else:
+            self.foundOptimalSolution = True
+            print(str(self.bestSolution))
+            print("***THIS IS THE BEST SOLUTION WE CAN EVER FIND.***")
+            print("***THERE IS NO MOVE FOR ANY NURSE AT ALL THAT WOULD EVER DECREASE PC.***")
 
 
 
@@ -642,8 +649,6 @@ class TabuSearch_SIMPLE:
                             if fromN.worksNight != toN.worksNight:
                                 change = True
                             neighbour.assignPatternToNurse(neighbour.nurses[fromN.id], toN.shiftPattern)
-                        print("Current sched PC: " + str(schedule.PC))
-                        print("New sched PC: " + str(neighbour.PC))
                         self.tabuList = temptabulist
                         return neighbour, change
         return None
@@ -731,9 +736,12 @@ class TabuSearch_SIMPLE:
                 if pcDif < bestMove[2]:
                     bestMove = nurse.id, pattern, pcDif, nurse.worksNight
 
-        neighbour = copy.deepcopy(schedule)
-        n_nurse = neighbour.nurses[bestMove[0]]
-        neighbour.assignPatternToNurse(n_nurse, bestMove[1])
-        self.tabuList = []
-        self.tabuList.append(n_nurse.id)
-        return neighbour, bestMove[3] != n_nurse.worksNight
+        if bestMove[0] is not None:
+            neighbour = copy.deepcopy(schedule)
+            n_nurse = neighbour.nurses[bestMove[0]]
+            neighbour.assignPatternToNurse(n_nurse, bestMove[1])
+            self.tabuList = []
+            self.tabuList.append(n_nurse.id)
+            return neighbour, bestMove[3] != n_nurse.worksNight
+        else:
+            return None
