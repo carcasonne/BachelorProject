@@ -137,3 +137,4 @@ class BranchAndBound_MODERN:
                 sumZ = sumZ + (totalC - sumC) * ratio
 
             return sumZ
+

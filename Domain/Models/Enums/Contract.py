@@ -2,6 +2,11 @@ class Contract():
     def __init__(self, days, nights):
         self.days = days
         self.nights = nights
+        self.minConsecutiveDays = 0
+        self.maxConsecutiveDays = 7
+        self.minConsecutiveDaysOff = 0
+        self.maxConsecutiveDaysOff = 7
+        self.completeWeekend = False
     
     def __eq__(self, other): 
         if not isinstance(other, Contract):

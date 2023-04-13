@@ -9,6 +9,7 @@ from Domain.Models.Nurse import Nurse
 from Domain.Models.Shift import Shift
 from Domain.Models.Schedule import Schedule
 
+# TODO: Make tests for shiftOffRequests being handled correctly
 class TestNewJsonParser(unittest.TestCase):
     def test_parses_example(self):
         parser = NurseParser()

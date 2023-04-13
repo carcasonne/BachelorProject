@@ -29,8 +29,52 @@ class JSONParser:
         nurses = []
         shifts = []
 
+        dynamicContractDays = False
+
+        self.fullTimeContract = None
+        self.halfTimeContract = None
+        self.pastTimeContract = None
+        for jsonContract in nursesJson["contracts"]:
+            # The json describes number of shifts to be covered in a month, while we only consider a single week
+            days = jsonContract["maximumNumberOfAssignments"] // 4
+            nights = days - 1
+            contract = Contract(days, nights)
+
+            contract.minConsecutiveDays = jsonContract["minimumNumberOfConsecutiveWorkingDays"]
+            contract.maxConsecutiveDays = jsonContract["maximumNumberOfConsecutiveWorkingDays"]
+            contract.minConsecutiveDaysOff = jsonContract["minimumNumberOfConsecutiveDaysOff"]
+            contract.maxConsecutiveDaysOff = jsonContract["maximumNumberOfConsecutiveDaysOff"]
+            completeWeekend = jsonContract["completeWeekends"]
+
+            contract.minConsecutiveDays = 0
+            contract.minConsecutiveDaysOff = 0
+            contract.maxConsecutiveDays = 7
+            contract.maxConsecutiveDaysOff = 7
+
+            bWeekend = False if int(completeWeekend) == 0 else True
+            contract.completeWeekend = bWeekend
+
+            contract.completeWeekend = False
+
+            if jsonContract["id"] == "FullTime":
+                if not dynamicContractDays:
+                    contract.days = 5
+                    contract.nights = 4
+                self.fullTimeContract = contract
+            elif jsonContract["id"] == "PartTime":
+                if not dynamicContractDays:
+                    contract.days = 4
+                    contract.nights = 3
+                self.halfTimeContract = contract
+            elif jsonContract["id"] == "HalfTime":
+                if not dynamicContractDays:
+                    contract.days = 3
+                    contract.nights = 2
+                self.pastTimeContract = contract
+            
+            print(f"Contract working: {contract.days} days, {contract.nights} nights")
+
         # Ignored fields are:
-            # id
             # numberOfWeeks
             # skills
             # shiftTypes (soft constraints?)
@@ -39,8 +83,7 @@ class JSONParser:
         for nurse in nursesJson["nurses"]:
             rawId = nurse["id"]
             rawContract = nurse["contract"]
-            contractDays = self.getContractDays(rawContract)
-            contract = Contract(contractDays[0], contractDays[1])
+            contract = self.getContract(rawContract)
 
             rawId = self.getIdAndGrade(rawId)
             grade = rawId[0]
@@ -51,11 +94,9 @@ class JSONParser:
 
         # This looks at the shifts each nurse has requested to not work
         # shiftsOffRequirements =  workdaysJson["shiftOffRequests"]
-
         shiftsRequirements = workdaysJson["requirements"]
         shiftsDict = {}
 
-        # Had trouble making for loops inside dictionary
         for day in Days:
             shiftsDict[day] = {
                 ShiftType.EARLY: {
@@ -132,8 +173,40 @@ class JSONParser:
                 shift = Shift(coverRequirements, shiftType, day)
                 shifts.append(shift)
 
+        # Soft constraints
+
+        history = historyJson
+        shiftOfRequests = workdaysJson["shiftOffRequests"]
+
+        for request in shiftOfRequests:
+            nurseId = int(request["nurse"].split("_")[1])
+            undesiredShifts = nurses[nurseId].undesiredShifts
+            day = self.strToDay(request["day"])
+            # Manipulates given list undesiredShifts
+            self.setUndesiredShifts(request["shiftType"], day, undesiredShifts)
+            
         return Schedule(shifts, nurses)
     
+    # nurseShifts: # List of 3 lists: Early shifts, late shifts, night shifts
+    def setUndesiredShifts(self, shiftReq, day:Days, nurseShifts):
+        dayIndex = day.value - 1
+        match shiftReq:
+            case "Early": 
+                nurseShifts[0][dayIndex] = 1
+            case "Late":
+                nurseShifts[1][dayIndex] = 1
+            case "Day":
+                nurseShifts[0][dayIndex] = 1
+                nurseShifts[1][dayIndex] = 1
+            case "Night":
+                nurseShifts[2][dayIndex] = 1
+            case "Any":
+                nurseShifts[0][dayIndex] = 1
+                nurseShifts[1][dayIndex] = 1
+                nurseShifts[2][dayIndex] = 1
+            case _:
+                raise ValueError(f'{shiftReq} not recognized')
+        
     # Combine caretakers and nurses into the same grade
     # Debatable
     def getIdAndGrade(self, rawId):
@@ -164,16 +237,16 @@ class JSONParser:
             case _:
                 raise ValueError(f'{skill} not recognized')
 
-    def getContractDays(self, contract):
-        match contract:
+    def getContract(self, contractStr):
+        match contractStr:
             case "FullTime":
-                return (5,4)
+                return self.fullTimeContract
             case "PartTime":
-                return (4,3)
+                return self.pastTimeContract
             case "HalfTime":
-                return (3,2)
+                return self.halfTimeContract
             case _:
-                raise ValueError(f'{contract} not recognized')
+                raise ValueError(f'{contractStr} not recognized')
     
     def indexToShiftType(self, i):
         match i:
@@ -185,56 +258,6 @@ class JSONParser:
                 return ShiftType.NIGHT
             case _:
                 raise ValueError(f'{i} out of bounds')
-
-    def parse(self, jsonData):
-        nurses = []
-        shifts = []
-
-        try:
-            startDate = jsonData["StartDate"]
-            duration = jsonData["DurationWeeks"]
-
-            for rawNurse in jsonData["Nurses"]:
-                id = rawNurse["Id"]
-                intGrade = rawNurse["Grade"]
-                grade = self.intToGrade(intGrade)
-
-                # Snak om hvad der er smartest at implementere ift. kontrakt
-                contract = None
-
-                # Preferences bliver bare sprunget over nu
-
-                nurse = Nurse(id, grade, contract)
-                nurses.append(nurse)
-            
-            for days in jsonData["Shifts"]:
-                dayName = None
-                for name in days:
-                    dayName = name
-                 
-                day = list(days.values())[0]
-                for rawShift in day:
-                    strShiftType    = rawShift["ShiftType"]
-                    noGradeOne      = rawShift["Grade1"]
-                    noGradeTwo      = rawShift["Grade2"]
-                    noGradeThree    = rawShift["Grade3"]
-
-                    shiftType   = self.strToShiftType(strShiftType)
-                    dayType     = self.strToDay(dayName)
-
-                    coverRequirements = {
-                        Grade.ONE: noGradeOne,
-                        Grade.TWO: noGradeTwo,
-                        Grade.THREE: noGradeThree 
-                    }
-
-                    shift = Shift(coverRequirements, shiftType, dayType)
-                    shifts.append(shift)
-
-            return Schedule(shifts, nurses)
-        except Exception as e:
-            raise ValueError("Failed to parse json: " + str(e)) from e
-
 
     def intToGrade(self, i):
         match i:

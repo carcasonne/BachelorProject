@@ -2,6 +2,7 @@ import json
 import time
 
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
+from Parser.NurseParser import NurseParser
 from Knapsack.KnapsackSolver import KnapsackSolver
 from TabuSearch.DirectedGraph import DirectedGraph
 from TabuSearch.StaticMethods import evaluateCC
@@ -14,9 +15,16 @@ def time_convert(sec, str):
 
 start_time = time.time()
 
-schedule = copy.deepcopy(TestTabuData().schedule)
+parser = NurseParser()
+schedule_parsed = parser.parseScenario("n030w4")
+schedule_artificial = copy.deepcopy(TestTabuData().schedule)
 
-solver = KnapsackSolver(schedule)
+end_parser_time = time.time()
+
+# schedule_parsed.shifts = schedule_artificial.shifts
+# schedule_parsed.nurses = schedule_artificial.nurses
+
+solver = KnapsackSolver(schedule_parsed)
 solver.solve()
 
 schedule = TabuSchedule(solver.schedule)
@@ -28,8 +36,9 @@ search.initSchedule()
 #print(str(search.currSolution))
 
 search.run()
-
 end_tabu_time = time.time()
+print(search.bestSolution.nursePatternSchedule())
+print(str(search.bestSolution))
 
 #print(search.currSolution.scheduleTable())
 print("Executed P1 Random Descent: " + str(search.stepsP1[0]) + " times.")
@@ -55,7 +64,9 @@ print("Total iterations: " + str(sum(search.stepsP1) + sum(search.stepsP2) + sum
 
 print("\n")
 
-time_knapsack_lapsed = end_knapsack_time - start_time
+time_parser_lapsed = end_parser_time - start_time
+time_knapsack_lapsed = end_knapsack_time - end_parser_time
 time_tabu_lapsed = end_tabu_time - end_knapsack_time
+time_convert(time_parser_lapsed, "Parser parsing time: ")
 time_convert(time_knapsack_lapsed, "Knapsack computation time: ")
 time_convert(time_tabu_lapsed, "Tabu search computation time: ")

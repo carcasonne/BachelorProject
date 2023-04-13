@@ -9,7 +9,7 @@ from TabuSearch.StaticMethods import evaluatePC
 from TabuSearch.StaticMethods import evaluateLB
 
 from tabulate import tabulate
-from colorama import Fore
+from colorama import Fore, Back
 
 
 class TabuSchedule:
@@ -84,36 +84,72 @@ class TabuSchedule:
             shifts.append(item)
         string += tabulate(shifts, headers=["Day", "ShiftType", "Requirements", "Assigned"], tablefmt='fancy_grid', showindex="always")
         string += f"\n \n                 CC Score: {self.CC}       PC Score: {self.PC}\n"
-        return string
-    
-    def scheduleTable(self):
+        averagePc = self.PC/len(self.nurses)
+        string += f"\n \n                 PC/Nurse Score: {averagePc}\n"
+        
+        return string + "\n"
+        
+    def nursePatternSchedule(self):
         # COLUMNS: DAYS
         # ROWS: SHIFTS
         # CELLS: IDS OF NURSES WORKING SHIFT ON DAY
 
         string = "\n \n \n"
-        string += "                  NURSE WORK PATTERNS                 \n"
-        rows = [str(typ) for typ in TabuShiftType]
-        dayRow = [""] * 7
-        nightRow = [""] * 7
+        string += "                                             NURSE WORK PATTERNS\n\n"
+        #rows = [str(typ) for typ in TabuShiftType]
+        dayRow = [None] * 8
+        dayRow[0] = "Day"
+        nightRow = [None] * 8
+        nightRow[0] = "Night"
 
-        for i in range(7):
-            item = []
-            rows.append(item)
-            shift = self.shifts[i*2]
-            ids = shift.assignedNurses[Grade.THREE]
-            content = ""
-            for idd in ids:
-                content += f"{idd}, "      
-            nightRow[i] = content
+        dayNurses = []
+        nightNurses = []
+
+        colors = [Back.RED, Back.GREEN, Back.BLUE, Back.WHITE, Back.YELLOW, Back.MAGENTA, Back.CYAN, Back.WHITE, Back.LIGHTRED_EX, Back.LIGHTGREEN_EX, Back.LIGHTYELLOW_EX, Back.LIGHTBLUE_EX, Back.LIGHTMAGENTA_EX, Back.LIGHTCYAN_EX, Back.LIGHTWHITE_EX]
+        resetColor = Back.RESET
+
+        idToColor = {}
+
+        for i in range(len(self.nurses)):
+            nurse = self.nurses[i]
+            idToColor[nurse.id] = colors[i % len(colors)]
+
+        rows = [dayRow]
         
-        #headers = ["Shoft Type", str(day) for day in Days]
+        for nurse in self.nurses:
+            item = [""] * 8
+            item[0] = f"Nurse ID: {nurse.id}"
 
-        string += tabulate(rows, headers=[], tablefmt='fancy_grid', showindex="always")
-
-
-        pass
+            if nurse.shiftPattern.day != [0] * 7:
+                for i in range(len(nurse.shiftPattern.day)):
+                    day = nurse.shiftPattern.day[i]
+                    if day == 1:
+                        item[i + 1] = "X"
+                dayNurses.append(item)
         
+        rows = rows + dayNurses
+        rows = rows + [nightRow]
+
+        for nurse in self.nurses:
+            item = [""] * 8
+            item[0] = f"Nurse ID: {nurse.id}"
+
+            if nurse.shiftPattern.day == [0] * 7:
+                for i in range(len(nurse.shiftPattern.night)):
+                    night = nurse.shiftPattern.night[i]
+                    if night == 1:
+                        item[i + 1] = "X"
+                nightNurses.append(item)
+        
+        rows = rows + nightNurses
+        
+        headers = [""]
+        days = [str(day) for day in Days]
+        headers = headers + days
+        string += tabulate(rows, headers=headers, tablefmt='fancy_grid')
+        return string
+        
+
     def scores(self):
         string = f"CC Score: {self.CC} \n"
         string += f"PC Score: {self.PC}"
