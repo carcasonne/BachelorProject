@@ -202,65 +202,15 @@ class Test_TabuNurse(unittest.TestCase):
         pattern = TabuShiftPattern([1, 1, 1, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0], )
         self.assertEqual(0, n.calculatePenalty(pattern))
 
-    # undesiredWeekend
-    def test_calculate_penalty_nurse_undesired_weekend_true_has_weekend_shift_returns_30(self):
-        n = TabuNurse(Nurse(0, Grade.TWO, Contract(1, 1)))
-        n.undesiredWeekend = True
-
-        pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 1, 1, 0, 1])
-        self.assertEqual(30, n.calculatePenalty(pattern))
-
-        pattern = TabuShiftPattern([1, 0, 0, 1, 1, 0, 1], [0, 0, 0, 0, 0, 0, 0], )
-        self.assertEqual(30, n.calculatePenalty(pattern))
-
-        pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 1, 1, 1, 0])
-        self.assertEqual(30, n.calculatePenalty(pattern))
-
-        pattern = TabuShiftPattern([1, 0, 0, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0], )
-        self.assertEqual(30, n.calculatePenalty(pattern))
-
-    def test_calculate_penalty_nurse_undesired_weekend_true_has_no_weekends_returns_0(self):
-        n = TabuNurse(Nurse(0, Grade.TWO, Contract(1, 1)))
-        n.undesiredWeekend = True
-
-        pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 1, 1, 0, 0])
-        self.assertEqual(0, n.calculatePenalty(pattern))
-
-        pattern = TabuShiftPattern([1, 0, 0, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0],)
-        self.assertEqual(0, n.calculatePenalty(pattern))
-
-    def test_calculate_penalty_nurse_undesired_weekend_false_return_always_0(self):
-        n = TabuNurse(Nurse(0, Grade.TWO, Contract(1, 1)))
-        n.undesiredWeekend = False
-
-        pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0, 1])
-        self.assertEqual(0, n.calculatePenalty(pattern))
-
-        pattern = TabuShiftPattern([1, 0, 1, 0, 1, 0, 1], [0, 0, 0, 0, 0, 0, 0],)
-        self.assertEqual(0, n.calculatePenalty(pattern))
-
-        pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 1, 1, 0, 1, 1])
-        self.assertEqual(0, n.calculatePenalty(pattern))
-
-        pattern = TabuShiftPattern([1, 0, 1, 1, 0, 1, 1], [0, 0, 0, 0, 0, 0, 0], )
-        self.assertEqual(0, n.calculatePenalty(pattern))
-
-        pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 1, 0, 0])
-        self.assertEqual(0, n.calculatePenalty(pattern))
-
-        pattern = TabuShiftPattern([1, 1, 0, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0, 0], )
-        self.assertEqual(0, n.calculatePenalty(pattern))
-
     # Multiple penalties:
-    def test_calculate_penalty_multiple_penalties_returns_(self):
+    def test_calculate_penalty_multiple_penalties_returns_90(self):
         n = TabuNurse(Nurse(0, Grade.TWO, Contract(1, 1)))
-        n.undesiredWeekend = True
         n.consecutiveDaysOff = (1, 2)
         n.consecutiveWorkingDays = (1, 2)
 
         n.undesiredShifts = TabuShiftPattern([1, 1, 1, 1, 1, 1, 1], [1, 0, 0, 0, 0, 1, 1])
         pattern = TabuShiftPattern([0, 0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 1, 1, 1])
-        self.assertEqual(120, n.calculatePenalty(pattern))
+        self.assertEqual(90, n.calculatePenalty(pattern))
 
     # ----------------------------------- __eq__(self, other) -----------------------------------
     def test_nurse_eq_nurse_with_different_id_and_same_grade_returns_false(self):
