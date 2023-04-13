@@ -12,7 +12,7 @@ class NetworkNurse:
         # Soft constraints:
         self.consecutiveWorkingDays = tabuNurse.consecutiveWorkingDays
         self.consecutiveDaysOff = tabuNurse.consecutiveDaysOff
-        self.undesiredShifts = tabuNurse.undesiredShifts
+        self.undesiredShifts = nurse.undesiredShifts
         self.shiftPenalty = [0, 0, 0, 0, 0, 0, 0]
         for x in range(7):
             if nurse.undesiredShifts[0][x] != nurse.undesiredShifts[1][x]:
@@ -21,6 +21,22 @@ class NetworkNurse:
                 elif nurse.undesiredShifts[0][x] == 0:
                     self.shiftPenalty[x] = 1
         self.completeWeekend = tabuNurse.completeWeekend
+        self.LB = self.calculateLowerBound()  # This is the lower bound for the amount of early shifts this nurse can work
+        self.UP = self.calculateUpperBound()  # this is the upper bound for the amount of early shifts this nurse can work
 
     def penalty(self, day):
         return self.shiftPenalty[day]
+
+    def calculateLowerBound(self):
+        result = 0
+        for d in self.shiftPenalty:
+            if d < 0:
+                result += 1
+        return min(result, self.contract[0])
+
+    def calculateUpperBound(self):
+        result = 0
+        for d in self.shiftPenalty:
+            if d <= 0:
+                result += 1
+        return min(result, self.contract[0])

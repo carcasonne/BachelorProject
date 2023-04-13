@@ -1,5 +1,3 @@
-
-
 def evaluationFunction(tabuSchedule, schedule):
     """
     This function is used as the
@@ -21,4 +19,3 @@ def getUpperBound(nurse):
 
 def getLowerBound(nurse):
     pass
-
