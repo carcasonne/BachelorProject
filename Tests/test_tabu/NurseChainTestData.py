@@ -44,7 +44,7 @@ class NurseChainTestData:
         self.tschedule = TabuSchedule(self.schedule)
 
         nurses = self.tschedule.nurses
-        nurses[0].undesiredShifts.day[5] = 1
+        nurses[0].undesiredShifts.night[3] = 1
         self.tschedule.assignPatternToNurse(nurses[0], TabuShiftPattern([1, 1, 1, 1, 1, 0, 0], [0] * 7))
         self.tschedule.assignPatternToNurse(nurses[1], TabuShiftPattern([1, 0, 1, 1, 1, 0, 1], [0] * 7))
         self.tschedule.assignPatternToNurse(nurses[2], TabuShiftPattern([0] * 7, [0, 0, 1, 1, 1, 1, 0]))

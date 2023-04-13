@@ -47,6 +47,14 @@ print("Executed P2 Nurse Chain: " + str(search.stepsP2[2]) + " times.")
 
 print("\n")
 
+print("Executed P3 Search Stuck: " + str(search.stepsP3[0]) + " times.")
+
+print("\n")
+
+print("Total iterations: " + str(sum(search.stepsP1) + sum(search.stepsP2) + sum(search.stepsP3)) + ".")
+
+print("\n")
+
 time_knapsack_lapsed = end_knapsack_time - start_time
 time_tabu_lapsed = end_tabu_time - end_knapsack_time
 time_convert(time_knapsack_lapsed, "Knapsack computation time: ")

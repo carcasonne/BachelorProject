@@ -42,8 +42,9 @@ class TabuSearch_SIMPLE:
 
         self.stepsP1 = [0, 0, 0, 0, 0, 0]
         self.stepsP2 = [0, 0, 0]
+        self.stepsP3 = [0]
 
-        self.debug = False
+        self.debug = True
 
     def initSchedule(self):
         """
@@ -153,20 +154,26 @@ class TabuSearch_SIMPLE:
         """
         while self.currSolution.PC > 0:
             if self.makeMove(self.randomDecent(self.currSolution, 2)) is None:
-                if self.makeMove(self.shiftChain(self.currSolution, 2)) is not None:
+                if self.makeMove(self.shiftChain(self.currSolution, 2)) is None:
+                    if self.makeMove(self.nurseChain(self.currSolution, 2)) is not None:
+                        self.stepsP2[2] += 1
+                        if self.debug:
+                            print(self.currSolution.scores())
+
+                    else:
+                        if self.currSolution.PC < self.bestSolution.PC:
+                            print()
+                            print("FOUND A BETTER SOLUTION THAN THE LAST ONE!")
+                            print("RUN: " + str(runs) + " PC: FROM: " + str(self.bestSolution.PC) + " TO: " + str(
+                                self.currSolution.PC))
+                            print()
+                            print(str(self.currSolution))
+                            self.bestSolution = copy.deepcopy(self.currSolution)
+                        break
+                else:
                     self.stepsP2[1] += 1
                     if self.debug:
                         print(self.currSolution.scores())
-                else:
-                    if self.currSolution.PC < self.bestSolution.PC:
-                        print()
-                        print("FOUND A BETTER SOLUTION THAN THE LAST ONE!")
-                        print("RUN: " + str(runs) + " PC: FROM: " + str(self.bestSolution.PC) + " TO: " + str(
-                            self.currSolution.PC))
-                        print()
-                        print(str(self.currSolution))
-                        self.bestSolution = copy.deepcopy(self.currSolution)
-                    break
             else:
                 self.stepsP2[0] += 1
                 if self.debug:
@@ -177,6 +184,7 @@ class TabuSearch_SIMPLE:
         phase1. Execute the move searchStuck.
         """
         self.makeMove(self.searchStuck(self.currSolution))
+        self.stepsP3[0] += 1
         if self.debug:
             print(self.currSolution.scores())
 
@@ -313,7 +321,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        return None
+        #return None
         if self.debug:
             print("Running Balance Swap...")
         ccAndMove = 0, None
@@ -571,43 +579,67 @@ class TabuSearch_SIMPLE:
                     elif nurse2.worksNight is False and nurse2.contract.days == nurse1.contract.days:
                         graph.addEdge(nurse1.id, nurse2.id, nurse1.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
 
-        for shift in schedule.shifts:
-            if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
-                overCovered.append(shift)
-            elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
-                underCovered.append(shift)
-
         if phase == 1:
+            for shift in schedule.shifts:
+                if shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) < 0:
+                    overCovered.append(shift)
+                elif shift.coverRequirements[grade] - len(shift.assignedNurses[grade]) > 0:
+                    underCovered.append(shift)
+
             for source in nurseList:
+                isSource = False
                 for o in overCovered:
                     if patternCoverShift(source.shiftPattern, o):
-                        for u in underCovered:  # TODO: Maybe break here to make it more efficient
-                            if patternCoverShift(source.shiftPattern, u):
-                                for pattern in self.feasiblePatterns[source.id]:
-                                    if calculateDifferenceCC(schedule, source, pattern) < 0:
-                                        for sink in nurseList:
-                                            if pattern in self.feasiblePatterns[sink.id]:
-                                                edges = graph.search(source.id, sink.id)
-                                                if len(edges) > 0:
-                                                    pcCounter = 0
-                                                    for edge in edges:
-                                                        pcCounter += edge.weight
-                                                    pcCounter += calculateDifferencePC(schedule.nurses[edges[len(edges)-1].toNode], pattern)
-                                                    if pcCounter <= 0:
-                                                        neighbour = copy.deepcopy(schedule)
-                                                        change = False
-                                                        for edge in edges:
-                                                            fromN = neighbour.nurses[edge.fromNode]
-                                                            toN = neighbour.nurses[edge.toNode]
-                                                            if fromN.worksNight != toN.worksNight:
-                                                                change = True
-                                                            neighbour.assignPatternToNurse(fromN, toN.shiftPattern)
-                                                        neighbour.assignPatternToNurse(neighbour.nurses[sink.id], pattern)
-                                                        if neighbour.CC < schedule.CC:
-                                                            "Move Nurse Chain XXX"
-                                                            return neighbour, change
+                        for u in underCovered:
+                            if patternCoverShift(source.shiftPattern, u) == 0:
+                                isSource = True
+                                break
+                    if isSource:
+                        break
+
+                if isSource:
+                    for pattern in self.feasiblePatterns[source.id]:
+                        if calculateDifferenceCC(schedule, source, pattern) < 0:
+                            for sink in nurseList:
+                                if sink.contract == source.contract and sink.id != source.id:
+                                    edges = graph.search(source.id, sink.id)
+                                    if len(edges) > 0:
+                                        pcCounter = 0
+                                        for edge in edges:
+                                            pcCounter += edge.weight
+                                        pcCounter += calculateDifferencePC(
+                                            schedule.nurses[edges[len(edges) - 1].toNode], pattern)
+                                        if pcCounter <= 0:
+                                            neighbour = copy.deepcopy(schedule)
+                                            change = False
+                                            for edge in edges:
+                                                fromN = schedule.nurses[edge.fromNode]
+                                                toN = schedule.nurses[edge.toNode]
+                                                if fromN.worksNight != toN.worksNight:
+                                                    change = True
+                                                neighbour.assignPatternToNurse(neighbour.nurses[fromN.id], toN.shiftPattern)
+                                            neighbour.assignPatternToNurse(neighbour.nurses[sink.id], pattern)
+                                            return neighbour, change
         elif phase == 2:
-            return None
+            for source in nurseList:
+                edges = graph.search(source.id, source.id)
+                if len(edges) > 0:
+                    pcCounter = 0
+                    for edge in edges:
+                        pcCounter += edge.weight
+                    if pcCounter < 0:
+                        neighbour = copy.deepcopy(schedule)
+                        change = False
+                        for edge in edges:
+                            fromN = schedule.nurses[edge.fromNode]
+                            toN = schedule.nurses[edge.toNode]
+                            if fromN.worksNight != toN.worksNight:
+                                change = True
+                            neighbour.assignPatternToNurse(neighbour.nurses[fromN.id], toN.shiftPattern)
+                        print("Current sched PC: " + str(schedule.PC))
+                        print("New sched PC: " + str(neighbour.PC))
+                        return neighbour, change
+        return None
 
     def underCovering(self, schedule):
         """
