@@ -67,6 +67,17 @@ class Test_TabuSearch(unittest.TestCase):
                 break
         self.assertTrue(scheduleWasChanged)
 
+    def test_random_kick_on_schedule_with_no_assigned_nurses(self):
+        oldSchedule = copy.deepcopy(self.schedule)
+        scheduleWasChanged = False
+        self.schedule = self.ts.randomKick(self.schedule)[0]
+        for nurse in self.schedule.nurses:
+            if nurse.shiftPattern != oldSchedule.nurses[nurse.id].shiftPattern:
+                scheduleWasChanged = True
+                break
+        self.assertTrue(scheduleWasChanged)
+
+
     # ----------------------------------- balanceRestoring(self, schedule) -----------------------------------
     def test_balance_restoring_with_undercovered_days_returns_move_with_more_day_nurses(self):
         for nurse in self.schedule.nurses:

@@ -24,7 +24,7 @@ end_parser_time = time.time()
 # schedule_parsed.shifts = schedule_artificial.shifts
 # schedule_parsed.nurses = schedule_artificial.nurses
 
-solver = KnapsackSolver(schedule_parsed)
+solver = KnapsackSolver(schedule_artificial)
 solver.solve()
 
 schedule = TabuSchedule(solver.schedule)
