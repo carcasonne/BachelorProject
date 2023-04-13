@@ -20,4 +20,4 @@ class Test_staticMethods(unittest.TestCase):
         result = evaluationFunction(self.tabuSchedule, self.schedule)
 
         self.assertTrue(0 < result)
-        self.assertEqual(29*10, result)
+        self.assertEqual(80, result)
