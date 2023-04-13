@@ -231,25 +231,23 @@ class Test_StaticMethods(unittest.TestCase):
         self.assertEqual(0, result)
 
     # ----------------------------------- calculateDifferencePC(nurse, pattern) -----------------------------------
-    def test_calculate_difference_pc_changing_pattern_returns_negative_60(self):
+    def test_calculate_difference_pc_changing_pattern_returns_negative_30(self):
         nurse = self.schedule.nurses[0]
-        nurse.undesiredWeekend = True
         nurse.completeWeekend = True
         self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [0, 1, 0, 1, 0, 1, 0]))
 
-        self.assertEqual(-60, calculateDifferencePC(nurse, TabuShiftPattern([0] * 7, [0, 1, 0, 1, 1, 0, 0])))
+        self.assertEqual(-30, calculateDifferencePC(nurse, TabuShiftPattern([0] * 7, [0, 1, 0, 1, 1, 0, 0])))
 
     # ----------------------------------- evaluatePC(nurse, pattern) -----------------------------------
-    def test_evaluate_pc_adding_new_shift_pattern_to_nurse_decrease_pc_with_60(self):
+    def test_evaluate_pc_adding_new_shift_pattern_to_nurse_decrease_pc_with_30(self):
         nurse = self.schedule.nurses[0]
-        nurse.undesiredWeekend = True
         nurse.completeWeekend = True
         self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [0, 1, 0, 1, 0, 1, 0]))
         oldPC = self.schedule.PC
         self.schedule.assignPatternToNurse(nurse, TabuShiftPattern([0] * 7, [0, 1, 0, 1, 1, 0, 0]))
         newPC = self.schedule.PC
 
-        self.assertEqual(oldPC - 60, newPC)
+        self.assertEqual(oldPC - 30, newPC)
 
     # ----------------------------------- evaluateLB(schedule, feasibleShiftPatterns) -----------------------------------
     def test_evaluate_lb_on_empty_penalty_schedule_returns_0(self):
