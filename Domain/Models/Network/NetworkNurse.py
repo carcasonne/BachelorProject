@@ -28,15 +28,24 @@ class NetworkNurse:
         return self.shiftPenalty[day]
 
     def calculateLowerBound(self):
+        """
+        The amount of times a nurse wants to work early. This is only based on the nurse wanting to work early.
+        :return Lower Bound:
+        """
         result = 0
         for d in self.shiftPenalty:
             if d < 0:
                 result += 1
-        return min(result, self.contract[0])
+        return min(result, self.contract.days)
 
     def calculateUpperBound(self):
+        """
+        The amount of times it is possible for a nurse to work early. This is based on the nurse wanting to work early
+        or having no preference.
+        :return Upper Bound:
+        """
         result = 0
         for d in self.shiftPenalty:
             if d <= 0:
                 result += 1
-        return min(result, self.contract[0])
+        return min(result, self.contract.days)
