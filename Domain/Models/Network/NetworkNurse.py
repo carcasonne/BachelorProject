@@ -1,5 +1,6 @@
 from Domain.Models.ShiftPatterns.ShiftPattern import StandardShiftPattern
 
+
 class NetworkNurse:
     def __init__(self, tabuNurse, nurse):
         self.id = nurse.id  # The identification number of the nurse

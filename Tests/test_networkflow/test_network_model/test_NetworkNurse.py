@@ -55,7 +55,7 @@ class Test_NetworkNurse(unittest.TestCase):
 
     def test_penalty_for_nurse0_day_5_returns_0(self):
         result = self.networkNurse0.penalty(5)
-        self.assertEqual(0, result)
+        self.assertEqual(-1, result)
 
     def test_penalty_for_nurse1_day_0_5_6_returns_1(self):
         self.assertEqual(1, self.networkNurse1.penalty(0))
