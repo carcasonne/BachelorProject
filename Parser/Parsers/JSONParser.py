@@ -46,15 +46,10 @@ class JSONParser:
             contract.maxConsecutiveDaysOff = jsonContract["maximumNumberOfConsecutiveDaysOff"]
             completeWeekend = jsonContract["completeWeekends"]
 
-            contract.minConsecutiveDays = 0
-            contract.minConsecutiveDaysOff = 0
-            contract.maxConsecutiveDays = 7
-            contract.maxConsecutiveDaysOff = 7
-
             bWeekend = False if int(completeWeekend) == 0 else True
             contract.completeWeekend = bWeekend
 
-            contract.completeWeekend = False
+            #contract.completeWeekend = False
 
             if jsonContract["id"] == "FullTime":
                 if not dynamicContractDays:
