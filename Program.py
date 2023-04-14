@@ -4,39 +4,40 @@ import time
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from Parser.NurseParser import NurseParser
 from Knapsack.KnapsackSolver import KnapsackSolver
+from Spinner import Spinner
 from TabuSearch.DirectedGraph import DirectedGraph
 from TabuSearch.StaticMethods import evaluateCC
 from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-def time_convert(sec, str):
-    print(f"{str}: {sec} seconds")
+with Spinner():
+    start_time = time.time()
 
-start_time = time.time()
+    parser = NurseParser()
+    schedule_parsed = parser.parseScenario("n030w4")
+    schedule_artificial = copy.deepcopy(TestTabuData().schedule)
 
-parser = NurseParser()
-schedule_parsed = parser.parseScenario("n030w4")
-schedule_artificial = copy.deepcopy(TestTabuData().schedule)
+    end_parser_time = time.time()
 
-end_parser_time = time.time()
+    # schedule_parsed.shifts = schedule_artificial.shifts
+    # schedule_parsed.nurses = schedule_artificial.nurses
 
-# schedule_parsed.shifts = schedule_artificial.shifts
-# schedule_parsed.nurses = schedule_artificial.nurses
+    solver = KnapsackSolver(schedule_parsed)
+    solver.solve()
 
-solver = KnapsackSolver(schedule_artificial)
-solver.solve()
+    schedule = TabuSchedule(solver.schedule)
 
-schedule = TabuSchedule(solver.schedule)
+    end_knapsack_time = time.time()
 
-end_knapsack_time = time.time()
+    search = TabuSearch_SIMPLE(schedule)
+    search.initSchedule()
+    search.debug = False
+    #print(str(search.currSolution))
 
-search = TabuSearch_SIMPLE(schedule)
-search.initSchedule()
-#print(str(search.currSolution))
+    search.run()
+    end_tabu_time = time.time()
 
-search.run()
-end_tabu_time = time.time()
 print(search.bestSolution.nursePatternSchedule())
 print(str(search.bestSolution))
 
@@ -67,6 +68,7 @@ print("\n")
 time_parser_lapsed = end_parser_time - start_time
 time_knapsack_lapsed = end_knapsack_time - end_parser_time
 time_tabu_lapsed = end_tabu_time - end_knapsack_time
-time_convert(time_parser_lapsed, "Parser parsing time: ")
-time_convert(time_knapsack_lapsed, "Knapsack computation time: ")
-time_convert(time_tabu_lapsed, "Tabu search computation time: ")
+
+print(f"Parser parsing time: {time_parser_lapsed} seconds")
+print(f"Knapsack computation time: {time_knapsack_lapsed} seconds")
+print(f"Tabu search computation time: {time_tabu_lapsed} seconds")
