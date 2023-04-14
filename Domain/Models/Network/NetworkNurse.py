@@ -23,9 +23,9 @@ class NetworkNurse:
         for x in range(7):
             if nurse.undesiredShifts[0][x] != nurse.undesiredShifts[1][x]:
                 if nurse.undesiredShifts[0][x] == 1:
-                    self.shiftPreference[x] = -1
-                elif nurse.undesiredShifts[0][x] == 0:
                     self.shiftPreference[x] = 1
+                elif nurse.undesiredShifts[0][x] == 0:
+                    self.shiftPreference[x] = -1
         self.completeWeekend = tabuNurse.completeWeekend
         self.LB = self.calculateLowerBound()  # This is the lower bound for the amount of early shifts this nurse can work
         self.UP = self.calculateUpperBound()  # this is the upper bound for the amount of early shifts this nurse can work
@@ -38,6 +38,12 @@ class NetworkNurse:
         """
         return self.shiftPreference[day.value - 1]
 
+    def worksDay(self, day):
+        if day in self.daySet:
+            return True
+        else:
+            return False
+
     # TODO: Need to take care of if nurse works these days
     def calculateLowerBound(self):
         """
@@ -45,10 +51,10 @@ class NetworkNurse:
         :return Lower Bound:
         """
         result = 0
-        for d in self.shiftPreference:
-            if d < 0:
+        for d in Days:
+            if self.preference(d) < 0 and self.worksDay(d):
                 result += 1
-        return min(result, self.contract.days)
+        return result
 
     # TODO: Need to take care of if nurse works these days
     def calculateUpperBound(self):

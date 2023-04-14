@@ -49,23 +49,23 @@ class Test_NetworkNurse(unittest.TestCase):
         self.assertEqual(networkNurse.id, nurse.id)
         self.assertEqual(True, networkNurse.completeWeekend)
         self.assertEqual(([1, 0, 0, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1], [0, 0, 1, 1, 1, 1, 1]), networkNurse.undesiredShifts)
-        self.assertEqual([-1, 0, 0, 1, 0, 0, 0], networkNurse.shiftPreference)
+        self.assertEqual([1, 0, 0, -1, 0, 0, 0], networkNurse.shiftPreference)
 
     # ----------------------- preference(self, day) ---------------------------
-    def test_preference_for_nurse0_day_6_returns_1(self):
+    def test_preference_for_nurse0_day_6_returns_negative_1(self):
         result = self.networkNurse0.preference(Days.SUNDAY)
-        self.assertEqual(1, result)
-
-    def test_preference_for_nurse0_day_5_returns_0(self):
-        result = self.networkNurse0.preference(Days.SATURDAY)
         self.assertEqual(-1, result)
 
-    def test_preference_for_nurse1_day_0_5_6_returns_1(self):
-        self.assertEqual(1, self.networkNurse1.preference(Days.MONDAY))
-        self.assertEqual(1, self.networkNurse1.preference(Days.SATURDAY))
-        self.assertEqual(1, self.networkNurse1.preference(Days.SUNDAY))
+    def test_preference_for_nurse0_day_5_returns_1(self):
+        result = self.networkNurse0.preference(Days.SATURDAY)
+        self.assertEqual(1, result)
 
-    def test_preference_for_nurse1_day_3_returns_1(self):
+    def test_preference_for_nurse1_day_0_5_6_returns_negative_1(self):
+        self.assertEqual(-1, self.networkNurse1.preference(Days.MONDAY))
+        self.assertEqual(-1, self.networkNurse1.preference(Days.SATURDAY))
+        self.assertEqual(-1, self.networkNurse1.preference(Days.SUNDAY))
+
+    def test_preference_for_nurse1_day_3_returns_0(self):
         self.assertEqual(0, self.networkNurse1.preference(Days.THURSDAY))
 
     def test_preference_for_nurse2_all_days_returns_0(self):
@@ -88,11 +88,11 @@ class Test_NetworkNurse(unittest.TestCase):
         self.assertEqual(4, self.networkNurse2.calculateUpperBound())
 
     # ----------------------- calculateLowerBound(self) ---------------------------
-    def test_calculate_lower_bound_nurse0_return_1(self):
-        self.assertEqual(1, self.networkNurse0.calculateLowerBound())
+    def test_calculate_lower_bound_nurse0_return_0(self):
+        self.assertEqual(0, self.networkNurse0.calculateLowerBound())
 
-    def test_calculate_lower_bound_nurse1_return_3(self):
-        self.assertEqual(3, self.networkNurse1.calculateLowerBound())
+    def test_calculate_lower_bound_nurse1_return_0(self):
+        self.assertEqual(0, self.networkNurse1.calculateLowerBound())
 
     def test_calculate_lower_bound_nurse2_return_0(self):
         self.assertEqual(0, self.networkNurse2.calculateLowerBound())
