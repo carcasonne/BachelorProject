@@ -5,7 +5,7 @@ from Domain.Models.Tabu.TabuNurse import TabuNurse
 class NetworkSchedule:
     def __init__(self, tabuSchedule, schedule):
         self.nurses = list(map(lambda n: NetworkNurse(tabuSchedule.nurses[n.id], n), schedule.nurses))
-        self.tabuShifts = tabuSchedule.shifts
+        self.shifts = tabuSchedule.shifts
         if len(self.shifts) != 14:
             raise Exception("Must be exactly 14 shifts")
         self.shifts = schedule.shifts
