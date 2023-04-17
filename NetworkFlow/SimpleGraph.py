@@ -1,13 +1,35 @@
 class DirectedNetworkGraph:
     def __init__(self):
-        self.graph = {Node(0, None): [],  # Source Node
-                      Node(1, None): []}  # Sink Node
+        self.source = Node(0, None)
+        self.sink = Node(1, None)
+        self.nodeList = [self.source, self.sink]
+        self.graph = [[],  # Source Node
+                      []]  # Sink Node
 
-    def addNode(self, id, obj):
-        self.graph.update({Node(id, obj): []})
+    def addNode(self, obj):
+        id = len(self.graph)
+        self.nodeList.append(Node(id, obj))
+        self.graph.append([])
 
     def addEdge(self, fromNode, toNode, lowerBound, upperBound, cost):
         self.graph.get(fromNode).append(Edge(fromNode, toNode, lowerBound, upperBound, cost))
+
+    # find path by using BFS
+    def bfs(C, F, s, t):
+        queue = [s]
+        paths = {s: []}
+        if s == t:
+            return paths[s]
+        while queue:
+            u = queue.pop(0)
+            for v in range(len(C)):
+                if (C[u][v] - F[u][v] > 0) and v not in paths:
+                    paths[v] = paths[u] + [(u, v)]
+                    print(paths)
+                    if v == t:
+                        return paths[v]
+                    queue.append(v)
+        return None
 
     def maxFlow(self):
         pass
@@ -29,7 +51,7 @@ class Edge:
 
 
 class Node:
-    def __init__(self, id, obj):
+    def __init__(self, index, obj):
         self.id = id
         if obj is None:
             self.ref = None
