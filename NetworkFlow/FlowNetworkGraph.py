@@ -19,7 +19,7 @@ class DirectedEdge:
         self.fromNode = fromNode
         self.toNode = toNode
         self.cost = cost
-        self.requiredCapacity = lowerBound
+        self.requiredFlow = lowerBound
         self.capacity = upperBound
         self.flow = 0
 
@@ -93,8 +93,12 @@ class FlowNetwork:
                 if edge.flow == edge.capacity:
                     continue
 
+                # Make it cheaper to travel along paths which are below required flow
+                flowFromRequired = max(edge.requiredFlow - edge.flow, 0)
+                costToTravel = max(edge.cost - flowFromRequired, 0)
+
                 neighborId = edge.toNode.nodeId
-                newDistance = distance[visiting.nodeId] + edge.cost  # Current cost + cost of moving to neighbor
+                newDistance = distance[visiting.nodeId] + costToTravel  # Current cost + cost of moving to neighbor
 
                 if newDistance < distance[neighborId]:
                     distance[neighborId] = newDistance
