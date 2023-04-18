@@ -1,4 +1,5 @@
 from Domain.Models.Enums.Days import Days
+from NetworkFlow.FlowNetworkGraph import FlowNetwork
 from NetworkFlow.NetworkFlow import NetworkFlow
 
 
@@ -23,5 +24,28 @@ def evaluationFunction(networkSchedule):
     return result
 
 
-def EdmondsKarp(network: NetworkFlow):
+# Manipulates the input network to add the min-cost flow to edges
+# Also returns the flow created in the network
+def EdmondsKarp(network: FlowNetwork):
     flow = 0
+    augmentingPathExists = True
+
+    while augmentingPathExists:
+        shortestPath = network.findShortestPath()
+        if shortestPath is None:
+            augmentingPathExists = False
+            continue
+
+        # Finds the max flow which will fit in the entire path
+        df = float('inf')
+        for edge in shortestPath:
+            df = min(df, edge.capacity - edge.flow)
+
+        for edge in shortestPath:
+            edge.flow = edge.flow + df
+            # We are not using reverse edges. I don't understand the point of them.
+            # edge.reverse.flow = edge.reverse.flow - df
+
+        flow = flow + df
+
+    return flow

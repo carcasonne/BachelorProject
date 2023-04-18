@@ -24,3 +24,6 @@ class Test_staticMethods(unittest.TestCase):
             evaluationFunction(self.networkSchedule)
 
         self.assertTrue('Nurse 0 works day but are not assigned a StandardShiftPattern', context.exception)
+
+    def test_EdmondsKarp_on_network_finds_min_cost_flow(self):
+        pass
