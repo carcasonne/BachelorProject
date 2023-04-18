@@ -1,4 +1,5 @@
 from Domain.Models.Enums.Days import Days
+from NetworkFlow.NetworkFlow import NetworkFlow
 
 
 # TODO: Doesn't take into count that a nurse can have an empty a pattern currently... ([0]*7 , [0]*7, [0]*7)
@@ -22,3 +23,5 @@ def evaluationFunction(networkSchedule):
     return result
 
 
+def EdmondsKarp(network: NetworkFlow):
+    flow = 0

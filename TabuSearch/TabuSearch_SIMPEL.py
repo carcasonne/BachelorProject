@@ -328,7 +328,7 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        #return None
+        # return None
         if self.debug:
             print("Running Balance Swap...")
         ccAndMove = 0, None
