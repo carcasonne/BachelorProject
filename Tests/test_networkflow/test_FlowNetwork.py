@@ -6,7 +6,8 @@ from NetworkFlow.FlowNetworkGraph import FlowNetwork
 from NetworkFlow.NetworkFlow import NetworkFlow
 from Tests.test_networkflow.TestNetworkFlowData import TestNetworkFlowData
 
-
+# TODO: Tests that would make sense:
+# Is graph initialized correctly when given input? Nodes and edges
 class test_flowNetwork(unittest.TestCase):
 
     def setUp(self) -> None:

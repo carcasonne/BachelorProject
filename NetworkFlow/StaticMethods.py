@@ -28,12 +28,12 @@ def evaluationFunction(networkSchedule):
 # Also returns the flow created in the network
 def EdmondsKarp(network: FlowNetwork):
     flow = 0
-    augmentingPathExists = True
+    continueSearching = True
 
-    while augmentingPathExists:
+    while continueSearching:
         shortestPath = network.findShortestPath()
         if shortestPath is None:
-            augmentingPathExists = False
+            continueSearching = False
             continue
 
         # Finds the max flow which will fit in the entire path
@@ -47,5 +47,9 @@ def EdmondsKarp(network: FlowNetwork):
             # edge.reverse.flow = edge.reverse.flow - df
 
         flow = flow + df
+
+        if network.criticalBoundsSatisfied():
+            continueSearching = False
+            continue
 
     return flow

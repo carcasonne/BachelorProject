@@ -4,6 +4,7 @@ import unittest
 from Domain.Models.Network.NetworkSchedule import NetworkSchedule
 from NetworkFlow.StaticMethods import *
 from Tests.test_networkflow.TestNetworkFlowData import TestNetworkFlowData
+from Tests.test_networkflow.TestNetworkFlowData_Simple import TestNetworkFlowData_Simple
 from Tests.test_tabu.TestTabuData import TestTabuData
 
 
@@ -25,5 +26,34 @@ class Test_staticMethods(unittest.TestCase):
 
         self.assertTrue('Nurse 0 works day but are not assigned a StandardShiftPattern', context.exception)
 
-    def test_EdmondsKarp_on_network_finds_min_cost_flow(self):
-        pass
+    def test_EdmondsKarp_on_network_finds_flow(self):
+        network = FlowNetwork(self.networkSchedule)
+        flow = EdmondsKarp(network)
+
+        self.assertTrue(flow > 0)
+
+    def test_EdmondsKarp_finds_optimal_solution_for_simple_schedule(self):
+        networkSchedule = self._get_network_2_nurses_2_days_schedule()
+        network = FlowNetwork(networkSchedule)
+        flow = EdmondsKarp(network)
+
+        # See if nurses are working early or late
+        assignment = network.nurseAssignment()
+
+        # Optimal solution is when:
+        # nurse 0 works early monday, late tuesday: 1, 0
+        # nurse 1 works late monday, late tuesday:  0, 0
+        nurse_0 = networkSchedule.nurses[0]
+        nurse_1 = networkSchedule.nurses[1]
+
+        self.assertEqual(assignment[nurse_0][Days.MONDAY], 1)
+        self.assertEqual(assignment[nurse_0][Days.TUESDAY], 0)
+        self.assertEqual(assignment[nurse_1][Days.MONDAY], 0)
+        self.assertEqual(assignment[nurse_1][Days.TUESDAY], 0)
+
+
+    def _get_network_2_nurses_2_days_schedule(self):
+        schedule = copy.deepcopy(TestNetworkFlowData_Simple().schedule)
+        tabuSchedule = copy.deepcopy(TestNetworkFlowData_Simple().tabuSchedule)
+        networkSchedule = NetworkSchedule(tabuSchedule, schedule)
+        return networkSchedule

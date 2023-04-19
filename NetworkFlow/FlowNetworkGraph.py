@@ -11,6 +11,9 @@ class Node:
     def __init__(self, nodeId):
         self.nodeId = nodeId
         self.edges = []  # list of all edges going out of this node
+        # Special case for day nodes
+        self.day = None
+        self.grade = None
 
 
 class DirectedEdge:
@@ -22,7 +25,7 @@ class DirectedEdge:
         self.requiredFlow = lowerBound
         self.capacity = upperBound
         self.flow = 0
-
+        self.reverseFlow = 0
 
 @dataclass(order=True)
 class PrioritizedNode:
@@ -36,9 +39,16 @@ class FlowNetwork:
         self.sink = None
         self.schedule = networkSchedule
         self.nurseIdToNodeId = {}  # nurse id to the node representing this nurse
-        self.dayToNodeId = {}  # day to the first node in the chain representing this day
+        self.dayToNodeId = {}  # day to grade to int (nodeId) dictionary
         self.nodes = []  # item at index 'i' should have nodeId 'i'
         self.edges = []  # item at index 'i' should have edgeId 'i'
+
+        for day in Days:
+            self.dayToNodeId[day] = {
+                Grade.ONE: -1,
+                Grade.TWO: -1,
+                Grade.THREE: -1,
+            }
 
         if initialize:
             self.initNetwork()
@@ -52,19 +62,58 @@ class FlowNetwork:
         for nurse in self.schedule.nurses:
             nurseNode = self.createNode()
             self.nurseIdToNodeId[nurse.id] = nurseNode.nodeId
-            self.createDirectedPath(self.source, nurseNode, 0, nurse.UP, nurse.LB)
+            self.createDirectedPath(self.source, nurseNode, 0, nurse.LB, nurse.UP)
 
         # Make nodes for each day
+        # TODO: split into grades
         for day in Days:
-            dayNode = self.createNode()
-            self.dayToNodeId[day] = dayNode.nodeId
+            dayNode_grade_1 = self.createNode()
+            dayNode_grade_2 = self.createNode()
+            dayNode_grade_3 = self.createNode()
+            dayNode_grade_1.day = day
+            dayNode_grade_1.grade = Grade.ONE
+            dayNode_grade_2.day = day
+            dayNode_grade_2.grade = Grade.TWO
+            dayNode_grade_3.day = day
+            dayNode_grade_3.grade = Grade.THREE
+            self.dayToNodeId[day][Grade.ONE] = dayNode_grade_1.nodeId
+            self.dayToNodeId[day][Grade.TWO] = dayNode_grade_2.nodeId
+            self.dayToNodeId[day][Grade.THREE] = dayNode_grade_3.nodeId
 
-            hej = self.schedule.shifts
+            (requiredEarly_1, requiredLate_1) = self.schedule.getRequiredForDay(day, Grade.ONE)
+            (requiredEarly_2, requiredLate_2) = self.schedule.getRequiredForDay(day, Grade.TWO)
+            (requiredEarly_3, requiredLate_3) = self.schedule.getRequiredForDay(day, Grade.THREE)
+            nursesOnDay_1 = self.schedule.getNursesWorkingDay(day, Grade.ONE)
+            nursesOnDay_2 = self.schedule.getNursesWorkingDay(day, Grade.TWO)
+            nursesOnDay_3 = self.schedule.getNursesWorkingDay(day, Grade.THREE)
 
-            # Connect each day to the sink node
-            self.createDirectedPath(dayNode, self.sink, 0, 0, 0)
+            lowerBound_1 = requiredEarly_1
+            upperBound_1 = len(nursesOnDay_1) - requiredLate_1
+            lowerBound_2 = requiredEarly_2
+            upperBound_2 = len(nursesOnDay_2) - requiredLate_2
+            lowerBound_3 = requiredEarly_3
+            upperBound_3 = len(nursesOnDay_3) - requiredLate_3
+
+            # Make day chain, from grade 1 to 2 to 3 to sink
+            self.createDirectedPath(dayNode_grade_1, dayNode_grade_2, 0, lowerBound_1, upperBound_1)
+            self.createDirectedPath(dayNode_grade_2, dayNode_grade_3, 0, lowerBound_2, upperBound_2)
+            self.createDirectedPath(dayNode_grade_3, self.sink, 0, lowerBound_3, upperBound_3)
 
         # Connect the nurse nodes to day nodes
+        for nurse in self.schedule.nurses:
+            nurseNodeId = self.nurseIdToNodeId[nurse.id]
+            nurseNode = self.nodes[nurseNodeId]
+            for day in Days:
+                if nurse.worksDay(day):
+                    dayNodeId = self.dayToNodeId[day][nurse.grade]
+                    dayNode = self.nodes[dayNodeId]
+                    cost = nurse.shiftPreference[day.value - 1]
+                    # Get rid of negative weights as stated in the paper
+                    if cost < 0:
+                        self.createDirectedPath(nurseNode, dayNode, 0, 1, 1)
+                        self.createDirectedPath(dayNode, nurseNode, -cost, 0, 1)
+                    else:
+                        self.createDirectedPath(nurseNode, dayNode, cost, 0, 1)
 
         # Relax restrictions for nurses working more than 3 days
 
@@ -135,10 +184,33 @@ class FlowNetwork:
         self.edges.append(dirEdge)
         return dirEdge
 
-    # Finds a minimum flow solution in the network
-    # Implementation finds the solution, which violates fewest early/late preferences
-    def findMinimumCostFlow(self):
-        pass
+    # Returns if the critical edges (from day to sink) are within the required bounds
+    # These edges are critical, because they determine feasibility of the solution as a whole
+    def criticalBoundsSatisfied(self):
+        for day in Days:
+            for grade in Grade:  # must be feasible for all grades
+                dayNodeId = self.dayToNodeId[day][grade]
+                edge = self.nodes[dayNodeId].edges[0]  # Only 1 edge, which goes to sink
 
-    def getRequirementsForGrade(self, grade: Grade):
-        pass
+                if edge.flow < edge.requiredFlow:
+                    return False
+
+        return True
+
+    # This is meant to be called after a flow has been created
+    def nurseAssignment(self):
+        nurseToDayToFlow = {}
+        for nurse in self.schedule.nurses:
+            nurseToDayToFlow[nurse] = {}
+            for day in Days:
+                nurseToDayToFlow[nurse][day] = -1
+
+        for nurse in self.schedule.nurses:
+            nodeId = self.nurseIdToNodeId[nurse.id]
+            node = self.nodes[nodeId]
+            for edge in node.edges:
+                if edge.toNode.day is None or edge.toNode.day is None:
+                    raise TypeError(f"Node with id {edge.toNode.nodeId} is not a day node!")
+                nurseToDayToFlow[nurse][edge.toNode.day] = edge.flow
+
+        return nurseToDayToFlow
