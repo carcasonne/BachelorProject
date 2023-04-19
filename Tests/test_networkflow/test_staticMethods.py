@@ -37,6 +37,9 @@ class Test_staticMethods(unittest.TestCase):
         network = FlowNetwork(networkSchedule)
         flow = EdmondsKarp(network)
 
+        # Only 1 nurse should work early
+        self.assertEqual(1, flow)
+
         # See if nurses are working early or late
         assignment = network.nurseAssignment()
 
