@@ -51,5 +51,6 @@ def EdmondsKarp(network: FlowNetwork):
         if network.criticalBoundsSatisfied():
             continueSearching = False
             continue
-
+    if not network.criticalBoundsSatisfied():
+        raise Exception("BIG trouble!!!... infeasible early/late allocation found ")
     return flow
