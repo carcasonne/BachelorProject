@@ -29,8 +29,8 @@ class Test_staticMethods(unittest.TestCase):
     def test_bullshit(self):
         networkSchedule = self.networkSchedule
         solution = runNetworkFlow(self.schedule, self.tabuSchedule)
-        print(solution.getScheduleRequirementsAsString())
         print(solution.getNursePatternsAsString())
+        print(solution.getScheduleRequirementsAsString())
         hej = 1
 
 

@@ -36,7 +36,7 @@ with Spinner():
     search = TabuSearch_SIMPLE(tabuSchedule)
     search.initSchedule()
     search.debug = False
-    search.run()
+    search.run(1, False, False)
     end_tabu_time = time.time()
 
     solutionSchedule = runNetworkFlow(schedule, search.bestSolution)

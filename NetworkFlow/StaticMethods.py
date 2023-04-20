@@ -39,7 +39,7 @@ def runNetworkFlow(schedule: Schedule, tabuSchedule: TabuSchedule):
     solution = buildFinalSchedule(schedule, tabuSchedule, flowNetwork)
 
     # this is fucking scuffed
-    for shift in solution.shifts:
+    """for shift in solution.shifts:
         for grade in Grade:
             reqs = shift.coverRequirements[grade]
             assi = len(shift.assignedNurses[grade])
@@ -57,7 +57,7 @@ def runNetworkFlow(schedule: Schedule, tabuSchedule: TabuSchedule):
                                 break
                         shift2.removeNurse(nurse)
                         shift.addNurse(nurse)
-                        break
+                        break"""
 
     return solution
 
@@ -67,7 +67,7 @@ def runNetworkFlow(schedule: Schedule, tabuSchedule: TabuSchedule):
 def EdmondsKarp(network: FlowNetwork):
     flow = 0
     continueSearching = True
-    residualNetwork = network
+    residualNetwork = network #  copy.deepcopy(network)
 
     while continueSearching:
         if residualNetwork.criticalBoundsSatisfied():
@@ -91,7 +91,6 @@ def EdmondsKarp(network: FlowNetwork):
 
         flow = flow + df
 
-        # residualNetwork = residualNetwork.updateResidualNetwork()
     # if not network.criticalBoundsSatisfied():
     #   raise Exception("BIG trouble!!!... infeasible early/late allocation found ")
 

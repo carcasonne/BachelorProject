@@ -25,7 +25,6 @@ class DirectedEdge:
         self.requiredFlow = lowerBound
         self.capacity = upperBound
         self.flow = 0
-        self.reverseFlow = 0
 
 @dataclass(order=True)
 class PrioritizedNode:
@@ -144,10 +143,6 @@ class FlowNetwork:
                 if edge.flow == edge.capacity:
                     continue
 
-                # Make it cheaper to travel along paths which are below required flow
-                # flowFromRequired = min(edge.requiredFlow - edge.flow, 0)
-                # costToTravel = min(edge.cost - flowFromRequired, 0)  # TODO: reevalute how to fix this
-
                 neighborId = edge.toNode.nodeId
                 newDistance = distance[visiting.nodeId] + edge.cost  # Current cost + cost of moving to neighbor
 
@@ -195,13 +190,6 @@ class FlowNetwork:
         self.reverseEdges.append(dirEdge)       # Reverse of reverse edge (normal)
 
         return dirEdge
-
-    def updateResidualNetwork(self):
-        for node in self.nodes:
-            for edge in node.edges:
-                if edge.flow == edge.capacity:
-                    node.edges.remove(edge)
-        return self
 
     # Returns if the critical edges (from day to sink) are within the required bounds
     # These edges are critical, because they determine feasibility of the solution as a whole
