@@ -745,3 +745,27 @@ class TabuSearch_SIMPLE:
             return neighbour, bestMove[3] != n_nurse.worksNight
         else:
             return None
+
+    def printStats(self):
+        print("Executed P1 Random Descent: " + str(self.stepsP1[0]) + " times.")
+        print("Executed P1 Balance Restoration: " + str(self.stepsP1[1]) + " times.")
+        print("Executed P1 Shift Chain: " + str(self.stepsP1[2]) + " times.")
+        print("Executed P1 Nurse Chain: " + str(self.stepsP1[3]) + " times.")
+        print("Executed P1 Under Covering: " + str(self.stepsP1[4]) + " times.")
+        print("Executed P1 Random Kick: " + str(self.stepsP1[5]) + " times.")
+
+        print("\n")
+
+        print("Executed P2 Random Descent: " + str(self.stepsP2[0]) + " times.")
+        print("Executed P2 Shift Chain: " + str(self.stepsP2[1]) + " times.")
+        print("Executed P2 Nurse Chain: " + str(self.stepsP2[2]) + " times.")
+
+        print("\n")
+
+        print("Executed P3 Search Stuck: " + str(self.stepsP3[0]) + " times.")
+
+        print("\n")
+
+        print("Total iterations: " + str(sum(self.stepsP1) + sum(self.stepsP2) + sum(self.stepsP3)) + ".")
+
+        print("\n")

@@ -16,10 +16,10 @@ class TestNetworkFlowData_Simple:
             if day == Days.MONDAY:
                 self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 1, Grade.THREE: 1}, ShiftType.EARLY, day))
                 self.shifts.append(Shift({Grade.ONE: 0, Grade.TWO: 0, Grade.THREE: 1}, ShiftType.LATE, day))
-                self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 2, Grade.THREE: 3}, ShiftType.NIGHT, day))
+                self.shifts.append(Shift({Grade.ONE: 0, Grade.TWO: 0, Grade.THREE: 0}, ShiftType.NIGHT, day))
             elif day == Days.TUESDAY:
                 self.shifts.append(Shift({Grade.ONE: 0, Grade.TWO: 0, Grade.THREE: 0}, ShiftType.EARLY, day))
-                self.shifts.append(Shift({Grade.ONE: 0, Grade.TWO: 0, Grade.THREE: 0}, ShiftType.LATE, day))
+                self.shifts.append(Shift({Grade.ONE: 1, Grade.TWO: 1, Grade.THREE: 1}, ShiftType.LATE, day))
                 self.shifts.append(Shift({Grade.ONE: 0, Grade.TWO: 0, Grade.THREE: 0}, ShiftType.NIGHT, day))
             else:
                 self.shifts.append(Shift({Grade.ONE: 0, Grade.TWO: 0, Grade.THREE: 0}, ShiftType.EARLY, day))
@@ -28,8 +28,8 @@ class TestNetworkFlowData_Simple:
 
         self.nurses = []
         # Almost minimal amount of nurses:
-        self.nurses.append(Nurse(0, Grade.ONE, Contract(5, 4)))
-        self.nurses.append(Nurse(1, Grade.ONE, Contract(3, 2)))
+        self.nurses.append(Nurse(0, Grade.ONE, Contract(2, 4)))
+        self.nurses.append(Nurse(1, Grade.THREE, Contract(2, 2)))
 
         self.schedule = Schedule(self.shifts, self.nurses)
         nurses = self.schedule.nurses

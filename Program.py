@@ -1,7 +1,9 @@
 import json
 import time
 
+from Domain.Models.Network.NetworkSchedule import NetworkSchedule
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
+from NetworkFlow.StaticMethods import runNetworkFlow
 from Parser.NurseParser import NurseParser
 from Knapsack.KnapsackSolver import KnapsackSolver
 from Spinner import Spinner
@@ -17,58 +19,39 @@ with Spinner():
     parser = NurseParser()
     schedule_parsed = parser.parseScenario("n030w4")
     schedule_artificial = copy.deepcopy(TestTabuData().schedule)
+    schedule = schedule_parsed
 
     end_parser_time = time.time()
 
     # schedule_parsed.shifts = schedule_artificial.shifts
     # schedule_parsed.nurses = schedule_artificial.nurses
 
-    solver = KnapsackSolver(schedule_parsed)
+    solver = KnapsackSolver(schedule)
     solver.solve()
 
-    schedule = TabuSchedule(solver.schedule)
+    tabuSchedule = TabuSchedule(solver.schedule)
 
     end_knapsack_time = time.time()
 
-    search = TabuSearch_SIMPLE(schedule)
+    search = TabuSearch_SIMPLE(tabuSchedule)
     search.initSchedule()
     search.debug = False
-    #print(str(search.currSolution))
-
     search.run()
     end_tabu_time = time.time()
 
-print(search.bestSolution.nursePatternSchedule())
-print(str(search.bestSolution))
+    solutionSchedule = runNetworkFlow(schedule, search.bestSolution)
+    end_network_time = time.time()
 
-#print(search.currSolution.scheduleTable())
-print("Executed P1 Random Descent: " + str(search.stepsP1[0]) + " times.")
-print("Executed P1 Balance Restoration: " + str(search.stepsP1[1]) + " times.")
-print("Executed P1 Shift Chain: " + str(search.stepsP1[2]) + " times.")
-print("Executed P1 Nurse Chain: " + str(search.stepsP1[3]) + " times.")
-print("Executed P1 Under Covering: " + str(search.stepsP1[4]) + " times.")
-print("Executed P1 Random Kick: " + str(search.stepsP1[5]) + " times.")
 
-print("\n")
-
-print("Executed P2 Random Descent: " + str(search.stepsP2[0]) + " times.")
-print("Executed P2 Shift Chain: " + str(search.stepsP2[1]) + " times.")
-print("Executed P2 Nurse Chain: " + str(search.stepsP2[2]) + " times.")
-
-print("\n")
-
-print("Executed P3 Search Stuck: " + str(search.stepsP3[0]) + " times.")
-
-print("\n")
-
-print("Total iterations: " + str(sum(search.stepsP1) + sum(search.stepsP2) + sum(search.stepsP3)) + ".")
-
-print("\n")
+print(solutionSchedule.getNursePatternsAsString())
+print(solutionSchedule.getScheduleRequirementsAsString())
 
 time_parser_lapsed = end_parser_time - start_time
 time_knapsack_lapsed = end_knapsack_time - end_parser_time
 time_tabu_lapsed = end_tabu_time - end_knapsack_time
+time_network_lapsed = end_network_time - end_tabu_time
 
 print(f"Parser parsing time: {time_parser_lapsed} seconds")
 print(f"Knapsack computation time: {time_knapsack_lapsed} seconds")
 print(f"Tabu search computation time: {time_tabu_lapsed} seconds")
+print(f"Network flow computation time: {time_network_lapsed} seconds")

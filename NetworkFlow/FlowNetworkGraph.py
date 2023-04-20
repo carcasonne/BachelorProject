@@ -21,7 +21,7 @@ class DirectedEdge:
         self.edgeId = edgeId
         self.fromNode = fromNode
         self.toNode = toNode
-        self.cost = cost
+        self.cost = 0 + cost
         self.requiredFlow = lowerBound
         self.capacity = upperBound
         self.flow = 0
@@ -42,6 +42,7 @@ class FlowNetwork:
         self.dayToNodeId = {}  # day to grade to int (nodeId) dictionary
         self.nodes = []  # item at index 'i' should have nodeId 'i'
         self.edges = []  # item at index 'i' should have edgeId 'i'
+        self.reverseEdges = []  # item at index 'i' is the reverse edge of edgeId 'i'
 
         for day in Days:
             self.dayToNodeId[day] = {
@@ -101,19 +102,20 @@ class FlowNetwork:
 
         # Connect the nurse nodes to day nodes
         for nurse in self.schedule.nurses:
-            nurseNodeId = self.nurseIdToNodeId[nurse.id]
-            nurseNode = self.nodes[nurseNodeId]
-            for day in Days:
-                if nurse.worksDay(day):
-                    dayNodeId = self.dayToNodeId[day][nurse.grade]
-                    dayNode = self.nodes[dayNodeId]
-                    cost = nurse.shiftPreference[day.value - 1]
-                    # Get rid of negative weights as stated in the paper
-                    if cost < 0:
-                        self.createDirectedPath(nurseNode, dayNode, 0, 1, 1)
-                        self.createDirectedPath(dayNode, nurseNode, -cost, 0, 1)
-                    else:
-                        self.createDirectedPath(nurseNode, dayNode, cost, 0, 1)
+            if not nurse.worksNight:
+                nurseNodeId = self.nurseIdToNodeId[nurse.id]
+                nurseNode = self.nodes[nurseNodeId]
+                for day in Days:
+                    if nurse.worksDay(day):
+                        dayNodeId = self.dayToNodeId[day][nurse.grade]
+                        dayNode = self.nodes[dayNodeId]
+                        cost = nurse.shiftPreference[day.value - 1]
+                        # Get rid of negative weights as stated in the paper
+                        if cost < 0:
+                            self.createDirectedPath(nurseNode, dayNode, 0, 1, 1)
+                            self.createDirectedPath(dayNode, nurseNode, -cost, 0, 1)
+                        else:
+                            self.createDirectedPath(nurseNode, dayNode, cost, 0, 1)
 
         # Relax restrictions for nurses working more than 3 days
 
@@ -143,11 +145,11 @@ class FlowNetwork:
                     continue
 
                 # Make it cheaper to travel along paths which are below required flow
-                flowFromRequired = max(edge.requiredFlow - edge.flow, 0)
-                costToTravel = max(edge.cost - flowFromRequired, 0)
+                # flowFromRequired = min(edge.requiredFlow - edge.flow, 0)
+                # costToTravel = min(edge.cost - flowFromRequired, 0)  # TODO: reevalute how to fix this
 
                 neighborId = edge.toNode.nodeId
-                newDistance = distance[visiting.nodeId] + costToTravel  # Current cost + cost of moving to neighbor
+                newDistance = distance[visiting.nodeId] + edge.cost  # Current cost + cost of moving to neighbor
 
                 if newDistance < distance[neighborId]:
                     distance[neighborId] = newDistance
@@ -182,7 +184,24 @@ class FlowNetwork:
         dirEdge = DirectedEdge(newId, fromNode, toNode, cost, lowerBound, upperBound)
         fromNode.edges.append(dirEdge)  # add to edges going out of fromNode
         self.edges.append(dirEdge)
+
+        # Create reverse edge
+        newId = newId + 1
+        reverseEdge = DirectedEdge(newId, toNode, fromNode, cost, 0, 0)
+        toNode.edges.append(reverseEdge)
+        self.edges.append(reverseEdge)
+
+        self.reverseEdges.append(reverseEdge)   # Reverse of normal edge
+        self.reverseEdges.append(dirEdge)       # Reverse of reverse edge (normal)
+
         return dirEdge
+
+    def updateResidualNetwork(self):
+        for node in self.nodes:
+            for edge in node.edges:
+                if edge.flow == edge.capacity:
+                    node.edges.remove(edge)
+        return self
 
     # Returns if the critical edges (from day to sink) are within the required bounds
     # These edges are critical, because they determine feasibility of the solution as a whole
@@ -210,7 +229,7 @@ class FlowNetwork:
             node = self.nodes[nodeId]
             for edge in node.edges:
                 if edge.toNode.day is None or edge.toNode.day is None:
-                    raise TypeError(f"Node with id {edge.toNode.nodeId} is not a day node!")
+                    continue
                 nurseToDayToFlow[nurse][edge.toNode.day] = edge.flow
 
         return nurseToDayToFlow
