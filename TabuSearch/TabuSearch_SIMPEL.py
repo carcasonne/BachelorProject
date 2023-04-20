@@ -46,7 +46,8 @@ class TabuSearch_SIMPLE:
         self.stepsP2 = [0, 0, 0]
         self.stepsP3 = [0]
 
-        self.debug = True
+        self.useBalanceSwap = True
+        self.debug = False
 
     def initSchedule(self):
         """
@@ -90,13 +91,14 @@ class TabuSearch_SIMPLE:
             self.currSolution = move[0]
             return move[0]
 
-    def run(self):
+    def run(self, maxRuns, useBalanceSwap, debugmode):
         """
         run. Execute Tabu Search with maxRuns amount of runs. Find out which solution is best according to PC and
         return that.
         :return bestSolution:
         """
-        maxRuns = 1
+        self.useBalanceSwap = useBalanceSwap
+        self.debug = debugmode
         runs = 0
         print(str(self.currSolution))
 
@@ -328,7 +330,12 @@ class TabuSearch_SIMPLE:
         :param relaxed:
         :return move, with two swapped nurses:
         """
-        #return None
+        if self.useBalanceSwap is False:
+            if relaxed:
+                return None
+            else:
+                return self.balanceRestoring(schedule, True)
+
         if self.debug:
             print("Running Balance Swap...")
         ccAndMove = 0, None
