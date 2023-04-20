@@ -52,7 +52,7 @@ class EntireFlow(unittest.TestCase):
         newSchedule = knapsackSolver.schedule
         
         search = TabuSearch_SIMPLE(TabuSchedule(newSchedule))
-        search.run()
+        search.run(1, False, False)
         print(str(search.bestSolution))
 
 if __name__ == '__main__':

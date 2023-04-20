@@ -35,7 +35,7 @@ search = TabuSearch_SIMPLE(schedule)
 search.initSchedule()
 #print(str(search.currSolution))
 
-search.run()
+search.run(1, False, False)
 end_tabu_time = time.time()
 print(search.bestSolution.nursePatternSchedule())
 print(str(search.bestSolution))
