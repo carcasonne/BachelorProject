@@ -50,7 +50,6 @@ class BoundedNetworkFlow:
         self.dayToNodeId = {}  # day to grade to int (nodeId) dictionary
         self.nodes = []  # item at index 'i' should have nodeId 'i'
         self.edges = []  # item at index 'i' should have edgeId 'i'
-        self.reverseEdges = []  # item at index 'i' is the reverse edge of edgeId 'i'
 
         for day in Days:
             self.dayToNodeId[day] = {
@@ -71,6 +70,9 @@ class BoundedNetworkFlow:
         for nurse in self.schedule.nurses:
             nurseNode = self.createNode()
             self.nurseIdToNodeId[nurse.id] = nurseNode.nodeId
+            lowerBound = nurse.LB
+            upperBound = nurse.UP
+
             self.createDirectedPath(self.source, nurseNode, 0, nurse.LB, nurse.UP)
 
         # Make nodes for each day
@@ -128,18 +130,19 @@ class BoundedNetworkFlow:
 
     def fillOutMinFlows(self):
         # Fill out all the required flows
-        # Only consider edges going out of nurse nodes to begin with
-        nurseNodeIds = self.nurseIdToNodeId.values()
-        for nodeId in nurseNodeIds:
-            node = self.nodes[nodeId]
+        # Done by forcing flow on edges going from day to sink
+        # Then balance the rest of the nodes untill every node has inFlow = outFlow
+        terminalDayNodes = []
+        for day in Days:
+            dayNode = self.dayToNodeId[day][Grade.THREE]
+            node = self.nodes[dayNode]
             for edge in node.edges:
-                edge.flow = edge.requiredFlow
-
+                if edge.toNode == self.sink:
+                    edge.flow = edge.requiredFlow
         balanced = False
-        # self._correctFlow()
-        # self._correctFlow()
-        # self._correctFlow()
-        """while not balanced:
+        counter = 0  # For debugging perpuses
+        while not balanced:
+            counter = counter + 1
             self._correctFlow()
             stop = True
             for node in self.nodes:
@@ -153,7 +156,8 @@ class BoundedNetworkFlow:
                     if flowIn != flowOut:
                         stop = False
                         break
-            balanced = stop"""
+            balanced = stop
+        # print(f"Counter flows adjustments: {counter}")
 
     def _correctFlow(self):
         # Find the edges, wherein the flow is not balanced
@@ -276,6 +280,8 @@ class BoundedNetworkFlow:
                     continue
 
                 neighborId = edge.toNode.nodeId
+                penalty = max(edge.requiredFlow - edge.flow, 0)
+                weightedCost = max(edge.cost - penalty, 0)
                 newDistance = distance[visiting.nodeId] + edge.cost  # Current cost + cost of moving to neighbor
 
                 if newDistance < distance[neighborId]:
@@ -340,7 +346,7 @@ class BoundedNetworkFlow:
             nodeId = self.nurseIdToNodeId[nurse.id]
             node = self.nodes[nodeId]
             for edge in node.edges:
-                if edge.toNode.day is None or edge.toNode.day is None:
+                if edge.toNode.day is None or edge.toNode.day is None or edge.capacity == 0:
                     continue
                 nurseToDayToFlow[nurse][edge.toNode.day] = edge.flow
 

@@ -2,6 +2,7 @@ from colorama import Fore, Back
 from tabulate import tabulate
 
 from Domain.Models.Enums.Days import Days
+from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 
 
@@ -13,7 +14,21 @@ class Schedule:
         self.shifts = shifts
         self.nurses = nurses
 
-    def isValid(self):
+    def getPenaltyScore(self):
+        PC = 0
+        for nurse in self.nurses:
+            PC = PC + nurse.calculatePenalty()
+        return PC
+
+    def shiftsRequirementsMet(self):
+        for shift in self.shifts:
+            for grade in Grade:
+                shiftRequirements = shift.coverRequirements[grade]
+                assignedNurses = len(shift.assignedNurses[grade])
+                if shiftRequirements > assignedNurses:
+                    return False
+        return True
+    def nursesFulfillContract(self):
         valid = True
         # Are nurses assigned to more or fewer shifts than contractually obliged to?
         for nurse in self.nurses:
