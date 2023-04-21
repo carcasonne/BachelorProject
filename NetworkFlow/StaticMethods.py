@@ -7,7 +7,7 @@ from Domain.Models.Network.NetworkSchedule import NetworkSchedule
 from Domain.Models.Schedule import Schedule
 from Domain.Models.ShiftPatterns.ShiftPattern import StandardShiftPattern
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
-from NetworkFlow.FlowNetworkGraph import FlowNetwork
+from NetworkFlow.NetworkFlowBounds import BoundedNetworkFlow
 from NetworkFlow.NetworkFlow import NetworkFlow
 
 
@@ -34,40 +34,21 @@ def evaluationFunction(networkSchedule):
 
 def runNetworkFlow(schedule: Schedule, tabuSchedule: TabuSchedule):
     networkSchedule = NetworkSchedule(tabuSchedule, schedule)
-    flowNetwork = FlowNetwork(networkSchedule)
+    flowNetwork = BoundedNetworkFlow(networkSchedule)
+    flowNetwork.fillOutMinFlows()
+    solution = buildFinalSchedule(schedule, tabuSchedule, flowNetwork)
     flow = EdmondsKarp(flowNetwork)
     solution = buildFinalSchedule(schedule, tabuSchedule, flowNetwork)
-
-    # this is fucking scuffed
-    """for shift in solution.shifts:
-        for grade in Grade:
-            reqs = shift.coverRequirements[grade]
-            assi = len(shift.assignedNurses[grade])
-            if reqs > assi:
-                for shift2 in solution.shifts:
-                    reqs2 = shift2.coverRequirements[grade]
-                    assi2 = len(shift2.assignedNurses[grade])
-                    if reqs2 < assi2:
-                        nurseIds = list(shift2.assignedNurses[grade])
-                        nurse = None
-                        for nurseId in nurseIds:
-                            _nurse = solution.nurses[nurseId]
-                            if _nurse.grade == grade:
-                                nurse = _nurse
-                                break
-                        shift2.removeNurse(nurse)
-                        shift.addNurse(nurse)
-                        break"""
-
     return solution
 
 
 # Manipulates the input network to add the min-cost flow to edges
 # Also returns the flow created in the network
-def EdmondsKarp(network: FlowNetwork):
+def EdmondsKarp(network: BoundedNetworkFlow):
     flow = 0
     continueSearching = True
-    residualNetwork = network #  copy.deepcopy(network)
+    residualNetwork = network
+    residualNetwork.addReverseEdges()
 
     while continueSearching:
         if residualNetwork.criticalBoundsSatisfied():
@@ -86,19 +67,17 @@ def EdmondsKarp(network: FlowNetwork):
 
         for edge in shortestPath:
             edge.flow = edge.flow + df
-            reverseEdge = residualNetwork.reverseEdges[edge.edgeId]
-            reverseEdge.flow = reverseEdge.flow - df
+            edge.reverseEdge.flow = edge.reverseEdge.flow - df
 
         flow = flow + df
 
-    # if not network.criticalBoundsSatisfied():
-    #   raise Exception("BIG trouble!!!... infeasible early/late allocation found ")
+    if not network.criticalBoundsSatisfied():
+        raise Exception("BIG problem!!!... infeasible early/late allocation found ")
 
     for edge in network.edges:
         flow = edge.flow
-        rflow = network.reverseEdges[edge.edgeId].flow
-        if rflow != -edge.flow:
-            raise Exception("!!!!!!!!")
+        if edge.reverseEdge.flow != -edge.flow:
+            raise Exception(f"{edge.flow} != -{edge.reverseEdge.flow}! Constraints broken")
 
     return flow
 
@@ -107,7 +86,7 @@ def EdmondsKarp(network: FlowNetwork):
 # Takes shifts and nurses from schedule
 # Takes nurses working night from tabuSchedule
 # Takes nurses working early/late from flowNetwork
-def buildFinalSchedule(schedule: Schedule, tabuSchedule: TabuSchedule, networkFlow: FlowNetwork):
+def buildFinalSchedule(schedule: Schedule, tabuSchedule: TabuSchedule, networkFlow: BoundedNetworkFlow):
     solutionShifts = copy.deepcopy(schedule.shifts)
     solutionNurses = copy.deepcopy(schedule.nurses)
 
@@ -141,7 +120,7 @@ def buildFinalSchedule(schedule: Schedule, tabuSchedule: TabuSchedule, networkFl
                 elif nurseAssignment == 0:  # Nurse assigned late
                     latePattern[day.value - 1] = 1
                     solutionShifts[dayIndex + 1].addNurse(solutionNurse)
-                elif nurseAssignment == 1:  # Nurse assigned early
+                elif nurseAssignment >= 1:  # Nurse assigned early
                     earlyPattern[day.value - 1] = 1
                     solutionShifts[dayIndex].addNurse(solutionNurse)
             solutionNurse.assignedShiftPattern = StandardShiftPattern(earlyPattern, latePattern, [0] * 7)

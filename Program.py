@@ -29,6 +29,8 @@ with Spinner():
     solver = KnapsackSolver(schedule)
     solver.solve()
 
+    print("----- Beginning TABU SEARCH -----")
+
     tabuSchedule = TabuSchedule(solver.schedule)
 
     end_knapsack_time = time.time()
@@ -38,6 +40,8 @@ with Spinner():
     search.debug = False
     search.run(1, False, False)
     end_tabu_time = time.time()
+
+    print("----- Beginning NETWORK FLOW -----")
 
     solutionSchedule = runNetworkFlow(schedule, search.bestSolution)
     end_network_time = time.time()

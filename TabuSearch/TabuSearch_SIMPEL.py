@@ -7,7 +7,8 @@ from TabuSearch.DirectedGraph import DirectedGraph
 
 
 class TabuSearch_SIMPLE:
-    def __init__(self, initialSolution):  # (initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure)
+    def __init__(self,
+                 initialSolution):  # (initialSolution, solutionEvaluator, neighborOperator, aspirationCriteria, acceptableScoreThreshold, tabuTenure)
         """
         The next three variables is there to make sure that we hold the 3 tabu criteria:
             1) A move involves the tabu nurse (i.e. the nurse moved last time) from tabuList.
@@ -34,7 +35,7 @@ class TabuSearch_SIMPLE:
         for n in initialSolution.nurses:
             self.feasiblePatterns[n.id] = findFeasiblePatterns(n)
 
-        initialSolution.PC = 1000000 # Sat to a very high value, since it would otherwise be 0, and a best solution would never be found because of this.
+        initialSolution.PC = 1000000  # Sat to a very high value, since it would otherwise be 0, and a best solution would never be found because of this.
 
         self.currSolution = copy.deepcopy(initialSolution)
         self.bestSolution = copy.deepcopy(initialSolution)
@@ -100,7 +101,8 @@ class TabuSearch_SIMPLE:
         self.useBalanceSwap = useBalanceSwap
         self.debug = debugmode
         runs = 0
-        print(str(self.currSolution))
+        if self.debug:
+            print(str(self.currSolution))
 
         while runs < maxRuns and not self.foundOptimalSolution:
             if runs % 10 == 0:
@@ -111,9 +113,9 @@ class TabuSearch_SIMPLE:
                 self._phase3()
 
             runs += 1
-        print(str(self.bestSolution))
+        if self.debug:
+            print(str(self.bestSolution))
         return self.bestSolution
-
 
     def _phase1(self):
         """
@@ -171,7 +173,8 @@ class TabuSearch_SIMPLE:
                             print("RUN: " + str(runs) + " PC: FROM: " + str(self.bestSolution.PC) + " TO: " + str(
                                 self.currSolution.PC))
                             print()
-                            print(str(self.currSolution))
+                            if self.debug:
+                                print(str(self.currSolution))
                             self.bestSolution = copy.deepcopy(self.currSolution)
                         break
                 else:
@@ -197,9 +200,6 @@ class TabuSearch_SIMPLE:
             print("***THIS IS THE BEST SOLUTION WE CAN EVER FIND.***")
             print("***THERE IS NO MOVE FOR ANY NURSE AT ALL THAT WOULD EVER DECREASE PC.***")
 
-
-
-
     # Phase 1 Moves:
     def randomDecent(self, schedule, phase):
         """
@@ -217,8 +217,12 @@ class TabuSearch_SIMPLE:
         for nurse in schedule.nurses:
             if nurse.id not in self.tabuList:
                 for pattern in self.feasiblePatterns[nurse.id]:
-                    if (nurse.worksNight and pattern.day == [0] * 7) or (not nurse.worksNight and pattern.day != [0] * 7):
-                        if (calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse, pattern) <= 0 and phase == 1) or (calculateDifferencePC(nurse, pattern) < 0 and calculateDifferenceCC(schedule, nurse, pattern) <= 0 and phase == 2):
+                    if (nurse.worksNight and pattern.day == [0] * 7) or (
+                            not nurse.worksNight and pattern.day != [0] * 7):
+                        if (calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse,
+                                                                                                          pattern) <= 0 and phase == 1) or (
+                                calculateDifferencePC(nurse, pattern) < 0 and calculateDifferenceCC(schedule, nurse,
+                                                                                                    pattern) <= 0 and phase == 2):
                             neighbour = copy.deepcopy(schedule)
                             n_nurse = neighbour.nurses[nurse.id]
                             neighbour.assignPatternToNurse(n_nurse, pattern)
@@ -248,8 +252,12 @@ class TabuSearch_SIMPLE:
                         tabuCheck.remove(nurse.id)
                 if tabuCheck not in self.dayNightTabuList:
                     for pattern in self.feasiblePatterns[nurse.id]:
-                        if (nurse.worksNight and pattern.night == [0] * 7) or (not nurse.worksNight and pattern.night != [0] * 7):
-                            if (calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse, pattern) <= 0 and phase == 1) or (calculateDifferencePC(nurse, pattern) < 0 and calculateDifferenceCC(schedule, nurse, pattern) <= 0 and phase == 2):
+                        if (nurse.worksNight and pattern.night == [0] * 7) or (
+                                not nurse.worksNight and pattern.night != [0] * 7):
+                            if (calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse,
+                                                                                                              pattern) <= 0 and phase == 1) or (
+                                    calculateDifferencePC(nurse, pattern) < 0 and calculateDifferenceCC(schedule, nurse,
+                                                                                                        pattern) <= 0 and phase == 2):
                                 neighbour = copy.deepcopy(schedule)
                                 n_nurse = neighbour.nurses[nurse.id]
                                 neighbour.assignPatternToNurse(n_nurse, pattern)
@@ -355,7 +363,8 @@ class TabuSearch_SIMPLE:
                                 if pattern1.night == [0] * 7:
                                     for pattern2 in self.feasiblePatterns[nurse2.id]:
                                         if pattern2.day == [0] * 7:
-                                            ccval = calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1, pattern2)
+                                            ccval = calculateDifferenceDuoCC(schedule, nurse1, nurse2, pattern1,
+                                                                             pattern2)
                                             if ccval < ccAndMove[0]:
                                                 ccAndMove = ccval, (nurse1, nurse2, pattern1, pattern2)
 
@@ -377,7 +386,6 @@ class TabuSearch_SIMPLE:
                 return self.balanceRestoring(schedule, True)
             else:
                 return None
-
 
     # TODO: Function is kinda scuffed. Make it better computationally.
     def shiftChain(self, schedule, phase):
@@ -486,10 +494,6 @@ class TabuSearch_SIMPLE:
                             self.tabuList = tempTabuList
                             return neighbour, False
 
-
-
-
-
     def _shiftChainUtil(self, schedule, grade, phase):
         if self.debug:
             print("Checking grade: " + str(grade.value) + "...")
@@ -534,7 +538,6 @@ class TabuSearch_SIMPLE:
                     toShifts[1].append(shift)
                     nightGraph.addNode(shift.shiftDay.value - 1)
 
-
         for nurse in schedule.nurses:
             if not nurse.worksNight and nurse.grade == grade:
                 for i in range(7):
@@ -544,7 +547,8 @@ class TabuSearch_SIMPLE:
                                 patternDay = copy.copy(nurse.shiftPattern.day)
                                 patternDay[i] = 0
                                 patternDay[j] = 1
-                                dayGraph.addEdge(i, j, nurse.id, calculateDifferencePC(nurse, TabuShiftPattern(patternDay, [0] * 7)))
+                                dayGraph.addEdge(i, j, nurse.id,
+                                                 calculateDifferencePC(nurse, TabuShiftPattern(patternDay, [0] * 7)))
             elif nurse.worksNight and nurse.grade == grade:
                 for i in range(7):
                     if nurse.shiftPattern.night[i] == 1:
@@ -553,7 +557,9 @@ class TabuSearch_SIMPLE:
                                 patternNight = copy.copy(nurse.shiftPattern.night)
                                 patternNight[i] = 0
                                 patternNight[j] = 1
-                                nightGraph.addEdge(i, j, nurse.id, calculateDifferencePC(nurse, TabuShiftPattern([0] * 7, patternNight)))
+                                nightGraph.addEdge(i, j, nurse.id, calculateDifferencePC(nurse,
+                                                                                         TabuShiftPattern([0] * 7,
+                                                                                                          patternNight)))
 
         return fromShifts, toShifts, dayGraph, nightGraph
 
@@ -589,9 +595,11 @@ class TabuSearch_SIMPLE:
             for nurse2 in nurseList:
                 if nurse2 != nurse1:
                     if nurse2.worksNight and nurse2.contract.nights == nurse1.contract.nights:
-                        graph.addEdge(nurse1.id, nurse2.id, nurse1.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
+                        graph.addEdge(nurse1.id, nurse2.id, nurse1.id,
+                                      calculateDifferencePC(nurse1, nurse2.shiftPattern))
                     elif nurse2.worksNight is False and nurse2.contract.days == nurse1.contract.days:
-                        graph.addEdge(nurse1.id, nurse2.id, nurse1.id, calculateDifferencePC(nurse1, nurse2.shiftPattern))
+                        graph.addEdge(nurse1.id, nurse2.id, nurse1.id,
+                                      calculateDifferencePC(nurse1, nurse2.shiftPattern))
 
         if phase == 1:
             for shift in schedule.shifts:
@@ -633,7 +641,8 @@ class TabuSearch_SIMPLE:
                                                 temptabulist.append(edge.fromNode)
                                                 if fromN.worksNight != toN.worksNight:
                                                     change = True
-                                                neighbour.assignPatternToNurse(neighbour.nurses[fromN.id], toN.shiftPattern)
+                                                neighbour.assignPatternToNurse(neighbour.nurses[fromN.id],
+                                                                               toN.shiftPattern)
                                             temptabulist.append(sink.id)
                                             neighbour.assignPatternToNurse(neighbour.nurses[sink.id], pattern)
                                             self.tabuList = temptabulist
@@ -684,7 +693,6 @@ class TabuSearch_SIMPLE:
                         if ccDif < bestMove[2]:
                             bestMove = nurse.id, pattern, ccDif, nurse.worksNight
 
-
         if bestMove[0] is None:
             return None
         else:
@@ -694,7 +702,6 @@ class TabuSearch_SIMPLE:
             self.tabuList = []
             self.tabuList.append(n_nurse.id)
             return neighbour, bestMove[3] != n_nurse.worksNight
-
 
     def randomKick(self, schedule):
         """
@@ -718,14 +725,15 @@ class TabuSearch_SIMPLE:
 
             if nurse.id not in self.tabuList and tabuCheck not in self.dayNightTabuList:
                 pattern = self.feasiblePatterns[nurse.id][random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)]
-                if (((pattern.day == [0] * 7 and not oldWorksNight) or (pattern.night == [0] * 7 and oldWorksNight)) and self.dayNightCounter >= self.maxits) or (self.dayNightCounter < self.maxits):
+                if (((pattern.day == [0] * 7 and not oldWorksNight) or (
+                        pattern.night == [0] * 7 and oldWorksNight)) and self.dayNightCounter >= self.maxits) or (
+                        self.dayNightCounter < self.maxits):
                     neighbour = copy.deepcopy(schedule)
                     n_nurse = neighbour.nurses[nurse.id]
                     neighbour.assignPatternToNurse(n_nurse, pattern)
                     self.tabuList = []
                     self.tabuList.append(nurse.id)
                     return neighbour, nurseWorkedNight != n_nurse.worksNight
-
 
     def searchStuck(self, schedule):
         """

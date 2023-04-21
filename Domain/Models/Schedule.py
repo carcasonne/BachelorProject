@@ -13,6 +13,24 @@ class Schedule:
         self.shifts = shifts
         self.nurses = nurses
 
+    def isValid(self):
+        valid = True
+        # Are nurses assigned to more or fewer shifts than contractually obliged to?
+        for nurse in self.nurses:
+            assignedEarlies = sum(nurse.assignedShiftPattern.early)
+            assignedLates = sum(nurse.assignedShiftPattern.late)
+            assignedNights = sum(nurse.assignedShiftPattern.night)
+            worksNight = nurse.assignedShiftPattern.night != [0] * 7
+            if worksNight:
+                if assignedNights != nurse.contract.nights:
+                    valid = False
+                    break
+            else:
+                if assignedEarlies + assignedLates != nurse.contract.days:
+                    valid = False
+                    break
+        return valid
+
     def getScheduleRequirementsAsString(self):
         string = "\n \n \n"
         string += "                  SHIFT REQUIREMENTS/COVERAGE                 \n"

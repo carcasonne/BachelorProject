@@ -2,7 +2,7 @@ import copy
 import unittest
 
 from Domain.Models.Network.NetworkSchedule import NetworkSchedule
-from NetworkFlow.FlowNetworkGraph import FlowNetwork
+from NetworkFlow.NetworkFlowBounds import BoundedNetworkFlow
 from NetworkFlow.NetworkFlow import NetworkFlow
 from Tests.test_networkflow.TestNetworkFlowData import TestNetworkFlowData
 
@@ -64,7 +64,7 @@ class test_flowNetwork(unittest.TestCase):
 
     # A network, where there does not exist a path from source to sink
     def test_finds_shortest_path_disjoint_network_returns_cannot_find_path_returns_none(self):
-        disjointGraph = FlowNetwork(self.schedule, False)
+        disjointGraph = BoundedNetworkFlow(self.schedule, False)
         disjointGraph.source = disjointGraph.createNode()
         disjointGraph.sink = disjointGraph.createNode()
 
@@ -84,7 +84,7 @@ class test_flowNetwork(unittest.TestCase):
         self.assertListEqual(expectedPath, actualPath)
 
     def _get_basic_graph(self):
-        network = FlowNetwork(self.networkSchedule, False)
+        network = BoundedNetworkFlow(self.networkSchedule, False)
         node_0 = network.createNode()
         node_1 = network.createNode()
         network.source = node_0
@@ -106,7 +106,7 @@ class test_flowNetwork(unittest.TestCase):
         return network
 
     def _get_graph_with_lower_bounds_along_one_path(self):
-        network = FlowNetwork(self.networkSchedule, False)
+        network = BoundedNetworkFlow(self.networkSchedule, False)
         node_0 = network.createNode()
         node_1 = network.createNode()
         network.source = node_0
