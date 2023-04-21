@@ -80,17 +80,5 @@ class Test_TabuSchedule(unittest.TestCase):
                 self.assertEqual(0, len(self.ts.shifts[i].assignedNurses[Grade.THREE]))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     unittest.main()
