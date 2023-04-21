@@ -19,13 +19,19 @@ class TabuNurse:
         self.completeWeekend = nurse.completeWeekend
 
     def combineDayShiftRequests(self, undesiredEarlyShifts, undesiredLateShifts):
+        """
+        combineDayShiftRequests combines the early and late day shift requirements.
+        :param undesiredEarlyShifts:
+        :param undesiredLateShifts:
+        :return array of day requirements:
+        """
         composite = [0] * 7
         for i in range(7):
             r1 = undesiredEarlyShifts[i]
             r2 = undesiredLateShifts[i]
 
             if r1 == 1 or r2 == 1:
-                composite[i] == 1
+                composite[i] = 1
         
         return composite
 
