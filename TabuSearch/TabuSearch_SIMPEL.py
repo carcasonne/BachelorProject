@@ -2,6 +2,8 @@
 Tabu Search Class
 """
 import copy
+import random
+
 from TabuSearch.StaticMethods import *
 from TabuSearch.DirectedGraph import DirectedGraph
 
@@ -711,8 +713,11 @@ class TabuSearch_SIMPLE:
         """
         if self.debug:
             print("Running Random Kick...")
-        while True:
-            nurse = schedule.nurses[random.randint(0, len(schedule.nurses) - 1)]
+
+        randomNurseList = list(range(0, len(schedule.nurses)))
+        random.shuffle(randomNurseList)
+        for index in randomNurseList:
+            nurse = schedule.nurses[index]
             nurseWorkedNight = copy.copy(nurse.worksNight)
             tabuCheck = copy.copy(self.dayNightTabuList[0])
             if nurse.worksNight:
