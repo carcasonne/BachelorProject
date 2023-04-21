@@ -2,6 +2,7 @@ import json
 import time
 
 from Domain.Models.Network.NetworkSchedule import NetworkSchedule
+from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 from NetworkFlow.StaticMethods import runNetworkFlow
 from Parser.NurseParser import NurseParser
@@ -13,7 +14,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 1
+runs = 5
 counter = 0
 runToTime = {}
 for i in range(runs):
@@ -55,10 +56,14 @@ while counter < runs:
         search.run(1, False, False)
         end_tabu_time = time.time()
 
+        print(f"Tabu penalty score: {search.bestSolution.PC}")
+
         print("----- Beginning NETWORK FLOW -----")
 
         solutionSchedule = runNetworkFlow(schedule, search.bestSolution)
         end_network_time = time.time()
+
+        print("*** PENALTY TEST ***")
 
     print()
     print(f"---------- RUN NUMBER {counter + 1} results ----------")

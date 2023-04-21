@@ -52,7 +52,7 @@ class Nurse:
     def calculatePenalty(self, shiftpattern):
         newPen = 0  # New penalty score
         # Calculating which schedule we should be looking at:
-        if (shiftpattern.late or shiftpattern.early) != [0] * 7:
+        if shiftpattern.night == [0] * 7:
             composite = [0] * 7
             for i in range(7):
                 r1 = shiftpattern.late[i]
@@ -86,7 +86,6 @@ class Nurse:
                 if e == 1:
                     workList.append(work)
             count += 1
-
 
         # Calculation of penalty score for working more/less than the desired consecutive days:
         for e in workList:

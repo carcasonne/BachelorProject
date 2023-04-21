@@ -47,8 +47,9 @@ class Test_staticMethods(unittest.TestCase):
 
     def test_EdmondsKarp_finds_optimal_solution_for_simple_schedule(self):
         (schedule, tabuSchedule, networkSchedule) = self._get_network_2_nurses_2_days_schedule()
-        networkSchedule.nurses[0].undesiredShifts[1] = 2
+        networkSchedule.nurses[0].undesiredShifts[1][1] = 2
         network = BoundedNetworkFlow(networkSchedule)
+        network.fillOutMinFlows()
         flow = EdmondsKarp(network)
 
         # Only 1 nurse should work early
