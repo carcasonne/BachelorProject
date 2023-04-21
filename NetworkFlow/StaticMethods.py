@@ -36,7 +36,6 @@ def runNetworkFlow(schedule: Schedule, tabuSchedule: TabuSchedule):
     networkSchedule = NetworkSchedule(tabuSchedule, schedule)
     flowNetwork = BoundedNetworkFlow(networkSchedule)
     flowNetwork.fillOutMinFlows()
-    solution = buildFinalSchedule(schedule, tabuSchedule, flowNetwork)
     flow = EdmondsKarp(flowNetwork)
     solution = buildFinalSchedule(schedule, tabuSchedule, flowNetwork)
     return solution

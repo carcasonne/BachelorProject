@@ -32,8 +32,10 @@ class Test_staticMethods(unittest.TestCase):
         print(solution.getNursePatternsAsString())
         print(solution.getScheduleRequirementsAsString())
 
-        valid = solution.isValid()
+        valid = solution.nursesFulfillContract()
         print(f"All nurses are working as many shifts as contract says: {valid}")
+        shiftsAreCovered = solution.shiftsRequirementsMet()
+        print(f"All shift requirements are met: {shiftsAreCovered}")
         hej = 1
 
 
