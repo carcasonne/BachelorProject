@@ -10,8 +10,7 @@ class TabuNurse:
         self.grade = nurse.grade  # The grade of the nurse: 1= high grade, 2 = medium grade, 3 = low grade
         self.shiftPattern = TabuShiftPattern([0] * 7, [0] * 7)  # The shift pattern that this nurse is currently working
         self.worksNight = None  # True = Nurse works only night shifts, False = Nurse works only day shifts
-        self.penalty = 0  # The penalty of the current shift pattern: from 0 (good pattern) to 10 (infeasible pattern)
-        # TODO: Change this description since 0 - 10 does not make a lot of sense anymore.
+        self.penalty = 0  # The penalty of the current shift pattern.
 
         # Soft constraints:
         self.consecutiveWorkingDays = nurse.consecutiveWorkingDays
