@@ -14,7 +14,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 5
+runs = 1
 counter = 0
 runToTime = {}
 for i in range(runs):
@@ -26,8 +26,9 @@ while counter < runs:
 
     with Spinner():
         start_time = time.time()
-
         useParser = True
+
+        print("----- Beginning PARSING -----")
 
         parser = NurseParser()
         schedule_parsed = parser.parseScenario("n030w4")
@@ -36,11 +37,11 @@ while counter < runs:
 
         end_parser_time = time.time()
 
-        # schedule_parsed.shifts = schedule_artificial.shifts
-        # schedule_parsed.nurses = schedule_artificial.nurses
-
-        solver = KnapsackSolver(schedule)
+        print("----- Beginning KNAPSACK COMPUTATIONS -----")
+        solver = KnapsackSolver(schedule, True)
         solver.solve()
+
+        print(f"Added {len(solver.schedule.nurses) - len(schedule.nurses)} bank nurses")
 
         print("----- Beginning TABU SEARCH -----")
 
@@ -103,3 +104,57 @@ for i in range(runs):
           f"Computation Time: {stats[0]} seconds\n    "
           f"All nurse contracts fulfilled: {stats[3]} \n    "
           f"All shifts have minimum cover: {stats[4]}")
+
+print()
+print(f"---------- AVERAGE RESULTS ----------")
+print(f"Average computation time {sum([stats[0] for stats in runToTime.values()]) / runs}")
+print(f"Average penalty score {sum([stats[1] for stats in runToTime.values()]) / runs}")
+print(f"Average penalty score per nurse {sum([stats[1] for stats in runToTime.values()]) / len(solutionSchedule.nurses) / runs}")
+
+print()
+print(f"---------- BEST RUN ----------")
+bestTimeRunId = -1
+bestTime = float('inf')
+bestPenaltyRunId = -1
+bestPenalty = float('inf')
+for i in range(runs):
+    stats = runToTime[i]
+    if stats[0] < bestTime:
+        bestTime = stats[0]
+        bestTimeRunId = i
+    if stats[1] < bestPenalty:
+        bestPenalty = stats[1]
+        bestPenaltyRunId = i
+
+if bestTimeRunId == bestPenaltyRunId:
+    stats = runToTime[bestTimeRunId]
+    print(f"Run {bestPenaltyRunId} has the lowest penalty, and was the fastest!")
+    print(f"RUN {bestTimeRunId}: \n    "
+          f"Penalty score: {stats[1]} \n    "
+          f"Penalty score per nurse: {stats[2]} \n    "
+          f"Computation Time: {stats[0]} seconds\n    "
+          f"All nurse contracts fulfilled: {stats[3]} \n    "
+          f"All shifts have minimum cover: {stats[4]}")
+else:
+    stats = runToTime[bestTimeRunId]
+    print(f"RUN {bestTimeRunId} WAS THE FASTEST")
+    print(f"RUN {bestTimeRunId}: \n    "
+          f"Penalty score: {stats[1]} \n    "
+          f"Penalty score per nurse: {stats[2]} \n    "
+          f"Computation Time: {stats[0]} seconds\n    "
+          f"All nurse contracts fulfilled: {stats[3]} \n    "
+          f"All shifts have minimum cover: {stats[4]}")
+    print()
+    stats = runToTime[bestPenaltyRunId]
+    print(f"RUN {bestPenaltyRunId} HAD THE LOWEST PENALTY SCORE")
+    print(f"RUN {bestPenaltyRunId}: \n    "
+          f"Penalty score: {stats[1]} \n    "
+          f"Penalty score per nurse: {stats[2]} \n    "
+          f"Computation Time: {stats[0]} seconds\n    "
+          f"All nurse contracts fulfilled: {stats[3]} \n    "
+          f"All shifts have minimum cover: {stats[4]}")
+
+print(f"Total time for {runs} runs: {sum([stats[0] for stats in runToTime.values()])}")
+
+
+
