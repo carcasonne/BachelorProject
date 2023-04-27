@@ -13,6 +13,7 @@ class Nurse:
         self.consecutiveWorkingDays = (contract.minConsecutiveDays, contract.maxConsecutiveDays)
         self.consecutiveDaysOff = (contract.minConsecutiveDaysOff, contract.maxConsecutiveDaysOff)
         self.undesiredShifts = ([0] * 7, [0] * 7, [0] * 7)
+        self.worksNight = None
         self.completeWeekend = contract.completeWeekend
         self.penalty = 0
 
@@ -34,7 +35,10 @@ class Nurse:
                 raise Exception("Nurses can only be assigned to at most one shift per day")
         if contractnights > self.contract.nights or contractdays > self.contract.days or (contractdays > 0 and contractnights > 0):
             raise Exception("Shift pattern infeasible according to the contract")
-
+        if shiftPattern.night != [0]*7:
+            self.worksNight = True
+        else:
+            False
         self.assignedShiftPattern = shiftPattern
         self.penalty = self.calculatePenalty(shiftPattern)
 

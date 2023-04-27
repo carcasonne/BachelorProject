@@ -38,3 +38,8 @@ class NetworkSchedule:
         dayNurses = dayShifts.assignedNurses[grade]
         return list(dayNurses)
 
+    def worksEarly(self):
+        if self.assignedShiftPattern.early != [0] * 7:
+            return True
+        return False
+
