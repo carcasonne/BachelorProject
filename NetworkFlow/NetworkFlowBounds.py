@@ -6,34 +6,9 @@ import queue
 from Domain.Models.Enums.Days import Days
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Network.NetworkSchedule import NetworkSchedule
+from NetworkFlow.NetworkEdge import DirectedEdge
+from NetworkFlow.NetworkNode import Node
 
-
-class Node:
-    def __init__(self, nodeId):
-        self.nodeId = nodeId
-        self.edges = []  # list of all edges going out of this node
-        self.inEdges = []
-        # Special case for day nodes
-        self.day = None
-        self.grade = None
-
-    def __repr__(self):
-        return f"Node {self.nodeId}"
-
-
-class DirectedEdge:
-    def __init__(self, edgeId, fromNode: Node, toNode: Node, cost: int, lowerBound: int, upperBound: int):
-        self.edgeId = edgeId
-        self.fromNode = fromNode
-        self.toNode = toNode
-        self.cost = 0 + cost
-        self.requiredFlow = lowerBound
-        self.capacity = upperBound + 0
-        self.flow = 0
-        self.reverseEdge = None
-
-    def __repr__(self):
-        return f"Edge {self.edgeId} from node {self.fromNode.nodeId} to node {self.toNode.nodeId}"
 
 @dataclass(order=True)
 class PrioritizedNode:
@@ -120,11 +95,12 @@ class BoundedNetworkFlow:
                         dayNode = self.nodes[dayNodeId]
                         cost = nurse.shiftPreference[day.value - 1]
                         # Get rid of negative weights as stated in the paper
-                        if cost < 0:
-                            self.createDirectedPath(nurseNode, dayNode, 0, 1, 1)
-                            self.createDirectedPath(dayNode, nurseNode, -cost, 0, 1)
-                        else:
-                            self.createDirectedPath(nurseNode, dayNode, cost, 0, 1)
+                        # Note: We're no longer doing this shit
+                        # if cost < 0:
+                        #    self.createDirectedPath(nurseNode, dayNode, 0, 1, 1)
+                        #    self.createDirectedPath(dayNode, nurseNode, -cost, 0, 1)
+                        # else:
+                        self.createDirectedPath(nurseNode, dayNode, cost, 0, 1)
 
         # Relax restrictions for nurses working more than 3 days
 
@@ -133,81 +109,27 @@ class BoundedNetworkFlow:
         # Done by forcing flow on edges going from day to sink
         # Then balance the rest of the nodes untill every node has inFlow = outFlow
         terminalDayNodes = []
+        unbalancedQueue = queue.Queue()
         for day in Days:
             dayNode = self.dayToNodeId[day][Grade.THREE]
             node = self.nodes[dayNode]
+            unbalancedQueue.put(node)
             for edge in node.edges:
                 if edge.toNode == self.sink:
                     edge.flow = edge.requiredFlow
-        balanced = False
-        counter = 0  # For debugging perpuses
-        while not balanced:
-            counter = counter + 1
-            self._correctFlow()
-            stop = True
-            for node in self.nodes:
-                if node != self.source and node != self.sink:
-                    flowIn = 0
-                    flowOut = 0
-                    for edge in node.edges:
-                        flowOut = flowOut + edge.flow
-                    for edge in node.inEdges:
-                        flowIn = flowIn + edge.flow
-                    if flowIn != flowOut:
-                        stop = False
-                        break
-            balanced = stop
-        # print(f"Counter flows adjustments: {counter}")
 
-    def _correctFlow(self):
-        # Find the edges, wherein the flow is not balanced
-        for node in self.nodes:
+        self._balanceFlows(unbalancedQueue)
+
+    def _balanceFlows(self, unbalancedQueue: queue.Queue):
+        while unbalancedQueue.qsize() != 0:
+            node = unbalancedQueue.get()
             if node != self.source and node != self.sink:
-                flowIn = 0
-                flowOut = 0
-                for edge in node.edges:
-                    flowOut = flowOut + edge.flow
+                node.balanceFlowInNode()
+                # Add every node going into this node to queue
                 for edge in node.inEdges:
-                    flowIn = flowIn + edge.flow
-                if flowIn == flowOut:
-                    continue
+                    unbalancedQueue.put(edge.fromNode)
 
-                if flowIn > flowOut:
-                    eligibleEdges = []
-                    for edge in node.edges:
-                        if edge.flow < edge.capacity:
-                            residualCapacity = edge.capacity - edge.flow
-                            eligibleEdges.append((edge, residualCapacity))
-
-                    neededFlow = flowIn - flowOut
-                    for (edge, capacity) in eligibleEdges:
-                        if capacity > neededFlow:
-                            edge.flow = edge.flow + neededFlow
-                            neededFlow = 0
-                            break
-                        else:
-                            edge.flow = edge.flow + capacity
-                            neededFlow = neededFlow - capacity
-                        if neededFlow == 0:
-                            break
-                elif flowIn < flowOut:
-                    eligibleEdges = []
-                    for edge in node.inEdges:
-                        if edge.flow < edge.capacity:
-                            residualCapacity = edge.capacity - edge.flow
-                            eligibleEdges.append((edge, residualCapacity))
-                    neededFlow = flowOut - flowIn
-                    for (edge, capacity) in eligibleEdges:
-                        if capacity > neededFlow:
-                            edge.flow = edge.flow + neededFlow
-                            neededFlow = 0
-                            break
-                        else:
-                            edge.flow = edge.flow + capacity
-                            neededFlow = neededFlow - capacity
-                        if neededFlow == 0:
-                            break
-
+    # Does not seem to work
     def transformIntoUnbounded(self):
         # Create the new source and sink
         newSource = self.createNode()
