@@ -47,11 +47,6 @@ class Node:
                 residualCapacity = edge.capacity - edge.flow
                 eligibleEdges.append((edge, residualCapacity))
 
-        # First order ascending by cost
-        # eligibleEdges.sort(key=operator.itemgetter('cost'))
-        # Then order descending by lower bound. Items of equal requiredFlow will retain positions from prev sort
-        # eligibleEdges.sort(key=operator.itemgetter('requiredFlow'), reverse=True)
-
         eligibleEdges.sort(key=lambda x: (-x[0].requiredFlow, x[0].cost))
 
         for (edge, capacity) in eligibleEdges:

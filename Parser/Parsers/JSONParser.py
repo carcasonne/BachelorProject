@@ -29,7 +29,7 @@ class JSONParser:
         nurses = []
         shifts = []
 
-        dynamicContractDays = True
+        dynamicContractDays = False
 
         self.fullTimeContract = None
         self.halfTimeContract = None

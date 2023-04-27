@@ -14,7 +14,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 1
+runs = 10
 counter = 0
 runToTime = {}
 for i in range(runs):
@@ -64,7 +64,19 @@ while counter < runs:
         solutionSchedule = runNetworkFlow(schedule, search.bestSolution)
         end_network_time = time.time()
 
-        print("*** PENALTY TEST ***")
+        debugPenaltyScore = False
+        if debugPenaltyScore:
+            print("*** PENALTY TEST ***")
+            for nurse in solutionSchedule.nurses:
+                nurse.debug = True
+                normalP = nurse.calculatePenalty(nurse.assignedShiftPattern)
+                tabuNurse = search.bestSolution.nurses[nurse.id]
+                tabuP = tabuNurse.calculatePenalty(tabuNurse.shiftPattern)
+                print(f"Nurse {nurse.id}: New penalty: {normalP}, tabu penalty: {tabuP}")
+                print(str(nurse.assignedShiftPattern.early))
+                print(str(nurse.assignedShiftPattern.late))
+                print(str(nurse.assignedShiftPattern.night))
+                print(str(nurse.undesiredShifts))
 
     print()
     print(f"---------- RUN NUMBER {counter + 1} results ----------")
