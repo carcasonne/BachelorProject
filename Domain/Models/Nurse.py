@@ -15,6 +15,7 @@ class Nurse:
         self.undesiredShifts = ([0] * 7, [0] * 7, [0] * 7)
         self.completeWeekend = contract.completeWeekend
         self.penalty = 0
+        self.debug = False
 
     def assignShiftPattern(self, shiftPattern):  # A bit representation of ether (day, night) or (early, late, night)
         contractdays = 0
@@ -105,11 +106,17 @@ class Nurse:
             if (shiftpattern.late or shiftpattern.early) != [0] * 7:
                 if shiftpattern.late[x] == 1 and self.undesiredShifts[1][x] == 1:
                     newPen += 10
+                    if self.debug:
+                        print(f"DEBUG: Nurse {self.id} is working an undesired late shift")
                 elif shiftpattern.early[x] == 1 and self.undesiredShifts[0][x] == 1:
                     newPen += 10
+                    if self.debug:
+                        print(f"DEBUG: Nurse {self.id} is working an undesired early shift")
             elif shiftpattern.night != [0] * 7:
                 if shiftpattern.night[x] == 1 and self.undesiredShifts[2][x] == 1:
                     newPen += 10
+                    if self.debug:
+                        print(f"DEBUG: Nurse {self.id} is working an undesired night shift")
         # Calculation of the penalty score of the nurse not working a complete weekend:
         if pattern[5] != pattern[6] and self.completeWeekend:
             newPen += 30
