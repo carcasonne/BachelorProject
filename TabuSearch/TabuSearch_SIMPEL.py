@@ -58,7 +58,7 @@ class TabuSearch_SIMPLE:
         of all of the nurses in the tests, than it is to initialize knapsack which otherwise does this for the search.
         """
         for nurse in self.currSolution.nurses:
-            randomizeConstraints(nurse)
+            # randomizeConstraints(nurse)
             self.currSolution.assignPatternToNurse(nurse, self.feasiblePatterns[nurse.id][
                 random.randint(0, len(self.feasiblePatterns[nurse.id]) - 1)])
 

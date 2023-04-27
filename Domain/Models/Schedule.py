@@ -17,7 +17,7 @@ class Schedule:
     def getPenaltyScore(self):
         PC = 0
         for nurse in self.nurses:
-            PC = PC + nurse.calculatePenalty()
+            PC = PC + nurse.calculatePenalty(nurse.assignedShiftPattern)
         return PC
 
     def shiftsRequirementsMet(self):
