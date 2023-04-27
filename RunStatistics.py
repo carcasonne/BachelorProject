@@ -41,7 +41,7 @@ while counter < runs:
         solver = KnapsackSolver(schedule, True)
         solver.solve()
 
-        print(f"Added {len(solver.schedule.nurses) - len(schedule.nurses)} bank nurses")
+        print(f"Added {solver.bankNurseCount} bank nurses")
 
         print("----- Beginning TABU SEARCH -----")
 
