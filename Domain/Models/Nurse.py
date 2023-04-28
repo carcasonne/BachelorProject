@@ -13,7 +13,6 @@ class Nurse:
         self.consecutiveWorkingDays = (contract.minConsecutiveDays, contract.maxConsecutiveDays)
         self.consecutiveDaysOff = (contract.minConsecutiveDaysOff, contract.maxConsecutiveDaysOff)
         self.undesiredShifts = ([0] * 7, [0] * 7, [0] * 7)
-        self.worksNight = None
         self.completeWeekend = contract.completeWeekend
         self.penalty = 0
         self.debug = False

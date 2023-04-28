@@ -3,6 +3,7 @@ from mip import Model, xsum, minimize, BINARY, CBC
 # Define the input data
 from Domain.Models.Enums.Grade import Grade
 from Domain.Models.Enums.ShiftType import ShiftType
+from Domain.Models.ShiftPatterns.ShiftPattern import StandardShiftPattern
 from Tests.test_networkflow.TestNetworkFlowData import TestNetworkFlowData
 
 
@@ -11,7 +12,42 @@ class IntegerProgrammingModel:
         self.tabuSchedule = tabuSchedule
         self.schedule = schedule
 
-    def aux(self, grade, nurselist):
+    def buildFinalSchedule(self):
+        lst = self.run()
+        for nurse in self.tabuSchedule.nurses:
+            if nurse.worksNight:
+                pattern = StandardShiftPattern([0]*7, [0]*7, nurse.shiftPattern.night)
+                self.schedule.nurses[nurse.id].assignShiftPattern(pattern)
+            else:
+                pattern = StandardShiftPattern([0]*7, [0]*7, [0]*7)
+                for day in range(7):
+                    if nurse.shiftPattern.day[day] == 1:
+                        if nurse.id in lst[day]:
+                            pattern.early[day] = 1
+                        else:
+                            pattern.late[day] = 1
+                self.schedule.nurses[nurse.id].assignShiftPattern(pattern)
+
+        return self.schedule
+
+    def run(self):
+        result = [[], [], [], [], [], [], []]
+        nurseList = []
+        for nurse in self.tabuSchedule.nurses:
+            if not nurse.worksNight:
+                nurseList.append(nurse.id)
+
+        for grade in Grade:
+            values = self.aux(grade, nurseList, result)
+            for i in range(7):
+                result[i].extend(values[0][i])
+            for id in values[1]:
+                if id in nurseList:
+                    nurseList.remove(id)
+        print(str(result))
+        return result
+
+    def aux(self, grade, nurselist, current):
         referenceList = dict()
         days = 7
         workdays = dict()
@@ -41,11 +77,8 @@ class IntegerProgrammingModel:
         early_shifts_upper = dict()
         for d in range(days):
             currentEarlyRequirement = self.schedule.shifts[d * 3].coverRequirements[grade]
-            if grade == Grade.TWO:
-                currentEarlyRequirement -= self.schedule.shifts[d * 3].coverRequirements[Grade.ONE]
-            if grade == Grade.THREE:
-                currentEarlyRequirement -= self.schedule.shifts[d * 3].coverRequirements[Grade.ONE]
-                currentEarlyRequirement -= self.schedule.shifts[d * 3].coverRequirements[Grade.TWO]
+            if grade == Grade.TWO or grade == Grade.THREE:
+                currentEarlyRequirement -= len(current[d])
             early_shifts_lower[d] = currentEarlyRequirement
 
             tmpCounter = 0
@@ -56,23 +89,6 @@ class IntegerProgrammingModel:
             early_shifts_upper[d] = tmpCounter - currentEarlyRequirement
 
         return self.ipSolve(counter, days, penalties, workdays, early_shifts_lower, early_shifts_upper, referenceList)
-
-    def run(self):
-        result = [[], [], [], [], [], [], []]
-        nurseList = []
-        for nurse in self.tabuSchedule.nurses:
-            if not nurse.worksNight:
-                nurseList.append(nurse.id)
-
-        for grade in Grade:
-            values = self._aux(grade, nurseList)
-            for i in range(7):
-                result[i].extend(values[0][i])
-            for id in values[1]:
-                if id in nurseList:
-                    nurseList.remove(id)
-        print(str(result))
-        return result
 
     def ipSolve(self, nurses, days, penalties, workdays, early_shifts_lower, early_shifts_upper, ref):
         # Create the optimization model

@@ -4,6 +4,7 @@ import time
 from Domain.Models.Network.NetworkSchedule import NetworkSchedule
 from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
+from IntegerProgramming.IP import IntegerProgrammingModel
 from NetworkFlow.StaticMethods import runNetworkFlow
 from Parser.NurseParser import NurseParser
 from Knapsack.KnapsackSolver import KnapsackSolver
@@ -14,7 +15,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 10
+runs = 1
 counter = 0
 runToTime = {}
 for i in range(runs):
@@ -58,6 +59,11 @@ while counter < runs:
         end_tabu_time = time.time()
 
         print(f"Tabu penalty score: {search.bestSolution.PC}")
+
+        print("----- Beginning INTEGER PROGRAMMING MODEL -----")
+        betterSolutionSchedule = IntegerProgrammingModel(schedule, search.bestSolution).buildFinalSchedule()
+        end_IP_time = time.time()
+        print(betterSolutionSchedule.getScheduleRequirementsAsString())
 
         print("----- Beginning NETWORK FLOW -----")
 
