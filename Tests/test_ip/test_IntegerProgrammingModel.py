@@ -21,7 +21,7 @@ class TestIntegerProgrammingModel(unittest.TestCase):
         before = copy.copy(self.tabuSchedule.PC)
         newSchedule = IntegerProgrammingModel(self.schedule, self.tabuSchedule).buildFinalSchedule()
         after = newSchedule.getPenaltyScore()
-        self.assertTrue(before < after)
+        self.assertTrue(before > after)
 
     def test_ip_vs_network(self):
         ipSchedule = IntegerProgrammingModel(copy.deepcopy(self.schedule),

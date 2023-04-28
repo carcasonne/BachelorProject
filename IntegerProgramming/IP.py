@@ -17,7 +17,7 @@ class IntegerProgrammingModel:
         for nurse in self.tabuSchedule.nurses:
             if nurse.worksNight:
                 pattern = StandardShiftPattern([0]*7, [0]*7, nurse.shiftPattern.night)
-                self.schedule.nurses[nurse.id].assignShiftPattern(pattern)
+                self.schedule.assignPatternToNurse(self.schedule.nurses[nurse.id], pattern)
             else:
                 pattern = StandardShiftPattern([0]*7, [0]*7, [0]*7)
                 for day in range(7):
@@ -26,41 +26,35 @@ class IntegerProgrammingModel:
                             pattern.early[day] = 1
                         else:
                             pattern.late[day] = 1
-                self.schedule.nurses[nurse.id].assignShiftPattern(pattern)
+                self.schedule.assignPatternToNurse(self.schedule.nurses[nurse.id], pattern)
 
         return self.schedule
 
     def run(self):
-        result = [[], [], [], [], [], [], []]
         nurseList = []
         for nurse in self.tabuSchedule.nurses:
             if not nurse.worksNight:
                 nurseList.append(nurse.id)
 
-        for grade in Grade:
-            values = self.aux(grade, nurseList, result)
-            for i in range(7):
-                result[i].extend(values[0][i])
-            for id in values[1]:
-                if id in nurseList:
-                    nurseList.remove(id)
-        print(str(result))
-        return result
+        return self.aux(nurseList)
 
-    def aux(self, grade, nurselist, current):
+    def aux(self, nurselist):
         referenceList = dict()
         days = 7
         workdays = dict()
         penalties = dict()
+        nurse_grades = []
 
         counter = 0
         for id in nurselist:
-            if not self.tabuSchedule.nurses[id].worksNight and self.tabuSchedule.nurses[id].grade <= grade:
+            if not self.tabuSchedule.nurses[id].worksNight:
                 # Reference List
                 referenceList[counter] = self.tabuSchedule.nurses[id].id
 
                 # Work Days
                 workdays[counter] = self.tabuSchedule.nurses[id].shiftPattern.day
+
+                nurse_grades.append(self.tabuSchedule.nurses[id].grade.value)
 
                 # Penalty
                 tmp = [0] * 7
@@ -73,24 +67,35 @@ class IntegerProgrammingModel:
                 penalties[counter] = tmp
                 counter += 1
 
-        early_shifts_lower = dict()
-        early_shifts_upper = dict()
+        early_shifts_lower = [0, 0, 0] * 7
+        early_shifts_upper = [0, 0, 0] * 7
         for d in range(days):
-            currentEarlyRequirement = self.schedule.shifts[d * 3].coverRequirements[grade]
-            if grade == Grade.TWO or grade == Grade.THREE:
-                currentEarlyRequirement -= len(current[d])
-            early_shifts_lower[d] = currentEarlyRequirement
+            early_shifts_lower[d] = self.schedule.shifts[d*3].coverRequirements[Grade.ONE], \
+                                    self.schedule.shifts[d*3].coverRequirements[Grade.TWO], \
+                                    self.schedule.shifts[d*3].coverRequirements[Grade.THREE]
 
-            tmpCounter = 0
+            g1 = 0
+            g2 = 0
+            g3 = 0
             for id in nurselist:
-                if self.schedule.nurses[id].grade.value <= grade.value:
-                    if self.tabuSchedule.nurses[id].shiftPattern.day[d] == 1:
-                        tmpCounter += 1
-            early_shifts_upper[d] = tmpCounter - currentEarlyRequirement
+                if self.tabuSchedule.nurses[id].shiftPattern.day[d] == 1:
+                    if self.schedule.nurses[id].grade == Grade.ONE:
+                        g1 += 1
+                        g2 += 1
+                        g3 += 1
+                    elif self.schedule.nurses[id].grade == Grade.TWO:
+                        g2 += 1
+                        g3 += 1
+                    elif self.schedule.nurses[id].grade == Grade.THREE:
+                        g3 += 1
 
-        return self.ipSolve(counter, days, penalties, workdays, early_shifts_lower, early_shifts_upper, referenceList)
+            early_shifts_upper[d] = (g1 - self.schedule.shifts[d * 3 + 1].coverRequirements[Grade.ONE]), \
+                                    (g2 - self.schedule.shifts[d * 3 + 1].coverRequirements[Grade.TWO]), \
+                                    (g3 - self.schedule.shifts[d * 3 + 1].coverRequirements[Grade.THREE])
 
-    def ipSolve(self, nurses, days, penalties, workdays, early_shifts_lower, early_shifts_upper, ref):
+        return self.ipSolve(counter, days, nurse_grades, penalties, workdays, early_shifts_lower, early_shifts_upper, referenceList)
+
+    def ipSolve(self, nurses, days, nurse_grades, penalties, workdays, early_shifts_lower, early_shifts_upper, ref):
         # Create the optimization model
         model = Model(solver_name=CBC)
 
@@ -103,8 +108,24 @@ class IntegerProgrammingModel:
 
         # Define the constraints
         for day in range(days):
-            model += xsum(x[day][nurse] * workdays[nurse][day] for nurse in range(nurses)) >= early_shifts_lower[day]
-            model += xsum(x[day][nurse] * workdays[nurse][day] for nurse in range(nurses)) <= early_shifts_upper[day]
+            model += xsum(
+                x[day][nurse] * workdays[nurse][day] * (nurse_grades[nurse] == 1) for nurse in range(nurses)) >= \
+                     early_shifts_lower[day][0]
+            model += xsum(
+                x[day][nurse] * workdays[nurse][day] * (nurse_grades[nurse] <= 2) for nurse in range(nurses)) >= \
+                     early_shifts_lower[day][1]
+            model += xsum(
+                x[day][nurse] * workdays[nurse][day] * (nurse_grades[nurse] <= 3) for nurse in range(nurses)) >= \
+                     early_shifts_lower[day][2]
+            model += xsum(
+                x[day][nurse] * workdays[nurse][day] * (nurse_grades[nurse] == 1) for nurse in range(nurses)) <= \
+                     early_shifts_upper[day][0]
+            model += xsum(
+                x[day][nurse] * workdays[nurse][day] * (nurse_grades[nurse] <= 2) for nurse in range(nurses)) <= \
+                     early_shifts_upper[day][1]
+            model += xsum(
+                x[day][nurse] * workdays[nurse][day] * (nurse_grades[nurse] <= 3) for nurse in range(nurses)) <= \
+                     early_shifts_upper[day][2]
 
         # Solve the optimization problem
         model.optimize()
@@ -113,19 +134,17 @@ class IntegerProgrammingModel:
         if model.num_solutions:
             print('Total penalty: ', model.objective_value)
             result = []
-            remove = set()
             for day in range(days):
                 tmpDay = []
                 print('Day', day, ': ', end='')
                 for nurse in range(nurses):
                     if x[day][nurse].x >= 0.99:
                         print('Nurse', ref[nurse], end=' ')
-                        remove.add(ref[nurse])
                         tmpDay.append(ref[nurse])
                 print()
                 result.append(tmpDay)
 
-            return result, remove
+            return result
         else:
             print('No solution found.')
             return None
