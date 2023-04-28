@@ -15,7 +15,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 1
+runs = 10
 counter = 0
 runToTime = {}
 for i in range(runs):
@@ -61,7 +61,7 @@ while counter < runs:
         print(f"Tabu penalty score: {search.bestSolution.PC}")
 
         print("----- Beginning INTEGER PROGRAMMING MODEL -----")
-        betterSolutionSchedule = IntegerProgrammingModel(schedule, search.bestSolution).buildFinalSchedule()
+        betterSolutionSchedule = IntegerProgrammingModel(copy.deepcopy(schedule), copy.deepcopy(search.bestSolution)).buildFinalSchedule()
         end_IP_time = time.time()
         print(betterSolutionSchedule.getScheduleRequirementsAsString())
 
@@ -84,7 +84,7 @@ while counter < runs:
                 print(str(nurse.assignedShiftPattern.night))
                 print(str(nurse.undesiredShifts))
 
-    print()
+    print("XOXOX ", str(betterSolutionSchedule.getPenaltyScore()), " vs ", str(solutionSchedule.getPenaltyScore()), " XOXOX")
     print(f"---------- RUN NUMBER {counter + 1} results ----------")
 
     print(solutionSchedule.getNursePatternsAsString())
