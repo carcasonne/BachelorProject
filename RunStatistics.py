@@ -14,11 +14,41 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 10
+availableScenarios = [
+    ("Artificial test data", "18 nurses with randomized contracts, with just enough cover to meet shift requirements"),
+    ("n005w4", "5 nurses"),
+    ("n012w8", "12 nurses"),
+    ("n021w4", "21 nurses"),
+    ("n030w4", "30 nurses"),
+    ("n035w4", "35 nurses"),
+    ("n040w4", "40 nurses"),
+]
+
+print()
+print(f"---------- INPUT PICKER ----------")
+for i in range(len(availableScenarios)):
+    scenario = availableScenarios[i]
+    print(f"Scenario ID: {i}: {scenario[0]}")
+    print(f"   {scenario[1]}")
+print("Pick id: ...")
+userPickedScenarioId = int(input())
+userPickedScenario = availableScenarios[userPickedScenarioId]
+print(f"Picked scenario: {userPickedScenarioId}")
+
+if userPickedScenario == availableScenarios[0]:
+    useParser = False
+    scenario = None
+else:
+    useParser = True
+    scenario = userPickedScenario[0]
+
+print("Pick number of times to run...")
+runs = int(input())
 counter = 0
 runToTime = {}
 for i in range(runs):
     runToTime[i] = (0, "")
+
 
 while counter < runs:
     print()
@@ -26,26 +56,28 @@ while counter < runs:
 
     with Spinner():
         start_time = time.time()
-        useParser = True
 
         print("----- Beginning PARSING -----")
 
-        parser = NurseParser()
-        schedule_parsed = parser.parseScenario("n030w4")
-        schedule_artificial = copy.deepcopy(TestTabuData().schedule)
-        schedule = schedule_parsed if useParser else schedule_artificial
+        if useParser:
+            parser = NurseParser()
+            schedule = parser.parseScenario(scenario)
+        else:
+            schedule = copy.deepcopy(TestTabuData().schedule)
 
         end_parser_time = time.time()
 
         print("----- Beginning KNAPSACK COMPUTATIONS -----")
         solver = KnapsackSolver(schedule, True)
+        solver.debug = True
         solver.solve()
+        schedule = solver.schedule
 
         print(f"Added {solver.bankNurseCount} bank nurses")
 
         print("----- Beginning TABU SEARCH -----")
 
-        tabuSchedule = TabuSchedule(solver.schedule)
+        tabuSchedule = TabuSchedule(schedule)
         if not useParser:
             for nurse in tabuSchedule.nurses:
                 randomizeConstraints(nurse)
@@ -140,8 +172,8 @@ for i in range(runs):
 
 if bestTimeRunId == bestPenaltyRunId:
     stats = runToTime[bestTimeRunId]
-    print(f"Run {bestPenaltyRunId} has the lowest penalty, and was the fastest!")
-    print(f"RUN {bestTimeRunId}: \n    "
+    print(f"Run {bestPenaltyRunId + 1} has the lowest penalty, and was the fastest!")
+    print(f"RUN {bestTimeRunId + 1}: \n    "
           f"Penalty score: {stats[1]} \n    "
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "
@@ -149,8 +181,8 @@ if bestTimeRunId == bestPenaltyRunId:
           f"All shifts have minimum cover: {stats[4]}")
 else:
     stats = runToTime[bestTimeRunId]
-    print(f"RUN {bestTimeRunId} WAS THE FASTEST")
-    print(f"RUN {bestTimeRunId}: \n    "
+    print(f"RUN {bestTimeRunId + 1} WAS THE FASTEST")
+    print(f"RUN {bestTimeRunId + 1}: \n    "
           f"Penalty score: {stats[1]} \n    "
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "
@@ -158,8 +190,8 @@ else:
           f"All shifts have minimum cover: {stats[4]}")
     print()
     stats = runToTime[bestPenaltyRunId]
-    print(f"RUN {bestPenaltyRunId} HAD THE LOWEST PENALTY SCORE")
-    print(f"RUN {bestPenaltyRunId}: \n    "
+    print(f"RUN {bestPenaltyRunId + 1} HAD THE LOWEST PENALTY SCORE")
+    print(f"RUN {bestPenaltyRunId + 1}: \n    "
           f"Penalty score: {stats[1]} \n    "
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "

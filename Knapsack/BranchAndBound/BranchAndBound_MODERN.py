@@ -85,7 +85,7 @@ class BranchAndBound_MODERN:
                 exit = False
 
                 # Update best known solution if solution weight fits, and solution value is better
-                if  includeItemSolution.usedC <= self.C:
+                if includeItemSolution.usedC <= self.C:
                     # If a lower bound is given, we must take into consideration
                     # whether to update the solution or just stop now
                     if self.targetValue is not None:
