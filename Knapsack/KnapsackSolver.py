@@ -69,6 +69,8 @@ class KnapsackSolver:
                             print("Adding bank nurse of grade 2, and finding a new overall solution")
                         self.addBankNurse(Grade.TWO)
                         break
+                    else:
+                        continue
 
                 foundGrade1Solution = False
                 if self.debug:
