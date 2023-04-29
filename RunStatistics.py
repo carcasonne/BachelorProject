@@ -14,7 +14,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 10
+runs = 1
 counter = 0
 runToTime = {}
 for i in range(runs):
@@ -26,7 +26,7 @@ while counter < runs:
 
     with Spinner():
         start_time = time.time()
-        useParser = True
+        useParser = False
 
         print("----- Beginning PARSING -----")
 
@@ -38,14 +38,16 @@ while counter < runs:
         end_parser_time = time.time()
 
         print("----- Beginning KNAPSACK COMPUTATIONS -----")
+        schedule.nurses = schedule.nurses[:len(schedule.nurses)]
         solver = KnapsackSolver(schedule, True)
         solver.solve()
+        schedule = solver.schedule
 
         print(f"Added {solver.bankNurseCount} bank nurses")
 
         print("----- Beginning TABU SEARCH -----")
 
-        tabuSchedule = TabuSchedule(solver.schedule)
+        tabuSchedule = TabuSchedule(schedule)
         if not useParser:
             for nurse in tabuSchedule.nurses:
                 randomizeConstraints(nurse)

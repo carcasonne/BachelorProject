@@ -40,8 +40,104 @@ class KnapsackSolver:
     # 3. Define a new problem only accounting for grade 1 using the Z of previous solution as lower bound
     # When a feasible solution has been found for all steps, it is known for there to be a feasible solution
     # If any solution has no feasible solutions, add bank nurses
-    # TODO: Also account for prefered level of coverage
     def solve(self):
+        print("Starting knapsack search")
+        print("Adding minimal number of bank nurses")
+        # Add bank nurses
+        # Note: Important to first add grade 1 nurses, then 2, then 3
+        for grade in Grade:
+            self.addNecessaryBankNursesForGrade(grade)
+        print(f"Added {self.bankNurseCount} bank nurses")
+        # Find feasible solution
+        feasibleSolutionExists = False
+        while not feasibleSolutionExists:
+            SEARCH_3 = self.getOverallSolution()
+            SEARCH_2 = self.getGradeTwoSolution(SEARCH_3.bestSolution)
+            SEARCH_1 = self.getGradeOneSolution(SEARCH_2.bestSolution)
+            if SEARCH_2.bestSolution.nodeId == 0:
+                pass
+
+            counter = 0
+            foundGrade2Solution = False
+            print("Found overall solution, looking for grade 1+2")
+            # Find a grade 1+2 solution based on the overall solution
+            while not foundGrade2Solution:
+                SOLUTION_3 = SEARCH_3.bestSolution
+                SEARCH_2 = self.getGradeTwoSolution(SOLUTION_3)
+                SOLUTION_2 = SEARCH_2.bestSolution
+
+                if SOLUTION_2.nodeId == 0:
+                    counter = counter + 1
+                    if counter == 23:
+                        pass
+
+                    SEARCH_3.startSearch(True)
+                    if SEARCH_3.bestSolution.nodeId == 0:
+                        print("Found no new overall solution")
+                        print("Adding bank nurse of grade 2, and finding a new overall solution")
+                        self.addBankNurse(Grade.TWO)
+                        SEARCH_3 = self.getOverallSolution()
+                        break
+
+                foundGrade1Solution = False
+                print("Found grade 1+2 solution, looking for grade 1")
+                # Find a grade 1 solution based on the grade 1+2 solution
+                while not foundGrade1Solution:
+                    SOLUTION_2 = SEARCH_2.bestSolution
+                    SEARCH_1 = self.getGradeOneSolution(SOLUTION_2)
+                    SOLUTION_1 = SEARCH_1.bestSolution
+                    if SOLUTION_1.nodeId == 0:
+                        print("Found no grade 1 solution. Continuing search at previous level")
+                        SEARCH_2.startSearch(True)
+                        SOLUTION_2 = SEARCH_2.bestSolution
+                        if SOLUTION_2.nodeId == 0:
+                            print("Found no new grade 1+2 solution. Continuing search at previous level")
+                            SEARCH_3.startSearch(True)
+                            if SEARCH_3.bestSolution.nodeId == 0:
+                                print("Found no new overall solution")
+                                print("Adding bank nurse of grade 1, and finding a new overall solution")
+                                self.addBankNurse(Grade.ONE)
+                                SEARCH_3 = self.getOverallSolution()
+                            break
+                        else:
+                            continue
+                    else:
+                        print("Found a feasible grade 1 solution. Returning")
+                        return SEARCH_1
+
+    def addNecessaryBankNursesForGrade(self, grade: Grade):
+        E = self.requiredForGrade(grade, True)
+        D = self.requiredForGrade(grade, False)
+        N_I_G = self.getContractToGrade()
+        typeToCount = {}
+        for contract in self.contracts:
+            typeToCount[contract] = 0
+
+        for contract in self.contracts:
+            for derivedGrade in Grade:
+                if derivedGrade.value <= grade.value:
+                    N_I = N_I_G[contract][derivedGrade]
+                    typeToCount[contract] = typeToCount[contract] + N_I
+
+        cost = self.costForBounds(typeToCount, D)
+        if cost < E:
+            print(f"There are insufficient {grade} nurses to cover all requirements")
+            needed = E - cost
+            print(f"Adding {needed} {grade} bank nurses")
+            for _ in range(needed):
+                self.addBankNurse(grade)
+
+    def addBankNurse(self, grade: Grade):
+        bankContract = self.bankNurseContract
+        bankGrade = grade if self.useGradedBankNurses else Grade.ONE
+        bankNurse = Nurse(self.originalNurses + self.bankNurseCount, bankGrade, bankContract)
+        self.globalC += bankContract.days
+        self.schedule.nurses.append(bankNurse)
+        self.bankNurseCount += 1
+
+    # This is our first implementation, not in use
+    # TODO: Also account for prefered level of coverage
+    def oldSolve(self):
         if self.debug:
             print("Starting knapsack search")
 
@@ -144,7 +240,7 @@ class KnapsackSolver:
 
             # If the upper bound is smaller than lower bound, the problem is infeasible
             if cost < lowerBound:
-                print("There are insufficient grade 3 nurses to cover all requirements")
+                print("There are insufficient grade 3+2+1 nurses to cover all requirements")
                 n = lowerBound - cost
                 # n //= self.bankNurseContract.nights
                 print(f"Adding {n} nurses")
@@ -170,7 +266,7 @@ class KnapsackSolver:
                     bankN = 1
                 print(f'No solution found. Adding {bankN} extra bank nurses of Grade 3')
                 for _ in range(bankN):
-                    self.addBankNurse(Grade.THREE)
+                    self.addBankNurse(Grade.ONE)
                 continue
             else:
                 grade_three_solution_exists = True
@@ -279,14 +375,6 @@ class KnapsackSolver:
         solution = branchAndSearch.bestSolution
 
         return branchAndSearch
-
-    def addBankNurse(self, grade: Grade):
-        bankContract = self.bankNurseContract
-        bankGrade = grade if self.useGradedBankNurses else Grade.ONE
-        bankNurse = Nurse(self.originalNurses + self.bankNurseCount, bankGrade, bankContract)
-        self.globalC += bankContract.days
-        self.schedule.nurses.append(bankNurse)
-        self.bankNurseCount += 1
 
     # Returns a (dictionary of (contract to (dictionary of grade to (number of nurses working this contract with this grade))))
     # TODO: this is constant, make it into a self.property 
