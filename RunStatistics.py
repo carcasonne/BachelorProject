@@ -40,6 +40,7 @@ while counter < runs:
         print("----- Beginning KNAPSACK COMPUTATIONS -----")
         schedule.nurses = schedule.nurses[:len(schedule.nurses)]
         solver = KnapsackSolver(schedule, True)
+        # solver.debug = True
         solver.solve()
         schedule = solver.schedule
 

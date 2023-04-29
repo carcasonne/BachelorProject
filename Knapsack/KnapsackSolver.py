@@ -34,63 +34,73 @@ class KnapsackSolver:
         self.originalNurses = len(schedule.nurses)
         self.debug = False
 
-    # Strategy consists of 3 parts:
-    # 1. Find the first feasible solution above lower bound E (feasible for all grades)
-    # 2. Define a new problem only accounting for grade 1 and 2, using the Z of previous solution as lower bound
-    # 3. Define a new problem only accounting for grade 1 using the Z of previous solution as lower bound
     # When a feasible solution has been found for all steps, it is known for there to be a feasible solution
     # If any solution has no feasible solutions, add bank nurses
+    # Note: The use of while statements and break/continue is a bit messy. Not my problem!
     def solve(self):
-        print("Starting knapsack search")
-        print("Adding minimal number of bank nurses")
+        if self.debug:
+            print("Starting knapsack search")
+            print("Adding minimal number of bank nurses")
         # Add bank nurses
         # Note: Important to first add grade 1 nurses, then 2, then 3
         for grade in Grade:
             self.addNecessaryBankNursesForGrade(grade)
-        print(f"Added {self.bankNurseCount} bank nurses")
+        if self.debug:
+            print(f"Added {self.bankNurseCount} bank nurses")
         # Find feasible solution
         feasibleSolutionExists = False
         while not feasibleSolutionExists:
             SEARCH_3 = self.getOverallSolution()
             foundGrade2Solution = False
-            print("Found overall solution, looking for grade 1+2")
+            if self.debug:
+                print("Found overall solution, looking for grade 1+2")
             # Find a grade 1+2 solution based on the overall solution
             while not foundGrade2Solution:
                 SOLUTION_3 = SEARCH_3.bestSolution
                 SEARCH_2 = self.getGradeTwoSolution(SOLUTION_3)
                 SOLUTION_2 = SEARCH_2.bestSolution
-
+                # No grade 2+1 solution exists for this overall solution
                 if SOLUTION_2.nodeId == 0:
                     SEARCH_3.startSearch(True)
+                    # No more solutions exist... Fuck
                     if SEARCH_3.bestSolution.nodeId == 0:
-                        print("Found no new overall solution")
-                        print("Adding bank nurse of grade 2, and finding a new overall solution")
+                        if self.debug:
+                            print("Found no new overall solution")
+                            print("Adding bank nurse of grade 2, and finding a new overall solution")
                         self.addBankNurse(Grade.TWO)
                         break
 
                 foundGrade1Solution = False
-                print("Found grade 1+2 solution, looking for grade 1")
+                if self.debug:
+                    print("Found grade 1+2 solution, looking for grade 1")
                 # Find a grade 1 solution based on the grade 1+2 solution
                 while not foundGrade1Solution:
                     SOLUTION_2 = SEARCH_2.bestSolution
                     SEARCH_1 = self.getGradeOneSolution(SOLUTION_2)
                     SOLUTION_1 = SEARCH_1.bestSolution
+                    # No grade 1 solution exists
                     if SOLUTION_1.nodeId == 0:
-                        print("Found no grade 1 solution. Continuing search at previous level")
+                        if self.debug:
+                            print("Found no grade 1 solution. Continuing search at previous level")
                         SEARCH_2.startSearch(True)
                         SOLUTION_2 = SEARCH_2.bestSolution
+                        # No more grade 1+2 solutions exist
                         if SOLUTION_2.nodeId == 0:
-                            print("Found no new grade 1+2 solution. Continuing search at previous level")
+                            if self.debug:
+                                print("Found no new grade 1+2 solution. Continuing search at previous level")
                             SEARCH_3.startSearch(True)
+                            # No more solutions exist... Fuck
                             if SEARCH_3.bestSolution.nodeId == 0:
-                                print("Found no new overall solution")
-                                print("Adding bank nurse of grade 1, and finding a new overall solution")
+                                if self.debug:
+                                    print("Found no new overall solution")
+                                    print("Adding bank nurse of grade 1, and finding a new overall solution")
                                 self.addBankNurse(Grade.ONE)
                             break
                         else:
                             continue
                     else:
-                        print("Found a feasible grade 1 solution. Returning")
+                        if self.debug:
+                            print("Found a feasible grade 1 solution. Returning")
                         return SEARCH_1
 
     def addNecessaryBankNursesForGrade(self, grade: Grade):
