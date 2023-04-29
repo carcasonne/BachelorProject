@@ -52,12 +52,6 @@ class KnapsackSolver:
         feasibleSolutionExists = False
         while not feasibleSolutionExists:
             SEARCH_3 = self.getOverallSolution()
-            SEARCH_2 = self.getGradeTwoSolution(SEARCH_3.bestSolution)
-            SEARCH_1 = self.getGradeOneSolution(SEARCH_2.bestSolution)
-            if SEARCH_2.bestSolution.nodeId == 0:
-                pass
-
-            counter = 0
             foundGrade2Solution = False
             print("Found overall solution, looking for grade 1+2")
             # Find a grade 1+2 solution based on the overall solution
@@ -67,16 +61,11 @@ class KnapsackSolver:
                 SOLUTION_2 = SEARCH_2.bestSolution
 
                 if SOLUTION_2.nodeId == 0:
-                    counter = counter + 1
-                    if counter == 23:
-                        pass
-
                     SEARCH_3.startSearch(True)
                     if SEARCH_3.bestSolution.nodeId == 0:
                         print("Found no new overall solution")
                         print("Adding bank nurse of grade 2, and finding a new overall solution")
                         self.addBankNurse(Grade.TWO)
-                        SEARCH_3 = self.getOverallSolution()
                         break
 
                 foundGrade1Solution = False
@@ -97,7 +86,6 @@ class KnapsackSolver:
                                 print("Found no new overall solution")
                                 print("Adding bank nurse of grade 1, and finding a new overall solution")
                                 self.addBankNurse(Grade.ONE)
-                                SEARCH_3 = self.getOverallSolution()
                             break
                         else:
                             continue
