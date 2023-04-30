@@ -62,7 +62,7 @@ class BranchAndBound_MODERN:
 
     # targetValue: if not None, any solution must havr Z value greater than targetValue
     # earlyExit: Whether the solution should exit at first found, feasible solution (bound to targetValue)
-    def startSearch(self, earlyExit=False):
+    def startSearch(self, earlyExit=False, findExactSolution=False):
         self.bestSolution = self.v
         while self.queue.qsize() != 0:
             pi = self.queue.get()
@@ -99,7 +99,11 @@ class BranchAndBound_MODERN:
                     # If a lower bound is given, we must take into consideration
                     # whether to update the solution or just stop now
                     if self.targetValue is not None:
-                        if includeItemSolution.Z >= self.targetValue:
+                        if findExactSolution:
+                            if includeItemSolution.Z == self.targetValue:
+                                self.bestSolution = includeItemSolution
+                                exit = earlyExit
+                        elif includeItemSolution.Z >= self.targetValue:
                             if includeItemSolution.Z > self.bestSolution.Z:
                                 self.bestSolution = includeItemSolution
                                 exit = earlyExit

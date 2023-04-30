@@ -231,7 +231,7 @@ class KnapsackSolver:
         # Find a feasible solution for grade 3
         branchAndSearch = None
         grade_three_solution_exists = False
-
+        strictGrade3 = True
         while not grade_three_solution_exists:
             upperBounds = self.getOverallUpperBounds()
             boundedItemGroups = self.createBoundedItemGroups(upperBounds)
@@ -253,7 +253,7 @@ class KnapsackSolver:
             boundedKnapsack = BoundedKnapsack(boundedItemGroups, cost)
             zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
             branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
-            branchAndSearch.startSearch(True)
+            branchAndSearch.startSearch(True, strictGrade3)
 
             solution = branchAndSearch.bestSolution
 
@@ -261,12 +261,17 @@ class KnapsackSolver:
             # Else we have found a solution and exit the while loop
             if solution.level == -1:
                 # Add nurses equivelant to difference between lower and global upper bound
-                bankN = cost - lowerBound
-                if bankN == 0:
-                    bankN = 1
-                print(f'No solution found. Adding {bankN} extra bank nurses of Grade 3')
-                for _ in range(bankN):
-                    self.addBankNurse(Grade.ONE)
+                if strictGrade3:
+                    print("It was not able to find a solution with a strict night cover for grade 3. Trying again with relaxed constraint")
+                    strictGrade3 = False
+                else:
+                    bankN = cost - lowerBound
+                    if bankN == 0:
+                        bankN = 1
+                    print(f'No solution found with relaxed constraint. Adding {bankN} extra bank nurse of Grade.ONE and trying again')
+                    for _ in range(bankN):
+                        self.addBankNurse(Grade.ONE)
+                    strictGrade3 = True
                 continue
             else:
                 grade_three_solution_exists = True
