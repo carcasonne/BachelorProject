@@ -7,8 +7,7 @@ from Domain.Models.Network.NetworkSchedule import NetworkSchedule
 from Domain.Models.Schedule import Schedule
 from Domain.Models.ShiftPatterns.ShiftPattern import StandardShiftPattern
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
-from NetworkFlow.NetworkFlowBounds import BoundedNetworkFlow
-from NetworkFlow.NetworkFlow import NetworkFlow
+from NetworkFlow.NetworkFlowGraph import NetworkFlowGraph
 
 
 # TODO: Doesn't take into count that a nurse can have an empty a pattern currently... ([0]*7 , [0]*7, [0]*7)
@@ -34,7 +33,7 @@ def evaluationFunction(networkSchedule):
 
 def runNetworkFlow(schedule: Schedule, tabuSchedule: TabuSchedule):
     networkSchedule = NetworkSchedule(tabuSchedule, schedule)
-    flowNetwork = BoundedNetworkFlow(networkSchedule)
+    flowNetwork = NetworkFlowGraph(networkSchedule)
     flowNetwork.fillOutMinFlows()
     # flow = EdmondsKarp(flowNetwork)
     solution = buildFinalSchedule(schedule, tabuSchedule, flowNetwork)
@@ -43,7 +42,7 @@ def runNetworkFlow(schedule: Schedule, tabuSchedule: TabuSchedule):
 
 # Manipulates the input network to add the min-cost flow to edges
 # Also returns the flow created in the network
-def EdmondsKarp(network: BoundedNetworkFlow):
+def EdmondsKarp(network: NetworkFlowGraph):
     flow = 0
     continueSearching = True
     residualNetwork = network
@@ -85,7 +84,7 @@ def EdmondsKarp(network: BoundedNetworkFlow):
 # Takes shifts and nurses from schedule
 # Takes nurses working night from tabuSchedule
 # Takes nurses working early/late from flowNetwork
-def buildFinalSchedule(schedule: Schedule, tabuSchedule: TabuSchedule, networkFlow: BoundedNetworkFlow):
+def buildFinalSchedule(schedule: Schedule, tabuSchedule: TabuSchedule, networkFlow: NetworkFlowGraph):
     solutionShifts = copy.deepcopy(schedule.shifts)
     solutionNurses = copy.deepcopy(schedule.nurses)
 

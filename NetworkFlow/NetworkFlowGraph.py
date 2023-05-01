@@ -16,7 +16,7 @@ class PrioritizedNode:
     item: Node = field(compare=False)
 
 
-class BoundedNetworkFlow:
+class NetworkFlowGraph:
     def __init__(self, networkSchedule: NetworkSchedule, initialize: bool = True):
         self.source = None
         self.sink = None
