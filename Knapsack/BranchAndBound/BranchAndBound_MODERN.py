@@ -4,10 +4,12 @@ import queue
 from dataclasses import dataclass, field
 from typing import Any
 
+
 @dataclass(order=True)
 class PrioritizedItem:
     priority: int
-    item: Any=field(compare=False)
+    item: Any = field(compare=False)
+
 
 class Node:
     # level: level of node (id)
@@ -15,12 +17,14 @@ class Node:
     # usedC: the total weight of this solution
     # items: The items in the solution. Items not in this list are not in the knapsack
     # U: upper bound of this solution 
-    def __init__(self, level, Z, usedC):
+    def __init__(self, level, Z, usedC, nodeId):
+        self.nodeId = nodeId
         self.level = level
         self.Z = Z
         self.usedC = usedC
         self.items = []
-        self.U = None # Will be set later
+        self.U = None  # Will be set later
+
 
 class BranchAndBound_MODERN:
     # items: All possible items which can be in the knapsacl
@@ -35,7 +39,7 @@ class BranchAndBound_MODERN:
         self.C = zeroOneKnapsack.C
         self.N = len(self.items)
 
-        self.v = Node(-1, 0, 0)
+        self.v = Node(-1, 0, 0, 0)
         self.v.U = BranchAndBound_MODERN.get_bound(self.v, self.items, self.C, self.N)
         self.nodeCount = 1
 
@@ -45,22 +49,28 @@ class BranchAndBound_MODERN:
         self.queue = queue.PriorityQueue()
         self.queue.put(PrioritizedItem(0, self.v))
 
+    def createNode(self, level, Z, usedC):
+        newId = self.nodeCount
+        self.nodeCount = self.nodeCount + 1
+        return Node(level, Z, usedC, newId)
+
     def resetSearch(self):
         self.v = Node(-1, 0, 0)
         self.v.U = BranchAndBound_MODERN.get_bound(self.v, self.items, self.C, self.N)
         self.nodeCount = 1
         self.bestSolution = self.v
-    
+
     # targetValue: if not None, any solution must havr Z value greater than targetValue
     # earlyExit: Whether the solution should exit at first found, feasible solution (bound to targetValue)
-    def startSearch(self, earlyExit=False):
+    def startSearch(self, earlyExit=False, findExactSolution=False):
+        self.bestSolution = self.v
         while self.queue.qsize() != 0:
             pi = self.queue.get()
             v = pi.item
-            
+
             # Ignore node if upper bound falls too low
             # Branches by making 2 solutions: 1 where we insert the item, 1 where we do not
-            if v.U > self.bestSolution.Z: 
+            if v.U > self.bestSolution.Z:
                 # Make new node in tree
                 newLevel = v.level + 1
 
@@ -73,8 +83,8 @@ class BranchAndBound_MODERN:
                 newSolutionZ = v.Z + item.profit
                 newSolutionC = v.usedC + item.weight
 
-                includeItemSolution = Node(newLevel, newSolutionZ, newSolutionC)
-                self.nodeCount += 1
+                # includeItemSolution = Node(newLevel, newSolutionZ, newSolutionC)
+                includeItemSolution = self.createNode(newLevel, newSolutionZ, newSolutionC)
 
                 # Add all items in current solution, then add the new item
                 includeItemSolution.items = v.items.copy()
@@ -85,24 +95,28 @@ class BranchAndBound_MODERN:
                 exit = False
 
                 # Update best known solution if solution weight fits, and solution value is better
-                if  includeItemSolution.usedC <= self.C:
+                if includeItemSolution.usedC <= self.C:
                     # If a lower bound is given, we must take into consideration
                     # whether to update the solution or just stop now
                     if self.targetValue is not None:
-                        if includeItemSolution.Z >= self.targetValue:
+                        if findExactSolution:
+                            if includeItemSolution.Z == self.targetValue:
+                                self.bestSolution = includeItemSolution
+                                exit = earlyExit
+                        elif includeItemSolution.Z >= self.targetValue:
                             if includeItemSolution.Z > self.bestSolution.Z:
                                 self.bestSolution = includeItemSolution
                                 exit = earlyExit
                     elif includeItemSolution.Z > self.bestSolution.Z:
                         self.bestSolution = includeItemSolution
 
-                # If the new solution could potentiall be better, add it to PQ
-                if includeItemSolution.U > self.bestSolution.Z:
-                    self.queue.put(PrioritizedItem(-includeItemSolution.U, includeItemSolution))
+                    # If the new solution could potentiall be better, add it to PQ
+                    if includeItemSolution.U > self.bestSolution.Z:
+                        self.queue.put(PrioritizedItem(-includeItemSolution.U, includeItemSolution))
 
                 # Generate another solution corresponding to not inserting the item
-                excludeItemSolution = Node(newLevel, v.Z, v.usedC)
-                self.nodeCount += 1
+                # excludeItemSolution = Node(newLevel, v.Z, v.usedC)
+                excludeItemSolution = self.createNode(newLevel, v.Z, v.usedC)
 
                 excludeItemSolution.items = v.items.copy()
                 excludeItemSolution.U = BranchAndBound_MODERN.get_bound(excludeItemSolution, self.items, self.C, self.N)
@@ -110,8 +124,8 @@ class BranchAndBound_MODERN:
                 # If potential to be better than best solution, even without adding the item, then add to PQ
                 if excludeItemSolution.U > self.bestSolution.Z:
                     self.queue.put(PrioritizedItem(-excludeItemSolution.U, excludeItemSolution))
-                
-                if exit: 
+
+                if exit:
                     return
 
     def get_bound(node, items, totalC, N):
@@ -130,11 +144,10 @@ class BranchAndBound_MODERN:
                     sumC = sumC + item.weight
                     sumZ = sumZ + item.profit
                     # continously update the critical item to be the one just before no more space is available
-                    s = i 
-            
+                    s = i
+
             if s < N:
                 ratio = items[s].profit / items[s].weight
                 sumZ = sumZ + (totalC - sumC) * ratio
 
             return sumZ
-

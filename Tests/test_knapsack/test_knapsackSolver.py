@@ -138,7 +138,7 @@ class TestKnapsackSolver(unittest.TestCase):
         # If not equal to -1, then a feasible solution exists
         # self.assertTrue(grade_1_solution.level != -1)
         # self.assertTrue(grade_1_solution.Z > 0)
-        self.assertEqual(newNurses, 15)
+        self.assertEqual(newNurses, 11)
         self.assertTrue(feasibleSolution.level != -1)
     
     def test_solves_feasible_grade_2_schedule(self):
