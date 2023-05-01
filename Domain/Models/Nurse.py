@@ -125,3 +125,9 @@ class Nurse:
             newPen += 30
 
         return newPen
+
+    def __str__(self):
+        return f"TabuNurse - Id: {self.id}, Grade: {self.grade}, days: {self.contract.days}, nights: {self.contract.nights}"
+
+    def __repr__(self):
+        return f"TabuNurse - Id: {self.id}, Grade: {self.grade}, days: {self.contract.days}, nights: {self.contract.nights}"
