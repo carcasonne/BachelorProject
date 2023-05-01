@@ -40,7 +40,7 @@ class Test_staticMethods(unittest.TestCase):
 
 
     def test_EdmondsKarp_on_network_finds_flow(self):
-        network = BoundedNetworkFlow(self.networkSchedule)
+        network = NetworkFlowGraph(self.networkSchedule)
         flow = EdmondsKarp(network)
 
         self.assertTrue(flow > 0)
@@ -48,7 +48,7 @@ class Test_staticMethods(unittest.TestCase):
     def test_EdmondsKarp_finds_optimal_solution_for_simple_schedule(self):
         (schedule, tabuSchedule, networkSchedule) = self._get_network_2_nurses_2_days_schedule()
         networkSchedule.nurses[0].undesiredShifts[1][1] = 2
-        network = BoundedNetworkFlow(networkSchedule)
+        network = NetworkFlowGraph(networkSchedule)
         network.fillOutMinFlows()
         flow = EdmondsKarp(network)
 

@@ -4,6 +4,7 @@ import time
 from Domain.Models.Network.NetworkSchedule import NetworkSchedule
 from Domain.Models.Tabu.TabuNurse import TabuNurse
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
+from IntegerProgramming.IP import IntegerProgrammingModel
 from NetworkFlow.StaticMethods import runNetworkFlow
 from Parser.NurseParser import NurseParser
 from Knapsack.KnapsackSolver import KnapsackSolver
@@ -15,6 +16,8 @@ from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
 runs = 1
+runsIpBetter = 0
+runsIpWorse = 0
 counter = 0
 runToTime = {}
 for i in range(runs):
@@ -29,11 +32,11 @@ while counter < runs:
         useParser = False
 
         print("----- Beginning PARSING -----")
-
-        parser = NurseParser()
-        schedule_parsed = parser.parseScenario("n030w4")
-        schedule_artificial = copy.deepcopy(TestTabuData().schedule)
-        schedule = schedule_parsed if useParser else schedule_artificial
+        if useParser:
+            parser = NurseParser()
+            schedule = parser.parseScenario("n030w4")
+        else:
+            schedule = copy.deepcopy(TestTabuData().schedule)
 
         end_parser_time = time.time()
 
@@ -45,7 +48,7 @@ while counter < runs:
         schedule = solver.schedule
 
         print(f"Added {solver.bankNurseCount} bank nurses")
-
+        print(f"Total nurses: {len(schedule.nurses)}")
         print("----- Beginning TABU SEARCH -----")
 
         tabuSchedule = TabuSchedule(schedule)
@@ -56,11 +59,15 @@ while counter < runs:
         end_knapsack_time = time.time()
         search = TabuSearch_SIMPLE(tabuSchedule)
         search.initSchedule()
-        search.debug = False
         search.run(1, False, False)
         end_tabu_time = time.time()
 
         print(f"Tabu penalty score: {search.bestSolution.PC}")
+
+        print("----- Beginning INTEGER PROGRAMMING MODEL -----")
+        betterSolutionSchedule = IntegerProgrammingModel(copy.deepcopy(schedule), copy.deepcopy(search.bestSolution)).buildFinalSchedule()
+        end_IP_time = time.time()
+        print(betterSolutionSchedule.getScheduleRequirementsAsString())
 
         print("----- Beginning NETWORK FLOW -----")
 
@@ -81,7 +88,17 @@ while counter < runs:
                 print(str(nurse.assignedShiftPattern.night))
                 print(str(nurse.undesiredShifts))
 
-    print()
+    print("XOXOX ", str(betterSolutionSchedule.getPenaltyScore()), " vs ", str(solutionSchedule.getPenaltyScore()), " XOXOX")
+
+    difference = betterSolutionSchedule.getPenaltyScore() - solutionSchedule.getPenaltyScore()
+    ipIsBetter = 0
+    if difference < 0:
+        runsIpWorse = runsIpWorse + 1
+        ipIsBetter = -1
+    elif difference > 0:
+        runsIpBetter = runsIpBetter + 1
+        ipIsBetter = 1
+
     print(f"---------- RUN NUMBER {counter + 1} results ----------")
 
     print(solutionSchedule.getNursePatternsAsString())
@@ -107,7 +124,7 @@ while counter < runs:
     perNurse = penalty / len(solutionSchedule.nurses)
     nurseContractsFulfilled = solutionSchedule.nursesFulfillContract()
     shiftsCovered = solutionSchedule.shiftsRequirementsMet()
-    runToTime[counter] = (total_time_elapsed, penalty, perNurse, nurseContractsFulfilled, shiftsCovered)
+    runToTime[counter] = (total_time_elapsed, penalty, perNurse, nurseContractsFulfilled, shiftsCovered, ipIsBetter)
     counter = counter + 1
 
 print(f"---------- FINAL RESULTS ----------")
@@ -118,7 +135,8 @@ for i in range(runs):
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "
           f"All nurse contracts fulfilled: {stats[3]} \n    "
-          f"All shifts have minimum cover: {stats[4]}")
+          f"All shifts have minimum cover: {stats[4]} \n    " 
+          f"IP better than network flow: {stats[5]}")
 
 print()
 print(f"---------- AVERAGE RESULTS ----------")
@@ -149,7 +167,8 @@ if bestTimeRunId == bestPenaltyRunId:
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "
           f"All nurse contracts fulfilled: {stats[3]} \n    "
-          f"All shifts have minimum cover: {stats[4]}")
+          f"All shifts have minimum cover: {stats[4]} \n    " 
+          f"IP better than network flow: {stats[5]}")
 else:
     stats = runToTime[bestTimeRunId]
     print(f"RUN {bestTimeRunId} WAS THE FASTEST")
@@ -158,7 +177,8 @@ else:
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "
           f"All nurse contracts fulfilled: {stats[3]} \n    "
-          f"All shifts have minimum cover: {stats[4]}")
+          f"All shifts have minimum cover: {stats[4]} \n    " 
+          f"IP better than network flow: {stats[5]}")
     print()
     stats = runToTime[bestPenaltyRunId]
     print(f"RUN {bestPenaltyRunId} HAD THE LOWEST PENALTY SCORE")
@@ -167,9 +187,11 @@ else:
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "
           f"All nurse contracts fulfilled: {stats[3]} \n    "
-          f"All shifts have minimum cover: {stats[4]}")
+          f"All shifts have minimum cover: {stats[4]} \n    " 
+          f"IP better than network flow: {stats[5]}")
 
 print(f"Total time for {runs} runs: {sum([stats[0] for stats in runToTime.values()])}")
-
-
-
+print(f"Number of runs: {runs}: \n   "
+      f"Runs where IP was better: {runsIpBetter} ({(runsIpBetter / runs) * 100}%) \n    "
+      f"Runs where IP was worse: {runsIpWorse} ({(runsIpWorse / runs) * 100}%) \n   "
+      f"Runs with same penalty score: {runs - runsIpWorse - runsIpBetter} ({((runs - runsIpWorse - runsIpBetter) / runs) * 100}%)")

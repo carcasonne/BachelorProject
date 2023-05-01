@@ -21,7 +21,7 @@ class KnapsackSolver:
     # schedule: The schedule to be solved
     # useGradedBankNurses: True if bank nurses should have the grade that is currently lacking, false if bank nurses should always be Grade.ONE
     def __init__(self, schedule: Schedule, useGradedBankNurses=True):
-        self.schedule = Schedule(schedule.shifts.copy(), schedule.nurses.copy())
+        self.schedule = Schedule(copy.deepcopy(schedule.shifts), copy.deepcopy(schedule.nurses.copy()))
         self.E = self.requiredForGrade(Grade.THREE,
                                        True)  # sum(shift.coverRequirements[Grade.THREE] for shift in self.schedule.shifts if shift.shiftType == ShiftType.NIGHT)
         self.D = self.requiredForGrade(Grade.THREE,
@@ -31,8 +31,17 @@ class KnapsackSolver:
         self.contracts = self.extractContracts(self.schedule.nurses)
         self.useGradedBankNurses = useGradedBankNurses
         self.bankNurseCount = 0
-        self.originalNurses = len(schedule.nurses)
+        self.originalNurses = len(self.schedule.nurses)
         self.debug = False
+
+        days = 0
+        nights = 0
+        for nurse in self.schedule.nurses:
+            days += nurse.contract.days
+            nights += nurse.contract.nights
+
+        self.contractDays = days
+        self.contractNights = nights
 
     # When a feasible solution has been found for all steps, it is known for there to be a feasible solution
     # If any solution has no feasible solutions, add bank nurses
@@ -68,6 +77,7 @@ class KnapsackSolver:
                             print("Found no new overall solution")
                             print("Adding bank nurse of grade 2, and finding a new overall solution")
                         self.addBankNurse(Grade.TWO)
+                        SEARCH_3 = self.getOverallSolution()
                         break
                     else:
                         continue
@@ -97,6 +107,7 @@ class KnapsackSolver:
                                     print("Found no new overall solution")
                                     print("Adding bank nurse of grade 1, and finding a new overall solution")
                                 self.addBankNurse(Grade.ONE)
+                                SEARCH_3 = self.getOverallSolution()
                             break
                         else:
                             continue
@@ -131,7 +142,6 @@ class KnapsackSolver:
         bankContract = self.bankNurseContract
         bankGrade = grade if self.useGradedBankNurses else Grade.ONE
         bankNurse = Nurse(self.originalNurses + self.bankNurseCount, bankGrade, bankContract)
-        self.globalC += bankContract.days
         self.schedule.nurses.append(bankNurse)
         self.bankNurseCount += 1
 

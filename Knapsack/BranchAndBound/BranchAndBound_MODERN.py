@@ -74,9 +74,9 @@ class BranchAndBound_MODERN:
                 # Make new node in tree
                 newLevel = v.level + 1
 
-                # means we have run through all items without finding a feasible solution
+                # means that this node cannot have any children. end of the line
                 if newLevel >= len(self.items):
-                    return
+                    continue
 
                 item = self.items[newLevel]
 
