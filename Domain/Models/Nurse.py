@@ -35,7 +35,10 @@ class Nurse:
                 raise Exception("Nurses can only be assigned to at most one shift per day")
         if contractnights > self.contract.nights or contractdays > self.contract.days or (contractdays > 0 and contractnights > 0):
             raise Exception("Shift pattern infeasible according to the contract")
-
+        if shiftPattern.night != [0]*7:
+            self.worksNight = True
+        else:
+            False
         self.assignedShiftPattern = shiftPattern
         self.penalty = self.calculatePenalty(shiftPattern)
 
@@ -122,3 +125,9 @@ class Nurse:
             newPen += 30
 
         return newPen
+
+    def __str__(self):
+        return f"TabuNurse - Id: {self.id}, Grade: {self.grade}, days: {self.contract.days}, nights: {self.contract.nights}"
+
+    def __repr__(self):
+        return f"TabuNurse - Id: {self.id}, Grade: {self.grade}, days: {self.contract.days}, nights: {self.contract.nights}"

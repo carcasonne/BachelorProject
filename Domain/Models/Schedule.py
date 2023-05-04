@@ -1,8 +1,11 @@
+import copy
+
 from colorama import Fore, Back
 from tabulate import tabulate
 
 from Domain.Models.Enums.Days import Days
 from Domain.Models.Enums.Grade import Grade
+from Domain.Models.ShiftPatterns.ShiftPattern import StandardShiftPattern
 from Domain.Models.Tabu.TabuSchedule import TabuSchedule
 
 
@@ -19,6 +22,30 @@ class Schedule:
         for nurse in self.nurses:
             PC = PC + nurse.calculatePenalty(nurse.assignedShiftPattern)
         return PC
+
+    def assignPatternToNurse(self, nurse, pattern):
+        if nurse.assignedShiftPattern is None:
+            oldPattern = StandardShiftPattern([0]*7, [0]*7, [0]*7)
+        else:
+            nurse.assignedShiftPattern
+
+        nurse.assignShiftPattern(pattern)
+        newPattern = nurse.assignedShiftPattern
+        for x in range(7):
+            if oldPattern.early[x] != newPattern.early[x] and newPattern.early[x] == 1:
+                self.shifts[x*3].addNurse(nurse)
+            if oldPattern.early[x] != newPattern.early[x] and oldPattern.early[x] == 1:
+                self.shifts[x*3].removeNurse(nurse)
+
+            if oldPattern.late[x] != newPattern.late[x] and newPattern.late[x] == 1:
+                self.shifts[x*3+1].addNurse(nurse)
+            if oldPattern.late[x] != newPattern.late[x] and oldPattern.late[x] == 1:
+                self.shifts[x*3+1].removeNurse(nurse)
+
+            if oldPattern.night[x] != newPattern.night[x] and newPattern.night[x] == 1:
+                self.shifts[x*3+2].addNurse(nurse)
+            if oldPattern.night[x] != newPattern.night[x] and oldPattern.night[x] == 1:
+                self.shifts[x*3+2].removeNurse(nurse)
 
     def shiftsRequirementsMet(self):
         for shift in self.shifts:

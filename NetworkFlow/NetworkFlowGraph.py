@@ -16,7 +16,7 @@ class PrioritizedNode:
     item: Node = field(compare=False)
 
 
-class BoundedNetworkFlow:
+class NetworkFlowGraph:
     def __init__(self, networkSchedule: NetworkSchedule, initialize: bool = True):
         self.source = None
         self.sink = None
@@ -123,6 +123,7 @@ class BoundedNetworkFlow:
     def _balanceFlows(self, unbalancedQueue: queue.Queue):
         while unbalancedQueue.qsize() != 0:
             node = unbalancedQueue.get()
+            print(f"Popped node with id {node.nodeId}")
             if node != self.source and node != self.sink:
                 node.balanceFlowInNode()
                 # Add every node going into this node to queue
