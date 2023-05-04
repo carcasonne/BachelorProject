@@ -23,6 +23,7 @@ runToTime = {}
 for i in range(runs):
     runToTime[i] = (0, "")
 
+bestSolution = None
 
 while counter < runs:
     print()
@@ -35,7 +36,7 @@ while counter < runs:
         print("----- Beginning PARSING -----")
         if useParser:
             parser = NurseParser()
-            schedule = parser.parseScenario("n005w4")
+            schedule = parser.parseScenario("n005w4-4")
         else:
             schedule = copy.deepcopy(TestTabuData().schedule)
 
@@ -44,7 +45,7 @@ while counter < runs:
         print("----- Beginning KNAPSACK COMPUTATIONS -----")
         schedule.nurses = schedule.nurses[:len(schedule.nurses)]
         solver = KnapsackSolver(schedule, True)
-        solver.debug = True
+        solver.debug = False
         solver.solve()
         schedule = solver.schedule
 
@@ -68,7 +69,7 @@ while counter < runs:
         print("----- Beginning INTEGER PROGRAMMING MODEL -----")
         betterSolutionSchedule = IntegerProgrammingModel(copy.deepcopy(schedule), copy.deepcopy(search.bestSolution)).buildFinalSchedule()
         end_IP_time = time.time()
-        print(betterSolutionSchedule.getScheduleRequirementsAsString())
+        # print(betterSolutionSchedule.getScheduleRequirementsAsString())
 
         print("----- Beginning NETWORK FLOW -----")
 
@@ -91,6 +92,9 @@ while counter < runs:
 
     print("XOXOX ", str(betterSolutionSchedule.getPenaltyScore()), " vs ", str(solutionSchedule.getPenaltyScore()), " XOXOX")
 
+    if bestSolution is None or bestSolution.getPenaltyScore() > solutionSchedule.getPenaltyScore():
+        bestSolution = solutionSchedule
+
     difference = betterSolutionSchedule.getPenaltyScore() - solutionSchedule.getPenaltyScore()
     ipIsBetter = 0
     if difference < 0:
@@ -102,8 +106,8 @@ while counter < runs:
 
     print(f"---------- RUN NUMBER {counter + 1} results ----------")
 
-    print(solutionSchedule.getNursePatternsAsString())
-    print(solutionSchedule.getScheduleRequirementsAsString())
+    # print(solutionSchedule.getNursePatternsAsString())
+    # print(solutionSchedule.getScheduleRequirementsAsString())
 
     print(f"IS SCHEDULE VALID: {solutionSchedule.nursesFulfillContract()}!!!!!!!!!!!!!!!!!")
 
@@ -193,6 +197,11 @@ else:
 
 print(f"Total time for {runs} runs: {sum([stats[0] for stats in runToTime.values()])}")
 print(f"Number of runs: {runs}: \n   "
-      f"Runs where IP was better: {runsIpBetter} ({(runsIpBetter / runs) * 100}%) \n    "
+      f"Runs where IP was better: {runsIpBetter} ({(runsIpBetter / runs) * 100}%) \n   "
       f"Runs where IP was worse: {runsIpWorse} ({(runsIpWorse / runs) * 100}%) \n   "
       f"Runs with same penalty score: {runs - runsIpWorse - runsIpBetter} ({((runs - runsIpWorse - runsIpBetter) / runs) * 100}%)")
+
+print(solutionSchedule.getNursePatternsAsString())
+print(solutionSchedule.getScheduleRequirementsAsString())
+
+print("Best solution printed")
