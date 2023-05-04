@@ -2,7 +2,7 @@
   "week" : 0,
   "scenario" : "n005w4",
   "nurseHistory" : [ {
-    "nurse" : "Patrick",
+    "nurse" : "HN_0",
     "numberOfAssignments" : 0,
     "numberOfWorkingWeekends" : 0,
     "lastAssignedShiftType" : "Night",
@@ -10,7 +10,7 @@
     "numberOfConsecutiveWorkingDays" : 4,
     "numberOfConsecutiveDaysOff" : 0
   }, {
-    "nurse" : "Andrea",
+    "nurse" : "HN_1",
     "numberOfAssignments" : 0,
     "numberOfWorkingWeekends" : 0,
     "lastAssignedShiftType" : "Early",
@@ -18,7 +18,7 @@
     "numberOfConsecutiveWorkingDays" : 3,
     "numberOfConsecutiveDaysOff" : 0
   }, {
-    "nurse" : "Stefaan",
+    "nurse" : "HN_2",
     "numberOfAssignments" : 0,
     "numberOfWorkingWeekends" : 0,
     "lastAssignedShiftType" : "None",
@@ -26,7 +26,7 @@
     "numberOfConsecutiveWorkingDays" : 0,
     "numberOfConsecutiveDaysOff" : 3
   }, {
-    "nurse" : "Sara",
+    "nurse" : "NU_3",
     "numberOfAssignments" : 0,
     "numberOfWorkingWeekends" : 0,
     "lastAssignedShiftType" : "Late",
@@ -34,7 +34,7 @@
     "numberOfConsecutiveWorkingDays" : 4,
     "numberOfConsecutiveDaysOff" : 0
   }, {
-    "nurse" : "Nguyen",
+    "nurse" : "NU_4",
     "numberOfAssignments" : 0,
     "numberOfWorkingWeekends" : 0,
     "lastAssignedShiftType" : "None",

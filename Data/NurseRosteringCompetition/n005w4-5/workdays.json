@@ -188,15 +188,15 @@
     }
   } ],
   "shiftOffRequests" : [ {
-    "nurse" : "Patrick",
+    "nurse" : "HN_0",
     "shiftType" : "Any",
     "day" : "Monday"
   }, {
-    "nurse" : "Stefaan",
+    "nurse" : "HN_2",
     "shiftType" : "Late",
     "day" : "Wednesday"
   }, {
-    "nurse" : "Sara",
+    "nurse" : "NU_3",
     "shiftType" : "Any",
     "day" : "Friday"
   } ]

@@ -47,23 +47,23 @@
     "completeWeekends" : 1
   } ],
   "nurses" : [ {
-    "id" : "Patrick",
+    "id" : "HN_0",
     "contract" : "FullTime",
     "skills" : [ "HeadNurse", "Nurse" ]
   }, {
-    "id" : "Andrea",
+    "id" : "HN_1",
     "contract" : "FullTime",
     "skills" : [ "HeadNurse", "Nurse" ]
   }, {
-    "id" : "Stefaan",
+    "id" : "HN_2",
     "contract" : "PartTime",
     "skills" : [ "HeadNurse", "Nurse" ]
   }, {
-    "id" : "Sara",
+    "id" : "NU_3",
     "contract" : "PartTime",
     "skills" : [ "Nurse" ]
   }, {
-    "id" : "Nguyen",
+    "id" : "NU_4",
     "contract" : "FullTime",
     "skills" : [ "Nurse" ]
   } ]
