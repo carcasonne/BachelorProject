@@ -98,6 +98,7 @@ class IntegerProgrammingModel:
     def ipSolve(self, nurses, days, nurse_grades, penalties, workdays, early_shifts_lower, early_shifts_upper, ref):
         # Create the optimization model
         model = Model(solver_name=CBC)
+        model.verbose = 0
 
         # Define the decision variables
         x = [[model.add_var(var_type=BINARY) for j in range(nurses)] for i in range(days)]
@@ -130,18 +131,13 @@ class IntegerProgrammingModel:
         # Solve the optimization problem
         model.optimize()
 
-        # Print the results
         if model.num_solutions:
-            print('Total penalty: ', model.objective_value)
             result = []
             for day in range(days):
                 tmpDay = []
-                print('Day', day, ': ', end='')
                 for nurse in range(nurses):
                     if x[day][nurse].x >= 0.99:
-                        print('Nurse', ref[nurse], end=' ')
                         tmpDay.append(ref[nurse])
-                print()
                 result.append(tmpDay)
 
             return result
