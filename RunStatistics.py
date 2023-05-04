@@ -15,6 +15,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
+
 runs = 10
 runsIpBetter = 0
 runsIpWorse = 0
@@ -36,7 +37,7 @@ while counter < runs:
         print("----- Beginning PARSING -----")
         if useParser:
             parser = NurseParser()
-            schedule = parser.parseScenario("n005w4-4")
+            schedule = parser.parseScenario("n005w4")
         else:
             schedule = copy.deepcopy(TestTabuData().schedule)
 
@@ -201,7 +202,7 @@ print(f"Number of runs: {runs}: \n   "
       f"Runs where IP was worse: {runsIpWorse} ({(runsIpWorse / runs) * 100}%) \n   "
       f"Runs with same penalty score: {runs - runsIpWorse - runsIpBetter} ({((runs - runsIpWorse - runsIpBetter) / runs) * 100}%)")
 
-print(solutionSchedule.getNursePatternsAsString())
-print(solutionSchedule.getScheduleRequirementsAsString())
+print(bestSolution.getNursePatternsAsString())
+print(bestSolution.getScheduleRequirementsAsString())
 
 print("Best solution printed")
