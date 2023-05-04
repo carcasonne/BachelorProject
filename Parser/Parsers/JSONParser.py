@@ -29,7 +29,7 @@ class JSONParser:
         nurses = []
         shifts = []
 
-        dynamicContractDays = False
+        dynamicContractDays = True
 
         self.fullTimeContract = None
         self.halfTimeContract = None
@@ -222,7 +222,7 @@ class JSONParser:
         elif grade == "NU":
             grade = Grade.TWO
         elif grade == "CT":
-            grade = Grade.TWO
+            grade = Grade.THREE
         elif grade == "TR":
             grade = Grade.THREE
         return (grade, id)
@@ -234,7 +234,7 @@ class JSONParser:
             case "Nurse":
                 return Grade.TWO
             case "Caretaker":
-                return Grade.TWO
+                return Grade.THREE
             case "Trainee":
                 return Grade.THREE
             case _:
