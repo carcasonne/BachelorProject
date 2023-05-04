@@ -15,7 +15,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 1
+runs = 10
 runsIpBetter = 0
 runsIpWorse = 0
 counter = 0
