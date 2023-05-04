@@ -15,7 +15,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 10
+runs = 1
 runsIpBetter = 0
 runsIpWorse = 0
 counter = 0
@@ -35,7 +35,7 @@ while counter < runs:
         print("----- Beginning PARSING -----")
         if useParser:
             parser = NurseParser()
-            schedule = parser.parseScenario("n021w4")
+            schedule = parser.parseScenario("n005w4")
         else:
             schedule = copy.deepcopy(TestTabuData().schedule)
 
