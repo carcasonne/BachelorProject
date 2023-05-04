@@ -312,8 +312,9 @@ class KnapsackSolver:
                 upperBounds[contract] = N_I_1 + N_I_2
             else:
                 sub = Q_i - N_I_3
+                # sub = 0
                 upperBounds[contract] = N_I_1 + N_I_2 - sub
-                lowerBound = lowerBound - sub
+                lowerBound = lowerBound - sub * contract.nights
 
             if Q_i < upperBounds[contract]:
                 upperBounds[contract] = Q_i
@@ -365,8 +366,9 @@ class KnapsackSolver:
                 upperBounds[contract] = N_I_1
             else:
                 sub = Q_i - (N_I_2 + N_I_3)
+                # sub = 0
                 upperBounds[contract] = N_I_1 - sub
-                lowerBound = E_1 - sub
+                lowerBound = E_1 - sub * contract.nights
             if Q_i < upperBounds[contract]:
                 upperBounds[contract] = Q_i
 

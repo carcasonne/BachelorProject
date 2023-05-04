@@ -47,7 +47,7 @@ class Node:
                 residualCapacity = edge.capacity - edge.flow
                 eligibleEdges.append((edge, residualCapacity))
 
-        eligibleEdges.sort(key=lambda x: (-x[0].requiredFlow, x[0].cost))
+        eligibleEdges.sort(key=lambda x: (-(max(x[0].requiredFlow - x[0].flow, 0)), x[0].cost))
 
         for (edge, capacity) in eligibleEdges:
             if capacity > neededFlow:

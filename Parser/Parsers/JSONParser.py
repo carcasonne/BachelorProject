@@ -75,6 +75,7 @@ class JSONParser:
             # shiftTypes (soft constraints?)
             # forbiddenShiftTypeSucessions (hard constraints?)
             # contracts
+        currentId = 0
         for nurse in nursesJson["nurses"]:
             rawId = nurse["id"]
             rawContract = nurse["contract"]

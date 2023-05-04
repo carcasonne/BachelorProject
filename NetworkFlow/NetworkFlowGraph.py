@@ -96,11 +96,11 @@ class NetworkFlowGraph:
                         cost = nurse.shiftPreference[day.value - 1]
                         # Get rid of negative weights as stated in the paper
                         # Note: We're no longer doing this shit
-                        # if cost < 0:
-                        #    self.createDirectedPath(nurseNode, dayNode, 0, 1, 1)
-                        #    self.createDirectedPath(dayNode, nurseNode, -cost, 0, 1)
-                        # else:
-                        self.createDirectedPath(nurseNode, dayNode, cost, 0, 1)
+                        if cost < 0:
+                            self.createDirectedPath(nurseNode, dayNode, 0, 1, 1)
+                            self.createDirectedPath(dayNode, nurseNode, -cost, 0, 1)
+                        else:
+                            self.createDirectedPath(nurseNode, dayNode, cost, 0, 1)
 
         # Relax restrictions for nurses working more than 3 days
 
@@ -123,6 +123,7 @@ class NetworkFlowGraph:
     def _balanceFlows(self, unbalancedQueue: queue.Queue):
         while unbalancedQueue.qsize() != 0:
             node = unbalancedQueue.get()
+            print(f"Popped node with id {node.nodeId}")
             if node != self.source and node != self.sink:
                 node.balanceFlowInNode()
                 # Add every node going into this node to queue

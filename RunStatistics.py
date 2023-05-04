@@ -15,7 +15,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 1
+runs = 10
 runsIpBetter = 0
 runsIpWorse = 0
 counter = 0
@@ -23,18 +23,19 @@ runToTime = {}
 for i in range(runs):
     runToTime[i] = (0, "")
 
+
 while counter < runs:
     print()
     print(f"---------- BEGINNING RUN NUMBER {counter + 1} ----------")
 
     with Spinner():
         start_time = time.time()
-        useParser = False
+        useParser = True
 
         print("----- Beginning PARSING -----")
         if useParser:
             parser = NurseParser()
-            schedule = parser.parseScenario("n030w4")
+            schedule = parser.parseScenario("n021w4")
         else:
             schedule = copy.deepcopy(TestTabuData().schedule)
 
@@ -43,7 +44,7 @@ while counter < runs:
         print("----- Beginning KNAPSACK COMPUTATIONS -----")
         schedule.nurses = schedule.nurses[:len(schedule.nurses)]
         solver = KnapsackSolver(schedule, True)
-        # solver.debug = True
+        solver.debug = True
         solver.solve()
         schedule = solver.schedule
 
@@ -161,8 +162,8 @@ for i in range(runs):
 
 if bestTimeRunId == bestPenaltyRunId:
     stats = runToTime[bestTimeRunId]
-    print(f"Run {bestPenaltyRunId} has the lowest penalty, and was the fastest!")
-    print(f"RUN {bestTimeRunId}: \n    "
+    print(f"Run {bestPenaltyRunId + 1} has the lowest penalty, and was the fastest!")
+    print(f"RUN {bestTimeRunId + 1}: \n    "
           f"Penalty score: {stats[1]} \n    "
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "
@@ -171,8 +172,8 @@ if bestTimeRunId == bestPenaltyRunId:
           f"IP better than network flow: {stats[5]}")
 else:
     stats = runToTime[bestTimeRunId]
-    print(f"RUN {bestTimeRunId} WAS THE FASTEST")
-    print(f"RUN {bestTimeRunId}: \n    "
+    print(f"RUN {bestTimeRunId + 1} WAS THE FASTEST")
+    print(f"RUN {bestTimeRunId + 1}: \n    "
           f"Penalty score: {stats[1]} \n    "
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "
@@ -181,8 +182,8 @@ else:
           f"IP better than network flow: {stats[5]}")
     print()
     stats = runToTime[bestPenaltyRunId]
-    print(f"RUN {bestPenaltyRunId} HAD THE LOWEST PENALTY SCORE")
-    print(f"RUN {bestPenaltyRunId}: \n    "
+    print(f"RUN {bestPenaltyRunId + 1} HAD THE LOWEST PENALTY SCORE")
+    print(f"RUN {bestPenaltyRunId + 1}: \n    "
           f"Penalty score: {stats[1]} \n    "
           f"Penalty score per nurse: {stats[2]} \n    "
           f"Computation Time: {stats[0]} seconds\n    "
