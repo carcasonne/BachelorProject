@@ -15,7 +15,7 @@ from TabuSearch.TabuSearch_SIMPEL import TabuSearch_SIMPLE
 from Tests.test_tabu.TestTabuData import TestTabuData
 import copy
 
-runs = 10
+runs = 5
 runsIpBetter = 0
 runsIpWorse = 0
 counter = 0
@@ -93,10 +93,10 @@ while counter < runs:
 
     difference = betterSolutionSchedule.getPenaltyScore() - solutionSchedule.getPenaltyScore()
     ipIsBetter = 0
-    if difference < 0:
+    if difference > 0:
         runsIpWorse = runsIpWorse + 1
         ipIsBetter = -1
-    elif difference > 0:
+    elif difference < 0:
         runsIpBetter = runsIpBetter + 1
         ipIsBetter = 1
 

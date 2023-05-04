@@ -128,7 +128,8 @@ class NetworkFlowGraph:
                 node.balanceFlowInNode()
                 # Add every node going into this node to queue
                 for edge in node.inEdges:
-                    unbalancedQueue.put(edge.fromNode)
+                    if edge.fromNode != self.source:
+                        unbalancedQueue.put(edge.fromNode)
 
     # Does not seem to work
     def transformIntoUnbounded(self):
