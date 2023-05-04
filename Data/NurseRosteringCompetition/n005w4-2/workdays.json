@@ -24,19 +24,19 @@
       "optimal" : 0
     },
     "requirementOnSaturday" : {
-      "minimum" : 1,
-      "optimal" : 1
-    },
-    "requirementOnSunday" : {
       "minimum" : 0,
       "optimal" : 0
+    },
+    "requirementOnSunday" : {
+      "minimum" : 1,
+      "optimal" : 1
     }
   }, {
     "shiftType" : "Early",
     "skill" : "Nurse",
     "requirementOnMonday" : {
-      "minimum" : 1,
-      "optimal" : 2
+      "minimum" : 0,
+      "optimal" : 1
     },
     "requirementOnTuesday" : {
       "minimum" : 1,
@@ -47,7 +47,7 @@
       "optimal" : 1
     },
     "requirementOnThursday" : {
-      "minimum" : 0,
+      "minimum" : 1,
       "optimal" : 1
     },
     "requirementOnFriday" : {
@@ -59,27 +59,27 @@
       "optimal" : 1
     },
     "requirementOnSunday" : {
-      "minimum" : 0,
+      "minimum" : 1,
       "optimal" : 1
     }
   }, {
     "shiftType" : "Late",
     "skill" : "HeadNurse",
     "requirementOnMonday" : {
-      "minimum" : 1,
-      "optimal" : 1
+      "minimum" : 0,
+      "optimal" : 0
     },
     "requirementOnTuesday" : {
       "minimum" : 0,
-      "optimal" : 1
+      "optimal" : 0
     },
     "requirementOnWednesday" : {
-      "minimum" : 1,
-      "optimal" : 1
-    },
-    "requirementOnThursday" : {
       "minimum" : 0,
       "optimal" : 0
+    },
+    "requirementOnThursday" : {
+      "minimum" : 1,
+      "optimal" : 1
     },
     "requirementOnFriday" : {
       "minimum" : 0,
@@ -90,8 +90,8 @@
       "optimal" : 0
     },
     "requirementOnSunday" : {
-      "minimum" : 0,
-      "optimal" : 0
+      "minimum" : 1,
+      "optimal" : 1
     }
   }, {
     "shiftType" : "Late",
@@ -105,11 +105,11 @@
       "optimal" : 1
     },
     "requirementOnWednesday" : {
-      "minimum" : 0,
+      "minimum" : 1,
       "optimal" : 1
     },
     "requirementOnThursday" : {
-      "minimum" : 0,
+      "minimum" : 1,
       "optimal" : 1
     },
     "requirementOnFriday" : {
@@ -117,7 +117,7 @@
       "optimal" : 1
     },
     "requirementOnSaturday" : {
-      "minimum" : 1,
+      "minimum" : 0,
       "optimal" : 1
     },
     "requirementOnSunday" : {
@@ -128,16 +128,16 @@
     "shiftType" : "Night",
     "skill" : "HeadNurse",
     "requirementOnMonday" : {
-      "minimum" : 0,
-      "optimal" : 0
-    },
-    "requirementOnTuesday" : {
       "minimum" : 1,
       "optimal" : 1
     },
-    "requirementOnWednesday" : {
+    "requirementOnTuesday" : {
       "minimum" : 0,
       "optimal" : 0
+    },
+    "requirementOnWednesday" : {
+      "minimum" : 1,
+      "optimal" : 1
     },
     "requirementOnThursday" : {
       "minimum" : 0,
@@ -148,8 +148,8 @@
       "optimal" : 1
     },
     "requirementOnSaturday" : {
-      "minimum" : 1,
-      "optimal" : 1
+      "minimum" : 0,
+      "optimal" : 0
     },
     "requirementOnSunday" : {
       "minimum" : 0,
@@ -159,15 +159,15 @@
     "shiftType" : "Night",
     "skill" : "Nurse",
     "requirementOnMonday" : {
-      "minimum" : 0,
+      "minimum" : 1,
       "optimal" : 1
     },
     "requirementOnTuesday" : {
-      "minimum" : 1,
+      "minimum" : 0,
       "optimal" : 1
     },
     "requirementOnWednesday" : {
-      "minimum" : 1,
+      "minimum" : 0,
       "optimal" : 1
     },
     "requirementOnThursday" : {
@@ -179,7 +179,7 @@
       "optimal" : 1
     },
     "requirementOnSaturday" : {
-      "minimum" : 0,
+      "minimum" : 1,
       "optimal" : 1
     },
     "requirementOnSunday" : {
@@ -188,16 +188,20 @@
     }
   } ],
   "shiftOffRequests" : [ {
-    "nurse" : "NU_3",
+    "nurse" : "NU_4",
+    "shiftType" : "Late",
+    "day" : "Tuesday"
+  }, {
+    "nurse" : "HN_1",
     "shiftType" : "Any",
+    "day" : "Wednesday"
+  }, {
+    "nurse" : "NU_3",
+    "shiftType" : "Early",
     "day" : "Thursday"
   }, {
     "nurse" : "NU_3",
     "shiftType" : "Night",
-    "day" : "Saturday"
-  }, {
-    "nurse" : "HN_2",
-    "shiftType" : "Late",
-    "day" : "Saturday"
+    "day" : "Thursday"
   } ]
 }

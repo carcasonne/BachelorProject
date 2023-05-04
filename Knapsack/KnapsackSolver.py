@@ -263,7 +263,7 @@ class KnapsackSolver:
             boundedKnapsack = BoundedKnapsack(boundedItemGroups, cost)
             zeroOneKnapsack = boundedKnapsack.asZeroOne_simple()
             branchAndSearch = BranchAndBound_MODERN(zeroOneKnapsack, lowerBound)
-            branchAndSearch.startSearch(True, strictGrade3)
+            branchAndSearch.startSearch(True, False)
 
             solution = branchAndSearch.bestSolution
 

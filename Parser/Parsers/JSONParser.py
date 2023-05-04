@@ -16,7 +16,7 @@ class JSONParser:
         nursesJson = None
         workdaysJson = None
         try:
-            folder = "Example/" if example else "NurseRosteringCompetition/" 
+            folder = "Example/" if example else "NurseRosteringCompetition/"
             historyFile = open("Data/" + folder + scenario + "/history.json")
             historyJson = json.load(historyFile)
             nursesFile = open("Data/" + folder + scenario + "/scenario.json")
@@ -25,7 +25,7 @@ class JSONParser:
             workdaysJson = json.load(workdaysFile)
         except Exception as e:
             raise FileNotFoundError(str(e)) from e
-        
+
         nurses = []
         shifts = []
 
@@ -33,7 +33,7 @@ class JSONParser:
 
         self.fullTimeContract = None
         self.halfTimeContract = None
-        self.pastTimeContract = None
+        self.partTimeContract = None
         for jsonContract in nursesJson["contracts"]:
             # The json describes number of shifts to be covered in a month, while we only consider a single week
             days = jsonContract["maximumNumberOfAssignments"] // 4
@@ -49,7 +49,7 @@ class JSONParser:
             bWeekend = False if int(completeWeekend) == 0 else True
             contract.completeWeekend = bWeekend
 
-            #contract.completeWeekend = False
+            # contract.completeWeekend = False
 
             if jsonContract["id"] == "FullTime":
                 if not dynamicContractDays:
@@ -60,21 +60,21 @@ class JSONParser:
                 if not dynamicContractDays:
                     contract.days = 4
                     contract.nights = 3
-                self.halfTimeContract = contract
+                self.partTimeContract = contract
             elif jsonContract["id"] == "HalfTime":
                 if not dynamicContractDays:
                     contract.days = 3
                     contract.nights = 2
-                self.pastTimeContract = contract
-            
+                self.halfTimeContract = contract
+
             print(f"Contract working: {contract.days} days, {contract.nights} nights")
 
         # Ignored fields are:
-            # numberOfWeeks
-            # skills
-            # shiftTypes (soft constraints?)
-            # forbiddenShiftTypeSucessions (hard constraints?)
-            # contracts
+        # numberOfWeeks
+        # skills
+        # shiftTypes (soft constraints?)
+        # forbiddenShiftTypeSucessions (hard constraints?)
+        # contracts
         currentId = 0
         for nurse in nursesJson["nurses"]:
             rawId = nurse["id"]
@@ -111,52 +111,59 @@ class JSONParser:
                     Grade.THREE: 0
                 },
             }
-        
-        for i in chain(range(4), range(8,16)):
-            skill = shiftsRequirements[i]["skill"]
+
+        for i in chain(range(4), range(8, 16)):
+            try:
+                skill = shiftsRequirements[i]["skill"]
+            except Exception:
+                continue
+
             grade = self.skillToGrade(skill)
             shiftType = self.indexToShiftType(i)
 
             for day in shiftsRequirements[i]:
                 # Only interested in day requirements
-                if(day == "shiftType" or day == "skill"):
+                if (day == "shiftType" or day == "skill"):
                     continue
 
                 dayEnum = self.strToDay(day)
 
                 min = shiftsRequirements[i][day]["minimum"]
                 shiftsDict[dayEnum][shiftType][grade] += min
-        
+
         # Special case for the "Day" ShiftType
-        for i in range(4,8):
-            skill = shiftsRequirements[i]["skill"]
+        for i in range(4, 8):
+            try:
+                skill = shiftsRequirements[i]["skill"]
+            except Exception:
+                continue
             grade = self.skillToGrade(skill)
 
             for day in shiftsRequirements[i]:
                 # Only interested in day requirements
-                if(day == "shiftType" or day == "skill"):
+                if (day == "shiftType" or day == "skill"):
                     continue
-                
+
                 dayEnum = self.strToDay(day)
 
                 # Split the day requirements between EARLY and LATE
                 # In case of odd number, make it even and add remainder to LATE shift
                 min = shiftsRequirements[i][day]["minimum"]
                 remainder = 0
-                if(min % 2 != 0):
+                if (min % 2 != 0):
                     min -= 1
                     remainder += 1
 
                 min //= 2
-                
+
                 shiftsDict[dayEnum][ShiftType.EARLY][grade] += min
                 shiftsDict[dayEnum][ShiftType.LATE][grade] += min + remainder
 
         for day in Days:
-            for shiftType in ShiftType: 
-                gradeOne    = shiftsDict[day][shiftType][Grade.ONE]
-                gradeTwo    = shiftsDict[day][shiftType][Grade.TWO]
-                gradeThree  = shiftsDict[day][shiftType][Grade.THREE]
+            for shiftType in ShiftType:
+                gradeOne = shiftsDict[day][shiftType][Grade.ONE]
+                gradeTwo = shiftsDict[day][shiftType][Grade.TWO]
+                gradeThree = shiftsDict[day][shiftType][Grade.THREE]
 
                 # Create shift objects
                 # Make cover requirements cumulative
@@ -180,14 +187,14 @@ class JSONParser:
             day = self.strToDay(request["day"])
             # Manipulates given list undesiredShifts
             self.setUndesiredShifts(request["shiftType"], day, undesiredShifts)
-            
+
         return Schedule(shifts, nurses)
-    
+
     # nurseShifts: # List of 3 lists: Early shifts, late shifts, night shifts
-    def setUndesiredShifts(self, shiftReq, day:Days, nurseShifts):
+    def setUndesiredShifts(self, shiftReq, day: Days, nurseShifts):
         dayIndex = day.value - 1
         match shiftReq:
-            case "Early": 
+            case "Early":
                 nurseShifts[0][dayIndex] = 1
             case "Late":
                 nurseShifts[1][dayIndex] = 1
@@ -202,7 +209,7 @@ class JSONParser:
                 nurseShifts[2][dayIndex] = 1
             case _:
                 raise ValueError(f'{shiftReq} not recognized')
-        
+
     # Combine caretakers and nurses into the same grade
     # Debatable
     def getIdAndGrade(self, rawId):
@@ -219,7 +226,7 @@ class JSONParser:
         elif grade == "TR":
             grade = Grade.THREE
         return (grade, id)
-     
+
     def skillToGrade(self, skill):
         match skill:
             case "HeadNurse":
@@ -238,12 +245,12 @@ class JSONParser:
             case "FullTime":
                 return self.fullTimeContract
             case "PartTime":
-                return self.pastTimeContract
+                return self.partTimeContract
             case "HalfTime":
                 return self.halfTimeContract
             case _:
                 raise ValueError(f'{contractStr} not recognized')
-    
+
     def indexToShiftType(self, i):
         match i:
             case 0 | 1 | 2 | 3:
@@ -260,19 +267,19 @@ class JSONParser:
             case 1:
                 return Grade.ONE
             case 2:
-                return Grade.TWO 
+                return Grade.TWO
             case 3:
                 return Grade.THREE
             case _:
                 raise ValueError("A grade must be either 1,2, or 3")
-    
+
     def strToDay(self, day):
         day = day.lower()
         match day:
             case "monday" | "requirementonmonday":
                 return Days.MONDAY
             case "tuesday" | "requirementontuesday":
-                return Days.TUESDAY 
+                return Days.TUESDAY
             case "wednesday" | "requirementonwednesday":
                 return Days.WEDNESDAY
             case "thursday" | "requirementonthursday":
@@ -285,14 +292,14 @@ class JSONParser:
                 return Days.SUNDAY
             case _:
                 raise ValueError(f'{day} not recognized as a day')
-    
+
     def strToShiftType(self, shift):
         shift = shift.lower()
         match shift:
             case "early":
                 return ShiftType.EARLY
             case "late":
-                return ShiftType.LATE 
+                return ShiftType.LATE
             case "night":
                 return ShiftType.NIGHT
             case _:
