@@ -128,10 +128,10 @@ while counter < runs:
 
     difference = betterSolutionSchedule.getPenaltyScore() - solutionSchedule.getPenaltyScore()
     ipIsBetter = 0
-    if difference < 0:
+    if difference > 0:
         runsIpWorse = runsIpWorse + 1
         ipIsBetter = -1
-    elif difference > 0:
+    elif difference < 0:
         runsIpBetter = runsIpBetter + 1
         ipIsBetter = 1
 
