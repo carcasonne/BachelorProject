@@ -99,7 +99,8 @@ class TabuSearch_SIMPLE:
             else:  # if move does not change the day night split
                 self.dayNightCounter += 1
             self.currSolution = move[0]
-            self._safeMoveToExcel(self.iterations, self.currSolution.CC, self.currSolution.PC, self.currentPhase)
+            if self.excelSheet is not None:
+                self._safeMoveToExcel(self.iterations, self.currSolution.CC, self.currSolution.PC, self.currentPhase)
             return move[0]
 
     def run(self, maxRuns, useBalanceSwap, debugmode, oneKMoves):
