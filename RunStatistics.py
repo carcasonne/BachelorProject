@@ -90,7 +90,7 @@ while counter < runs:
         search = TabuSearch_SIMPLE(tabuSchedule)
         search.initSchedule()
         search.excelSheet = runWorkSheet
-        search.run(1, False, False)
+        search.run(1, False, False, False)
         end_tabu_time = time.time()
 
         print(f"Tabu penalty score: {search.bestSolution.PC}")

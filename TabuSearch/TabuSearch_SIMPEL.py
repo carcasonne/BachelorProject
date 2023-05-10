@@ -49,6 +49,7 @@ class TabuSearch_SIMPLE:
         self.stepsP2 = [0, 0, 0]
         self.stepsP3 = [0]
         self.iterations = 0
+        self.iterationsNoImprovements = 0
         self.currentPhase = 1
 
         self.useBalanceSwap = True
@@ -80,6 +81,7 @@ class TabuSearch_SIMPLE:
             return None
         else:
             self.iterations += 1
+            self.iterationsNoImprovements += 1
             if move[1]:  # If move changes the day night split
                 dayNurses = set()
                 for nurse in move[0].nurses:  # Find all nurses that works during the day
@@ -97,10 +99,11 @@ class TabuSearch_SIMPLE:
             else:  # if move does not change the day night split
                 self.dayNightCounter += 1
             self.currSolution = move[0]
-            self._safeMoveToExcel(self.iterations, self.currSolution.CC, self.currSolution.PC, self.currentPhase)
+            if self.excelSheet is not None:
+                self._safeMoveToExcel(self.iterations, self.currSolution.CC, self.currSolution.PC, self.currentPhase)
             return move[0]
 
-    def run(self, maxRuns, useBalanceSwap, debugmode):
+    def run(self, maxRuns, useBalanceSwap, debugmode, oneKMoves):
         """
         run. Execute Tabu Search with maxRuns amount of runs. Find out which solution is best according to PC and
         return that.
@@ -108,6 +111,10 @@ class TabuSearch_SIMPLE:
         """
         self.useBalanceSwap = useBalanceSwap
         self.debug = debugmode
+
+        if oneKMoves:
+            self.runOneKMoves()
+
         runs = 0
         if self.debug:
             print(str(self.currSolution))
@@ -124,6 +131,27 @@ class TabuSearch_SIMPLE:
         if self.debug:
             print(str(self.bestSolution))
         self._safeMoveToExcel(self.iterations+3, self.bestSolution.CC, self.bestSolution.PC, "Final solution, the best run")
+        return self.bestSolution
+
+    def runOneKMoves(self):
+        firstRun = True
+        runs = 0
+        if self.debug:
+            print(str(self.currSolution))
+
+        while (self.iterationsNoImprovements < 1000 or firstRun) and not self.foundOptimalSolution:
+            if runs % 10 == 0:
+                print("Initiating run #" + str(runs))
+            self._phase1()
+            self._phase2(runs)
+            self._phase3()
+
+            runs += 1
+            firstRun = False
+        if self.debug:
+            print(str(self.bestSolution))
+        self._safeMoveToExcel(self.iterations + 3, self.bestSolution.CC, self.bestSolution.PC,
+                              "Final solution, the best run")
         return self.bestSolution
 
     def _safeMoveToExcel(self, iteration, CC, PC, phase):
@@ -193,7 +221,10 @@ class TabuSearch_SIMPLE:
                             print()
                             if self.debug:
                                 print(str(self.currSolution))
+                            self.iterationsNoImprovements = 0
                             self.bestSolution = copy.deepcopy(self.currSolution)
+                        print("Iterations: " + str(self.iterations))
+                        print("Iterations since last improvement: " + str(self.iterationsNoImprovements))
                         break
                 else:
                     self.stepsP2[1] += 1
