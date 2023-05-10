@@ -48,9 +48,13 @@ class TabuSearch_SIMPLE:
         self.stepsP1 = [0, 0, 0, 0, 0, 0]
         self.stepsP2 = [0, 0, 0]
         self.stepsP3 = [0]
+        self.iterations = 0
+        self.currentPhase = 1
 
         self.useBalanceSwap = True
         self.debug = False
+
+        self.excelSheet = None
 
     def initSchedule(self):
         """
@@ -75,6 +79,7 @@ class TabuSearch_SIMPLE:
         if move is None:
             return None
         else:
+            self.iterations += 1
             if move[1]:  # If move changes the day night split
                 dayNurses = set()
                 for nurse in move[0].nurses:  # Find all nurses that works during the day
@@ -92,6 +97,7 @@ class TabuSearch_SIMPLE:
             else:  # if move does not change the day night split
                 self.dayNightCounter += 1
             self.currSolution = move[0]
+            self._safeMoveToExcel(self.iterations, self.currSolution.CC, self.currSolution.PC, self.currentPhase)
             return move[0]
 
     def run(self, maxRuns, useBalanceSwap, debugmode):
@@ -117,13 +123,22 @@ class TabuSearch_SIMPLE:
             runs += 1
         if self.debug:
             print(str(self.bestSolution))
+        self._safeMoveToExcel(self.iterations+3, self.bestSolution.CC, self.bestSolution.PC, "Final solution, the best run")
         return self.bestSolution
+
+    def _safeMoveToExcel(self, iteration, CC, PC, phase):
+        rowNumber = 1 + iteration
+        self.excelSheet[f"A{rowNumber}"] = iteration
+        self.excelSheet[f"B{rowNumber}"] = CC
+        self.excelSheet[f"C{rowNumber}"] = PC
+        self.excelSheet[f"D{rowNumber}"] = phase
 
     def _phase1(self):
         """
         phase1. Execute the moves in the following order: randomDescent, balanceRestoring, shiftChain, nurseChain,
         underCovering, randomKick.
         """
+        self.currentPhase = 1
         while self.currSolution.CC > 0:
             if self.makeMove(self.randomDecent(self.currSolution, 1)) is None:
                 if self.makeMove(self.balanceRestoring(self.currSolution, False)) is None:
@@ -160,6 +175,7 @@ class TabuSearch_SIMPLE:
         """
         phase1. Execute the moves in the following order: randomDescent, shiftChain, nurseChain.
         """
+        self.currentPhase = 2
         while self.currSolution.PC > 0:
             if self.makeMove(self.randomDecent(self.currSolution, 2)) is None:
                 if self.makeMove(self.shiftChain(self.currSolution, 2)) is None:
@@ -192,6 +208,7 @@ class TabuSearch_SIMPLE:
         """
         phase1. Execute the move searchStuck.
         """
+        self.currentPhase = 3
         if self.makeMove(self.searchStuck(self.currSolution)) is not None:
             self.stepsP3[0] += 1
             if self.debug:
