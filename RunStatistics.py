@@ -37,7 +37,7 @@ sheet["G8"] = "IP better than Network Flow"
 
 overviewStartCell = 9
 
-runs = 10
+runs = 1
 runsIpBetter = 0
 runsIpWorse = 0
 counter = 0
@@ -64,7 +64,7 @@ while counter < runs:
         print("----- Beginning PARSING -----")
         if useParser:
             parser = NurseParser()
-            schedule = parser.parseScenario("n005w4")
+            schedule = parser.parseScenario("n030w4")
         else:
             schedule = copy.deepcopy(TestTabuData().schedule)
 
@@ -90,7 +90,7 @@ while counter < runs:
         search = TabuSearch_SIMPLE(tabuSchedule)
         search.initSchedule()
         search.excelSheet = runWorkSheet
-        search.run(1, False, False, False)
+        search.run(100, False, False, True)
         end_tabu_time = time.time()
 
         print(f"Tabu penalty score: {search.bestSolution.PC}")
