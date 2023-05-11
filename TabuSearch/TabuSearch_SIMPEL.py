@@ -92,7 +92,7 @@ class TabuSearch_SIMPLE:
                     self.dayNightTabuList.pop(6)
                 self.dayNightCounter = 0
                 self.lowerBound = evaluateLB(move[0], self.feasiblePatterns)
-                if self.lowerBound < move[0].PC:
+                if self.lowerBound < self.bestSolution.PC:
                     self.maxits = 50
                 else:
                     self.maxits = 5
