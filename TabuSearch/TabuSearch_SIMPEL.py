@@ -113,7 +113,7 @@ class TabuSearch_SIMPLE:
         self.debug = debugmode
 
         if oneKMoves:
-            self.runOneKMoves()
+            self.runOneKMoves(maxRuns)
 
         runs = 0
         if self.debug:
@@ -133,13 +133,13 @@ class TabuSearch_SIMPLE:
         self._safeMoveToExcel(self.iterations+3, self.bestSolution.CC, self.bestSolution.PC, "Final solution, the best run")
         return self.bestSolution
 
-    def runOneKMoves(self):
+    def runOneKMoves(self, maxIterations):
         firstRun = True
         runs = 0
         if self.debug:
             print(str(self.currSolution))
 
-        while (self.iterationsNoImprovements < 1000 or firstRun) and not self.foundOptimalSolution:
+        while (self.iterationsNoImprovements < maxIterations or firstRun) and not self.foundOptimalSolution:
             if runs % 10 == 0:
                 print("Initiating run #" + str(runs))
             self._phase1()
@@ -204,7 +204,7 @@ class TabuSearch_SIMPLE:
         phase1. Execute the moves in the following order: randomDescent, shiftChain, nurseChain.
         """
         self.currentPhase = 2
-        while self.currSolution.PC > 0:
+        while True:
             if self.makeMove(self.randomDecent(self.currSolution, 2)) is None:
                 if self.makeMove(self.shiftChain(self.currSolution, 2)) is None:
                     if self.makeMove(self.nurseChain(self.currSolution, 2)) is not None:
@@ -223,8 +223,9 @@ class TabuSearch_SIMPLE:
                                 print(str(self.currSolution))
                             self.iterationsNoImprovements = 0
                             self.bestSolution = copy.deepcopy(self.currSolution)
-                        print("Iterations: " + str(self.iterations))
-                        print("Iterations since last improvement: " + str(self.iterationsNoImprovements))
+                        if self.debug:
+                            print("Iterations: " + str(self.iterations))
+                            print("Iterations since last improvement: " + str(self.iterationsNoImprovements))
                         break
                 else:
                     self.stepsP2[1] += 1
@@ -264,20 +265,25 @@ class TabuSearch_SIMPLE:
         if self.dayNightCounter >= self.maxits:
             return self.descentDayNightChange(schedule, phase)
 
+        #Set up to make random descent truly random:
+        randomIds = []
         for nurse in schedule.nurses:
-            if nurse.id not in self.tabuList:
-                for pattern in self.feasiblePatterns[nurse.id]:
-                    if (nurse.worksNight and pattern.day == [0] * 7) or (
-                            not nurse.worksNight and pattern.day != [0] * 7):
-                        if (calculateDifferenceCC(schedule, nurse, pattern) < 0 and calculateDifferencePC(nurse,
-                                                                                                          pattern) <= 0 and phase == 1) or (
-                                calculateDifferencePC(nurse, pattern) < 0 and calculateDifferenceCC(schedule, nurse,
-                                                                                                    pattern) <= 0 and phase == 2):
+            randomIds.append(nurse.id)
+        random.shuffle(randomIds)
+
+        for id in randomIds:
+            if id not in self.tabuList:
+                for pattern in self.feasiblePatterns[id]:
+                    currNurse = schedule.nurses[id]
+                    if (currNurse.worksNight and pattern.day == [0] * 7) or (
+                            not currNurse.worksNight and pattern.day != [0] * 7):
+                        if (calculateDifferenceCC(schedule, currNurse, pattern) < 0 and calculateDifferencePC(currNurse, pattern) <= 0 and phase == 1) or (
+                                calculateDifferencePC(currNurse, pattern) < 0 and calculateDifferenceCC(schedule, currNurse, pattern) <= 0 and phase == 2):
                             neighbour = copy.deepcopy(schedule)
-                            n_nurse = neighbour.nurses[nurse.id]
+                            n_nurse = neighbour.nurses[currNurse.id]
                             neighbour.assignPatternToNurse(n_nurse, pattern)
                             self.tabuList = []
-                            self.tabuList.append(nurse.id)
+                            self.tabuList.append(currNurse.id)
                             return neighbour, False
         return None
 
