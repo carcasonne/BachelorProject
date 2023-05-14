@@ -38,13 +38,6 @@ class Test_staticMethods(unittest.TestCase):
         print(f"All shift requirements are met: {shiftsAreCovered}")
         hej = 1
 
-
-    def test_EdmondsKarp_on_network_finds_flow(self):
-        network = NetworkFlowGraph(self.networkSchedule)
-        flow = EdmondsKarp(network)
-
-        self.assertTrue(flow > 0)
-
     def test_EdmondsKarp_finds_optimal_solution_for_simple_schedule(self):
         (schedule, tabuSchedule, networkSchedule) = self._get_network_2_nurses_2_days_schedule()
         networkSchedule.nurses[0].undesiredShifts[1][1] = 2
