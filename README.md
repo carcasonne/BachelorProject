@@ -3,6 +3,12 @@ This is the git repository containing the code for the Bachelor project by Caspe
 
 ## Run the project
 
+Start by installing the necessary requirements:
+
+```
+pip install -r requirements.txt
+```
+
 The project can be run via the RunStatistics python file. In the file the scenario to look at, and how many runs to make, can be specificed:
 
 ```
