@@ -9,7 +9,7 @@ Start by installing the necessary requirements:
 pip install -r requirements.txt
 ```
 
-The project can be run via the RunStatistics python file. In the file the scenario to look at, and how many runs to make, can be specificed:
+The project can be run via the RunStatistics python file. The runned scenario can be changed in the file RunStatistics.py. It can also be specified how many runs to make and if you want debugging prints:
 
 ```
 python RunStatistics.py
